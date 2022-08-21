@@ -1,0 +1,10 @@
+# test file
+---
+- hosts: all
+  remote_user: vagrant
+  become: true
+  roles:
+    - ../../
+#  vars:
+#    # See: https://github.com/ansible/ansible/issues/63354
+#    hostname_use_strategy: systemd

@@ -1,0 +1,27 @@
+# meta file
+---
+galaxy_info:
+  namespace: oefenweb
+  role_name: docker
+  author: Mischa ter Smitten
+  company: Oefenweb.nl B.V.
+  description: Set up the latest version of Docker Engine in Debian-like systems
+  license: Apache v2.0
+  min_ansible_version: 2.9.0
+  platforms:
+    - name: Ubuntu
+      versions:
+        - xenial
+        - bionic
+        - focal
+    - name: Debian
+      versions:
+        - jessie
+        - stretch
+        - buster
+  galaxy_tags:
+    - development
+    - packaging
+    - system
+    - docker
+dependencies: []

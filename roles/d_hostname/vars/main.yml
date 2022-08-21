@@ -1,0 +1,4 @@
+# vars file
+---
+hostname_dependencies:
+  - dbus

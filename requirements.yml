@@ -1,0 +1,30 @@
+- name: d_apt
+  src: https://github.com/Oefenweb/ansible-apt
+
+- name: d_ca_certificates  
+  src: https://github.com/Oefenweb/ansible-ca-certificates
+
+- name: d_bash
+  src: https://github.com/Oefenweb/ansible-bash
+
+- name: d_docker
+  src: https://github.com/Oefenweb/ansible-docker
+
+- name: d_docker_compose
+  src: https://github.com/Oefenweb/ansible-docker-compose
+
+- name: d_dns
+  src: https://github.com/Oefenweb/ansible-dns
+
+- name: d_hostname
+  src: https://github.com/Oefenweb/ansible-hostname
+
+- name: d_ssh_keys
+  src: https://github.com/Oefenweb/ansible-ssh-keys
+
+- name: d_sudoers
+  src: https://github.com/Oefenweb/ansible-sudoers
+
+- name: d_vim
+  src: https://github.com/Oefenweb/ansible-vim
+

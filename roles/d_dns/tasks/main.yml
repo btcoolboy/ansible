@@ -1,0 +1,83 @@
+# tasks file
+---
+- name: remove resolvconf
+  ansible.builtin.apt:
+    name: resolvconf
+    state: absent
+  when: dns_remove_resolvconf
+  tags:
+    - configuration
+    - dns
+    - dns-remove-resolvconf
+
+- name: get resolvconf file stats
+  ansible.builtin.stat:
+    path: "{{ dns_resolvconf_file }}"
+  register: _resolvconf_file_stats
+  when: dns_remove_resolvconf
+  tags:
+    - configuration
+    - dns
+    - dns-resolvconf-file-stats
+
+- name: remove resolvconf symlink
+  ansible.builtin.file:
+    path: "{{ dns_resolvconf_file }}"
+    state: absent
+  when:
+    - dns_remove_resolvconf
+    - _resolvconf_file_stats is defined
+    - _resolvconf_file_stats.stat is defined
+    - _resolvconf_file_stats.stat.islnk
+  tags:
+    - configuration
+    - dns
+    - dns-remove-resolvconf
+
+- name: configure dns servers - /etc/resolv.conf
+  ansible.builtin.template:
+    src: etc/resolv.conf.j2
+    dest: "{{ dns_resolvconf_file }}"
+    mode: 0644
+  tags:
+    - configuration
+    - dns
+    - dns-configure-resolvconf
+
+- name: get dhclient file stats
+  ansible.builtin.stat:
+    path: "{{ dns_dhclient_file }}"
+  register: _dhclient_file_stats
+  tags:
+    - configuration
+    - dns
+    - dns-dhclient-file-stats
+
+- name: check dhclient file stats
+  ansible.builtin.fail:
+    msg: "dhclient file not found"
+  when: not _dhclient_file_stats.stat.exists
+  tags:
+    - configuration
+    - dns
+    - dns-dhclient-file-stats
+
+- name: configure dns servers - dhclient file  # noqa var-spacing
+  ansible.builtin.lineinfile:
+    regexp: '^(.*)(supersede|prepend) {{ item.name }} (.*);$'
+    backrefs: true
+    line: '\1{{ dns_dhclient_rules[item.name].rule }} {{ item.name }} {{ item.value }};'
+    dest: "{{ dns_dhclient_file }}"
+    state: present
+  with_items:
+    - name: 'domain-name'
+      value: '"{{ dns_domain }}"'
+    - name: 'domain-name-servers'
+      value: '{% for dns_nameserver in dns_nameservers %}{{ dns_nameserver }}{% if not loop.last %}, {% endif %}{% endfor %}'
+    - name: 'domain-search'
+      value: '{% for dns_search in dns_searches %}"{{ dns_search }}"{% if not loop.last %}, {% endif %}{% endfor %}'
+  when: item.value
+  tags:
+    - configuration
+    - dns
+    - dns-configure-dhclient-file
