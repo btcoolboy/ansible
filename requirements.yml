@@ -28,3 +28,5 @@
 - name: d_vim
   src: https://github.com/Oefenweb/ansible-vim
 
+- name: d_timezone
+  src: https://github.com/Oefenweb/ansible-timezone

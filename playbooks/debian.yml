@@ -44,3 +44,6 @@
         ssh_keys_authorized_keys:
           - owner: debian
             src: files/id_rsa.pub
+    - role: d_timezone
+      vars:
+        timezone_zone: Asia/Shanghai
