@@ -1,0 +1,46 @@
+---
+- hosts: debian
+  remote_user: debian
+  roles:
+    - role: d_dns
+      vars:
+        dns_domain: cloud.lab
+        dns_nameservers: [10.200.101.20, 10.200.101.254]
+        dns_searches: [cloud.lab]
+    - role: d_apt
+      vars:
+        apt_manage_sources_list: true
+        apt_debian_mirror: http://vm-data-20.cloud.lab:8081/repository/debian/ 
+        apt_debian_security_mirror: http://vm-data-20.cloud.lab:8081/repository/debian-security/ 
+        apt_debian_contrib_nonfree_enable: true
+    - role: d_bash
+    - role: d_vim
+    - role: d_ca_certificates
+      vars:
+        ca_certificates_certificate_map:
+          - src: ca.crt 
+            dest: cloud.lab/ca.crt
+    - role: d_sudoers
+      vars:
+        sudoers_sudoers:
+          defaults:
+            - env_reset
+            - exempt_group=sudo
+            - mail_badpass
+            - secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+          privileges:
+            - name: root
+              entry: "ALL=(ALL:ALL) ALL"
+            - name: "%sudo"
+              entry: "ALL=(ALL:ALL) NOPASSWD:ALL"
+    - role: d_ssh_keys
+      vars:
+        ssh_keys_private_keys:
+          - owner: debian
+            src: files/id_rsa
+        ssh_keys_public_keys:
+          - owner: debian
+            src: files/id_rsa.pub
+        ssh_keys_authorized_keys:
+          - owner: debian
+            src: files/id_rsa.pub

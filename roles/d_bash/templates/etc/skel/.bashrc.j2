@@ -96,7 +96,7 @@ if [ "$color_prompt" = 'yes' ]; then
       PS1='${yellow}$(jot -s "" -b "." ${COLUMNS})${end}\n'
       PS1+='${blue}$(date "+%F %T")${end}\n'
       PS1+='${red}$(id -un)@$(hostname)${end}${white}:${end}${green}${PWD}${end}\n'
-      PS1+='# '
+      PS1+='$ '
     fi
   fi
   unset fancy_prompt
