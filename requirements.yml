@@ -39,3 +39,9 @@
 
 - name: d_network_interfaces
   src: https://github.com/Oefenweb/ansible-network-interfaces
+
+- name: d_ntp
+  src: https://github.com/Oefenweb/ansible-ntp
+
+- name: d_logrotated
+  src: https://github.com/Oefenweb/ansible-logrotated
