@@ -30,3 +30,12 @@
 
 - name: d_timezone
   src: https://github.com/Oefenweb/ansible-timezone
+
+- name: u_netplan
+  src: https://github.com/Oefenweb/ansible-netplan
+
+- name: d_swapfile
+  src: https://github.com/Oefenweb/ansible-swapfile
+
+- name: d_network_interfaces
+  src: https://github.com/Oefenweb/ansible-network-interfaces
