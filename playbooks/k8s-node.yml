@@ -1,0 +1,21 @@
+---
+- hosts: k8s
+  remote_user: ubuntu
+  tasks:
+    - name: Install a list of packages
+      apt:
+        pkg:
+        - open-iscsi
+        - xfsprogs
+        - socat
+        - conntrack
+        - ebtables
+        - ipset
+        - ipvsadm
+        update_cache: yes
+        state: present
+    - name: Make sure iscsid is running
+      ansible.builtin.systemd:
+        name: iscsid
+        state: started
+        enabled: yes

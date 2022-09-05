@@ -1,4 +1,16 @@
 [ubuntu]
+10.200.101.160
 10.200.101.190
+10.200.101.191
 [debian]
 10.200.101.180
+[k8s]
+k8s-master03
+k8s-master02
+k8s-worker02
+k8s-master01
+k8s-worker01
+k8s-worker03
+k8s-worker05
+k8s-worker04
+k8s-worker06
