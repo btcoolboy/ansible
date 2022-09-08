@@ -45,3 +45,6 @@
 
 - name: d_logrotated
   src: https://github.com/Oefenweb/ansible-logrotated
+
+- name: d_user
+  src: https://github.com/Oefenweb/ansible-user

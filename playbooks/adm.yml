@@ -1,0 +1,27 @@
+---
+- hosts: adm
+  remote_user: ubuntu
+  no_log: false  
+  roles:
+    - role: d_user
+      vars:
+        user_groups:
+          - name: rocky
+            gid: 1001
+        user_users:
+          - name: rocky
+            gid: 1001
+            group: rocky
+            groups: 
+              - sudo
+    - role: d_ssh_keys
+      vars:
+        ssh_keys_private_keys:
+          - owner: rocky
+            src: files/id_rsa
+        ssh_keys_public_keys:
+          - owner: rocky
+            src: files/id_rsa.pub
+        ssh_keys_authorized_keys:
+          - owner: rocky
+            src: files/id_rsa.pub
