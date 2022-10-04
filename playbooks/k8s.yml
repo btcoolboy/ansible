@@ -12,6 +12,8 @@
         - ebtables
         - ipset
         - ipvsadm
+        - nfs-common
+        - ceph-common
         update_cache: yes
         state: present
     - name: Make sure iscsid is running
@@ -19,3 +21,20 @@
         name: iscsid
         state: started
         enabled: yes
+  roles:
+    - role: containerd
+      vars:
+        containerd_repo: http://vm-data-20.cloud.lab:8081/repository/docker-apt/
+        containerd_registry_mirrors:
+          - name: docker.io
+            endpoint:
+              - http://10.200.101.20:8083
+          - name: quay.io
+            endpoint:
+              - http://10.200.101.20:8083
+          - name: gcr.io
+            endpoint:
+              - http://10.200.101.20:8083
+          - name: k8s.gcr.io
+            endpoint:
+              - http://10.200.101.20:8083
