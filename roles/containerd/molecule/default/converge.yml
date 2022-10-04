@@ -1,0 +1,8 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include containerd"
+      include_role:
+        name: "containerd"
+        

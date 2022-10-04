@@ -1,0 +1,7 @@
+---
+- name: "restart containerd"
+  ansible.builtin.systemd:
+    name: "containerd"
+    enabled: true
+    state: restarted
+  throttle: "{{ containerd_restart_disruption_budget }}"

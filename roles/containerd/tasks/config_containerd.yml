@@ -1,0 +1,143 @@
+---
+- name: Ensure containerd directories exists
+  ansible.builtin.file:
+    state: directory
+    path: "{{ item.dir }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - dir: "{{ containerd_data_root }}"
+      mode: "0711"
+    - dir: /etc/containerd
+      mode: "0700"
+
+- name: Check if containerd config exists
+  ansible.builtin.stat:
+    path: /etc/containerd/config.toml
+  register: containerd_config
+
+- name: Check if containerd is properly configured
+  ansible.builtin.command: 'egrep -v "^$|^#|^disabled_plugins" /etc/containerd/config.toml'
+  register: containerd_config_lines
+  when: containerd_config.stat.exists
+  failed_when: false
+  changed_when: false
+
+- name: Configure containerd
+  ansible.builtin.shell: "containerd config default > /etc/containerd/config.toml"
+  when: not containerd_config.stat.exists or containerd_config_lines.stdout_lines | length == 0
+  notify: restart containerd
+
+- name: Configure containerd data root
+  ansible.builtin.lineinfile:
+    regexp: "^root *=.*"
+    line: 'root = "{{ containerd_data_root }}"'
+    path: /etc/containerd/config.toml
+
+- name: Configure cri plugin section
+  ansible.builtin.lineinfile:
+    line: "{{ item.line | indent(item.indent, true) }}"
+    regexp: '^ *\[{{ item.line }}\]'
+    insertafter: '^ *\[{{ item.parent }}\]'
+    path: /etc/containerd/config.toml
+  with_items:
+    - line: '[plugins."io.containerd.grpc.v1.cri"]'
+      parent: 'plugins'
+      indent: 2
+    - line: '[plugins."io.containerd.grpc.v1.cri".cni]'
+      parent: 'plugins."io.containerd.grpc.v1.cri"'
+      indent: 4
+
+- name: Configure CNI parameters
+  ansible.builtin.lineinfile:
+    line: '      {{ item.name }} = "{{ item.value }}"'
+    regexp: '^ +{{ item.name }} *= *'
+    insertafter: '^ *\[plugins."io.containerd.grpc.v1.cri".cni\]'
+    path: /etc/containerd/config.toml
+  with_items:
+    - name: bin_dir
+      value: "{{ containerd_cni_bin_dir }}"
+    - name: conf_dir
+      value: "{{ containerd_cni_conf_dir }}"
+
+- name: Configure containerd daemon slice
+  ansible.builtin.lineinfile:
+    line: '  path = "{{ containerd_daemon_slice }}"'
+    regexp: '^  path = *'
+    insertafter: '^\[cgroup\]'
+    path: /etc/containerd/config.toml
+  when: containerd_daemon_slice is defined
+
+- name: Configure shim cgroup for runc
+  ansible.builtin.lineinfile:
+    line: '            ShimCgroup = "{{ containerd_shim_slice }}"'
+    regexp: '^            ShimCgroup = *'
+    insertafter: '^          \[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options\]'
+    path: /etc/containerd/config.toml
+  when: containerd_shim_slice is defined
+
+- name: Configure cgroup driver for runc
+  ansible.builtin.lineinfile:
+    line: '            SystemdCgroup = {{ containerd_systemd_cgroup | ternary("true", "false") }}'
+    regexp: '^            SystemdCgroup = *'
+    insertafter: '^          \[plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options\]'
+    path: /etc/containerd/config.toml
+  when: containerd_systemd_cgroup is defined
+
+- name: Registry mirrors configuration
+  block:
+  - name: Configure cri plugin registry section
+    ansible.builtin.lineinfile:
+      line: "{{ item.line | indent(item.indent, true) }}"
+      regexp: '^ *\[{{ item.line }}\]'
+      insertafter: '^ *\[{{ item.parent }}\]'
+      path: /etc/containerd/config.toml
+    with_items:
+      - line: '[plugins."io.containerd.grpc.v1.cri".registry]'
+        parent: 'plugins."io.containerd.grpc.v1.cri"'
+        indent: 4
+      - line: '[plugins."io.containerd.grpc.v1.cri".registry.mirrors]'
+        parent: 'plugins."io.containerd.grpc.v1.cri".registry'
+        indent: 6
+
+  - name: Docker.io mirror configuration
+    block:
+    - name: Ensure docker.io mirror configuration does not exists
+      ansible.builtin.lineinfile:
+        regexp: '^ *\[plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"\]'
+        state: absent
+        path: /etc/containerd/config.toml
+
+    - name: Remove default docker.io mirror
+      ansible.builtin.lineinfile:
+        regexp: '^ * endpoint = \["https://registry-1.docker.io"\]'
+        state: absent
+        path: /etc/containerd/config.toml
+    when: dockerio_endpoint | length > 0 and (not containerd_config.stat.exists or containerd_config_lines.stdout_lines | length == 0)
+    vars:
+      dockerio_endpoint: "{{ containerd_registry_mirrors | json_query('[?name==`docker.io`].endpoint[]') }}"
+
+  - name: Configure registry mirrors
+    ansible.builtin.blockinfile:
+      marker: "# {mark} ANSIBLE MANAGED MIRRORS"
+      insertafter: '^ *\[plugins."io.containerd.grpc.v1.cri".registry.mirrors\]'
+      block: '{{ lookup("template", role_path + "/templates/registry_mirrors.toml.j2") }}'
+      path: /etc/containerd/config.toml
+    notify: restart containerd
+
+  - name: Configure cri plugin registry config section
+    ansible.builtin.lineinfile:
+      line: '      [plugins."io.containerd.grpc.v1.cri".registry.configs]'
+      regexp: '^ *\[plugins."io.containerd.grpc.v1.cri".registry.configs\]'
+      insertafter: '^ *\[plugins."io.containerd.grpc.v1.cri".registry\]'
+      path: /etc/containerd/config.toml
+
+  when: containerd_registry_mirrors is defined and containerd_registry_mirrors | length > 0
+
+- name: Configure registry parameters
+  ansible.builtin.blockinfile:
+    marker: "# {mark} ANSIBLE MANAGED REGISTRY CONFIG"
+    insertafter: '^ *\[plugins."io.containerd.grpc.v1.cri".registry.configs\]'
+    block: '{{ lookup("template", role_path + "/templates/registry_config.toml.j2") }}'
+    path: /etc/containerd/config.toml
+  notify: restart containerd
+  when: containerd_registry_configs is defined and containerd_registry_configs | length > 0

@@ -31,8 +31,10 @@
           privileges:
             - name: root
               entry: "ALL=(ALL:ALL) ALL"
+            - name: "debian"
+              entry: "ALL=(ALL) NOPASSWD:ALL"
             - name: "%sudo"
-              entry: "ALL=(ALL:ALL) NOPASSWD:ALL"
+              entry: "ALL=(ALL:ALL) ALL"
     - role: d_ssh_keys
       vars:
         ssh_keys_private_keys:

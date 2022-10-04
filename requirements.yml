@@ -48,3 +48,6 @@
 
 - name: d_user
   src: https://github.com/Oefenweb/ansible-user
+
+- name: containerd
+  src: https://github.com/incubateur-pe/containerd

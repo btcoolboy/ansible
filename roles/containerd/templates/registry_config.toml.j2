@@ -1,0 +1,16 @@
+#jinja2: lstrip_blocks: 'True'
+{% for registry in containerd_registry_configs %}
+        [plugins."io.containerd.grpc.v1.cri".registry.configs."{{ registry.name }}"]
+  {% for key in registry.keys() %}
+    {% if key != "name" %}
+          [plugins."io.containerd.grpc.v1.cri".registry.configs."{{ registry.name }}".{{ key }}]
+      {% for key,value in registry[key].items() %}
+        {% if value is boolean %}
+            {{ key }} = {{ value | ternary('true', 'false') }}
+        {% else %}
+            {{ key }} = "{{ value }}"
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+  {% endfor %}
+{% endfor %}
