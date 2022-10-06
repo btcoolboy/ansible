@@ -1,0 +1,7 @@
+---
+warn_list:
+  - role-name
+  - name[casing]
+  - '204'
+  - '405'
+  - '601'

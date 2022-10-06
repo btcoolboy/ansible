@@ -1,0 +1,54 @@
+# tasks file
+---
+- name: install
+  apt:
+    name: "{{ sysfs_dependencies }}"
+    state: "{{ apt_install_state | default('latest') }}"
+    update_cache: true
+    cache_valid_time: "{{ apt_update_cache_valid_time | default(3600) }}"
+  tags:
+    - configuration
+    - sysfs
+    - sysfs-install
+
+- name: validate actions
+  fail:
+    msg: "Action {{ item.value.action }} is not supported"
+  when:
+    - item.value.action is defined
+    - item.value.action not in sysfs_actions_supported
+  with_dict: "{{ sysfs_sysfs_d_files }}"
+  tags:
+    - configuration
+    - sysfs
+    - sysfs-validate
+
+- name: create (configuration) directory
+  file:
+    path: /etc/sysfs.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  tags:
+    - configuration
+    - sysfs
+    - sysfs-configuration
+    - sysfs-configuration-sysfs-d
+    - sysfs-configuration-sysfs-d-directory
+
+- name: update specific configuration files
+  template:
+    src: etc/sysfs.d/sysfs.conf.j2
+    dest: "/etc/sysfs.d/{{ item.key }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_dict: "{{ sysfs_sysfs_d_files }}"
+  notify: restart sysfsutils
+  tags:
+    - configuration
+    - sysfs
+    - sysfs-configuration
+    - sysfs-configuration-sysfs-d
+    - sysfs-configuration-sysfs-d-files

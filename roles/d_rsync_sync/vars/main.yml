@@ -1,0 +1,10 @@
+# vars file
+---
+rsync_sync_dependencies:
+  - rsync
+  - cron
+
+rsync_sync_configuration_path: /etc/rsync-sync
+rsync_sync_required_paths:
+  - "{{ rsync_sync_configuration_path }}"
+  - /etc/cron.d

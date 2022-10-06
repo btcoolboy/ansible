@@ -1,0 +1,6 @@
+# vars file
+---
+snmpd_dependencies:
+  - snmpd
+  - snmp
+  - snmp-mibs-downloader
