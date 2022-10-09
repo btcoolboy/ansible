@@ -1,19 +1,18 @@
 ---
-- hosts: k8s
-  remote_user: ubuntu
+- hosts: rocky
+  remote_user: rocky
   tasks:
     - name: Install a list of packages
-      apt:
-        pkg:
-        - open-iscsi
+      yum:
+        name:
+        - iscsi-initiator-utils
         - xfsprogs
         - socat
         - conntrack
         - ebtables
         - ipset
         - ipvsadm
-        - nfs-common
-        - ceph-common
+        - nfs-utils
         update_cache: yes
         state: present
     - name: Make sure iscsid is running
@@ -24,7 +23,8 @@
   roles:
     - role: c_containerd
       vars:
-        containerd_repo: http://vm-data-20.cloud.lab:8081/repository/docker-apt/
+        containerd_repo: http://vm-data-20.cloud.lab:8081/repository/docker-yum/
+        containerd_repo_address: http://vm-data-20.cloud.lab:8081/repository/docker-yum/centos/
         containerd_registry_mirrors:
           - name: docker.io
             endpoint:

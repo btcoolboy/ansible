@@ -1,3 +1,10 @@
+# common
+- name: c_containerd
+  src: https://github.com/incubateur-pe/containerd
+
+- name: c_docker
+  src: https://github.com/geerlingguy/ansible-role-docker
+
 # debian/ubuntu
 - name: d_ansible
   src: https://github.com/Oefenweb/ansible-ansible
@@ -19,13 +26,7 @@
   
 - name: d_dns
   src: https://github.com/Oefenweb/ansible-dns
-
-- name: d_docker
-  src: https://github.com/Oefenweb/ansible-docker
-
-- name: d_docker_compose
-  src: https://github.com/Oefenweb/ansible-docker-compose
-
+    
 - name: d_fail2ban
   src: https://github.com/Oefenweb/ansible-fail2ban
   
@@ -115,7 +116,3 @@
 
 - name: u_netplan
   src: https://github.com/Oefenweb/ansible-netplan
-  
-# common
-- name: containerd
-  src: https://github.com/incubateur-pe/containerd

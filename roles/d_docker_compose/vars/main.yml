@@ -1,3 +1,0 @@
-# vars file
----
-docker_compose_downloads_path: /var/lib/ansible/docker-compose/downloads
