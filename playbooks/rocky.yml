@@ -38,3 +38,6 @@
           - name: k8s.gcr.io
             endpoint:
               - http://10.200.101.20:8083
+          - name: registry.k8s.io
+            endpoint:
+              - http://10.200.101.20:8083
