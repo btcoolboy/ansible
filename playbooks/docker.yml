@@ -5,10 +5,13 @@
   roles:
     - role: c_docker
       vars:
-        docker_repo_url: http://vm-data-20.cloud.lab:8081/repository/docker-apt/
+        docker_repo_url: http://vm-data-20.cloud.lab:8081/repository/docker-apt
         docker_daemon_options:
           insecure-registries:
+            - http://10.200.101.20:8084
             - http://10.200.101.20:8083
             - http://10.200.101.20:8082
           registry-mirrors:
+            - http://10.200.101.20:8084
             - http://10.200.101.20:8083
+            - http://10.200.101.20:8082
