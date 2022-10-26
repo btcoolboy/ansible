@@ -1,6 +1,5 @@
 ---
 - hosts: ubuntu
-  remote_user: ubuntu
   roles:
     - role: d_apt
       vars:
