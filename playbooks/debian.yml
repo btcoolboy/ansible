@@ -1,6 +1,5 @@
 ---
 - hosts: debian
-  remote_user: debian
   roles:
     - role: d_dns
       vars:
