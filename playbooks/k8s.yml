@@ -30,7 +30,7 @@
               - http://10.200.101.20:8083
           - name: quay.io
             endpoint:
-              - http://10.200.101.20:8083
+              - http://10.200.101.20:8084
           - name: gcr.io
             endpoint:
               - http://10.200.101.20:8083
