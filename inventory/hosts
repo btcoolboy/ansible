@@ -1,6 +1,5 @@
 [ubuntu]
 ubuntu-template ansible_host=10.200.101.160
-
 [ubuntu:children]
 k8s
 adm
@@ -18,7 +17,6 @@ k8s-adm
 
 [docker]
 ubuntu-docker-template ansible_host=10.200.101.161
-
 [docker:children]
 ceph
 
