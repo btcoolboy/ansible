@@ -1,7 +1,5 @@
 ---
 - hosts: adm
-  remote_user: ubuntu
-  no_log: false  
   roles:
     - role: d_user
       vars:
