@@ -1,0 +1,5 @@
+---
+ubuntu:
+  vars:
+    ansible_connection: ssh
+    ansible_user: ubuntu
