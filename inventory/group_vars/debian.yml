@@ -3,3 +3,4 @@ debian:
   vars:
     ansible_connection: ssh
     ansible_user: debian
+    become: yes
