@@ -1,6 +1,5 @@
 ---
 - hosts: k8s
-  remote_user: ubuntu
   tasks:
     - name: Install a list of packages
       apt:
