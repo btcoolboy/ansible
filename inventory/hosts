@@ -4,16 +4,8 @@ k8s
 adm
 docker
 
-[ubuntu:vars]
-ansible_connection=ssh
-ansible_user=ubuntu
-
 [debian]
 debian-template ansible_host=10.200.101.180
-
-[debian:vars]
-ansible_connection=ssh
-ansible_user=debian
 
 [k8s]
 k8s-master[01:03]
