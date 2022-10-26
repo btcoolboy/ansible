@@ -1,6 +1,4 @@
 ---
-ubuntu:
-  vars:
-    ansible_connection: ssh
-    ansible_user: ubuntu
-    become: yes
+ansible_connection: ssh
+ansible_user: ubuntu
+become: yes
