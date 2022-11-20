@@ -1,4 +1,7 @@
 # common
+- name: c_chrony
+  src: https://github.com/mrlesmithjr/ansible-chrony
+
 - name: c_containerd
   src: https://github.com/incubateur-pe/containerd
 
@@ -21,9 +24,6 @@
 - name: d_ca_certificates  
   src: https://github.com/Oefenweb/ansible-ca-certificates
 
-- name: d_chrony
-  src: https://github.com/mrlesmithjr/ansible-chrony
-  
 - name: d_dns
   src: https://github.com/Oefenweb/ansible-dns
     

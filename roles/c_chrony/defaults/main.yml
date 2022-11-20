@@ -81,23 +81,30 @@ chrony_maxupdateskew: 100.0
 #       - option: maxsources
 #         val: 3
 #
+#chrony_ntp_servers:
+#  - server: 0.debian.pool.ntp.org
+#    options:
+#      - option: iburst
+#      - option: minpoll
+#        val: 8
+#  - server: 1.debian.pool.ntp.org
+#    options:
+#      - option: iburst
+#      - option: minpoll
+#        val: 8
+#  - server: 2.debian.pool.ntp.org
+#    options:
+#      - option: iburst
+#      - option: minpoll
+#        val: 8
+#  - server: 3.debian.pool.ntp.org
+#    options:
+#      - option: iburst
+#      - option: minpoll
+#        val: 8
+
 chrony_ntp_servers:
-  - server: 0.debian.pool.ntp.org
-    options:
-      - option: iburst
-      - option: minpoll
-        val: 8
-  - server: 1.debian.pool.ntp.org
-    options:
-      - option: iburst
-      - option: minpoll
-        val: 8
-  - server: 2.debian.pool.ntp.org
-    options:
-      - option: iburst
-      - option: minpoll
-        val: 8
-  - server: 3.debian.pool.ntp.org
+  - server: 10.200.101.20
     options:
       - option: iburst
       - option: minpoll

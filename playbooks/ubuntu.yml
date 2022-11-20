@@ -40,3 +40,4 @@
     - role: d_timezone
       vars:
         timezone_zone: Asia/Shanghai
+    - role: c_chrony
