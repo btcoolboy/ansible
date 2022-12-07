@@ -1,118 +1,125 @@
+---
+collections:
+  - name: debops.debops
+    version: 3.0.3
+    source: https://github.com/debops/debops
+
+roles:
 # common
-- name: chrony
-  src: https://github.com/mrlesmithjr/ansible-chrony
+  - name: chrony
+    src: https://github.com/mrlesmithjr/ansible-chrony
 
-- name: containerd
-  src: https://github.com/incubateur-pe/containerd
+  - name: containerd
+    src: https://github.com/incubateur-pe/containerd
 
-- name: docker
-  src: https://github.com/geerlingguy/ansible-role-docker
+  - name: docker
+    src: https://github.com/geerlingguy/ansible-role-docker
 
 # debian/ubuntu
-- name: ansible
-  src: https://github.com/Oefenweb/ansible-ansible
+  - name: ansible
+    src: https://github.com/Oefenweb/ansible-ansible
 
-- name: apparmor
-  src: https://github.com/Oefenweb/ansible-apparmor
+  - name: apparmor
+    src: https://github.com/Oefenweb/ansible-apparmor
   
-- name: apt
-  src: https://github.com/Oefenweb/ansible-apt
+  - name: apt
+    src: https://github.com/Oefenweb/ansible-apt
 
-- name: bash
-  src: https://github.com/Oefenweb/ansible-bash
+  - name: bash
+    src: https://github.com/Oefenweb/ansible-bash
   
-- name: ca_certificates  
-  src: https://github.com/Oefenweb/ansible-ca-certificates
+  - name: ca_certificates  
+    src: https://github.com/Oefenweb/ansible-ca-certificates
 
-- name: dns
-  src: https://github.com/Oefenweb/ansible-dns
+  - name: dns
+    src: https://github.com/Oefenweb/ansible-dns
     
-- name: fail2ban
-  src: https://github.com/Oefenweb/ansible-fail2ban
+  - name: fail2ban
+    src: https://github.com/Oefenweb/ansible-fail2ban
   
-- name: fonts
-  src: https://github.com/Oefenweb/ansible-fonts
+  - name: fonts
+    src: https://github.com/Oefenweb/ansible-fonts
 
-- name: haproxy
-  src: https://github.com/Oefenweb/ansible-haproxy
+  - name: haproxy
+    src: https://github.com/Oefenweb/ansible-haproxy
   
-- name: hostname
-  src: https://github.com/Oefenweb/ansible-hostname
+  - name: hostname
+    src: https://github.com/Oefenweb/ansible-hostname
 
-- name: keepalived
-  src: https://github.com/Oefenweb/ansible-keepalived
+  - name: keepalived
+    src: https://github.com/Oefenweb/ansible-keepalived
 
-- name: limits
-  src: https://github.com/Oefenweb/ansible-limits
+  - name: limits
+    src: https://github.com/Oefenweb/ansible-limits
   
-- name: locales
-  src: https://github.com/Oefenweb/ansible-locales
+  - name: locales
+    src: https://github.com/Oefenweb/ansible-locales
   
-- name: logrotated
-  src: https://github.com/Oefenweb/ansible-logrotated
+  - name: logrotated
+    src: https://github.com/Oefenweb/ansible-logrotated
   
-- name: network_interfaces
-  src: https://github.com/Oefenweb/ansible-network-interfaces
+  - name: network_interfaces
+    src: https://github.com/Oefenweb/ansible-network-interfaces
 
-- name: nfs_clinet
-  src: https://github.com/Oefenweb/ansible-nfs-client
+  - name: nfs_clinet
+    src: https://github.com/Oefenweb/ansible-nfs-client
   
-- name: nfs_server
-  src: https://github.com/Oefenweb/ansible-nfs-server
+  - name: nfs_server
+    src: https://github.com/Oefenweb/ansible-nfs-server
   
-- name: ntp
-  src: https://github.com/Oefenweb/ansible-ntp
+  - name: ntp
+    src: https://github.com/Oefenweb/ansible-ntp
 
-- name: postfix
-  src: https://github.com/Oefenweb/ansible-postfix
+  - name: postfix
+    src: https://github.com/Oefenweb/ansible-postfix
   
-- name: rc_local
-  src: https://github.com/Oefenweb/ansible-rc-local
+  - name: rc_local
+    src: https://github.com/Oefenweb/ansible-rc-local
   
-- name: rsync_sync
-  src: https://github.com/Oefenweb/ansible-rsync-sync
+  - name: rsync_sync
+    src: https://github.com/Oefenweb/ansible-rsync-sync
   
-- name: rsyslog
-  src: https://github.com/Oefenweb/ansible-rsyslog
+  - name: rsyslog
+    src: https://github.com/Oefenweb/ansible-rsyslog
   
-- name: ssh_client
-  src: https://github.com/Oefenweb/ansible-ssh-client
+  - name: ssh_client
+    src: https://github.com/Oefenweb/ansible-ssh-client
   
-- name: ssh_keys
-  src: https://github.com/Oefenweb/ansible-ssh-keys
+  - name: ssh_keys
+    src: https://github.com/Oefenweb/ansible-ssh-keys
 
-- name: ssh_server
-  src: https://github.com/Oefenweb/ansible-ssh-server
+  - name: ssh_server
+    src: https://github.com/Oefenweb/ansible-ssh-server
 
-- name: snmpd
-  src: https://github.com/Oefenweb/ansible-snmpd
+  - name: snmpd
+    src: https://github.com/Oefenweb/ansible-snmpd
   
-- name: sudoers
-  src: https://github.com/Oefenweb/ansible-sudoers
+  - name: sudoers
+    src: https://github.com/Oefenweb/ansible-sudoers
 
-- name: swapfile
-  src: https://github.com/Oefenweb/ansible-swapfile
+  - name: swapfile
+    src: https://github.com/Oefenweb/ansible-swapfile
 
-- name: sysctl
-  src: https://github.com/Oefenweb/ansible-sysctl
+  - name: sysctl
+    src: https://github.com/Oefenweb/ansible-sysctl
   
-- name: sysfs
-  src: https://github.com/Oefenweb/ansible-sysfs
+  - name: sysfs
+    src: https://github.com/Oefenweb/ansible-sysfs
   
-- name: systemd
-  src: https://github.com/Oefenweb/ansible-systemd
+  - name: systemd
+    src: https://github.com/Oefenweb/ansible-systemd
   
-- name: timezone
-  src: https://github.com/Oefenweb/ansible-timezone
+  - name: timezone
+    src: https://github.com/Oefenweb/ansible-timezone
 
-- name: ufw
-  src: https://github.com/Oefenweb/ansible-ufw
+  - name: ufw
+    src: https://github.com/Oefenweb/ansible-ufw
   
-- name: user
-  src: https://github.com/Oefenweb/ansible-user
+  - name: user
+    src: https://github.com/Oefenweb/ansible-user
   
-- name: vim
-  src: https://github.com/Oefenweb/ansible-vim
+  - name: vim
+    src: https://github.com/Oefenweb/ansible-vim
 
-- name: netplan
-  src: https://github.com/Oefenweb/ansible-netplan
+  - name: netplan
+    src: https://github.com/Oefenweb/ansible-netplan
