@@ -1,5 +1,5 @@
 ---
-- hosts: ubuntu-docker
+- hosts: ubuntu_docker
   roles:
     - role: c_docker
       vars:
