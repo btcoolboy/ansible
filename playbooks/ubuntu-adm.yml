@@ -1,7 +1,7 @@
 ---
 - hosts: ubuntu_adm
   roles:
-    - role: d_user
+    - role: user
       vars:
         user_groups:
           - name: rocky
@@ -12,7 +12,7 @@
             group: rocky
             groups: 
               - sudo
-    - role: d_ssh_keys
+    - role: ssh_keys
       vars:
         ssh_keys_private_keys:
           - owner: rocky
