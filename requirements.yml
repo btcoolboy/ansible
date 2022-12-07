@@ -59,6 +59,9 @@ roles:
   - name: logrotated
     src: https://github.com/Oefenweb/ansible-logrotated
   
+  - name: netplan
+    src: https://github.com/Oefenweb/ansible-netplan
+
   - name: network_interfaces
     src: https://github.com/Oefenweb/ansible-network-interfaces
 
@@ -121,6 +124,3 @@ roles:
   
   - name: vim
     src: https://github.com/Oefenweb/ansible-vim
-
-  - name: netplan
-    src: https://github.com/Oefenweb/ansible-netplan

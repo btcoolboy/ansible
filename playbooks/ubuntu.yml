@@ -6,7 +6,7 @@
         apt_manage_sources_list: true
         apt_ubuntu_mirror: http://vm-data-20.cloud.lab:8081/repository/ubuntu/
         apt_ubuntu_security_mirror: http://vm-data-20.cloud.lab:8081/repository/ubuntu/
-    - role: d_ca_certificates
+    - role: ca_certificates
       vars:
         ca_certificates_certificate_map:
           - src: ca.crt
