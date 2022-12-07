@@ -1,8 +1,6 @@
 ---
 collections:
-  - name: debops.debops
-    version: 3.0.3
-    source: https://github.com/debops/debops
+  - name: 'git+https://github.com/debops/debops#/ansible/,master'
 
 roles:
 # common
