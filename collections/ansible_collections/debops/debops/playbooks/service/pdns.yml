@@ -1,0 +1,10 @@
+---
+# Copyright (C) 2022 CipherMail B.V. <https://www.ciphermail.com/>
+# Copyright (C) 2022 DebOps <https://debops.org/>
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+- name: Manage regular PowerDNS server installation
+  import_playbook: 'pdns-plain.yml'
+
+- name: Manage PowerDNS server installation with nginx frontend
+  import_playbook: 'pdns-nginx.yml'

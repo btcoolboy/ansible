@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+# Copyright (C) 2022 Maciej Delmanowski <drybjed@gmail.com>
+# Copyright (C) 2022 DebOps <https://debops.org/>
+# SPDX-License-Identifier: GPL-3.0-only
+
+# When certbot refreshes a certificate, it generates a new private key for it.
+# This script will update the keys stored in 'private/key_chain.pem' and
+# 'private/key_chain_dhparam.pem' files in a given PKI realm.
+
+set -o nounset -o pipefail -o errexit
+
+if [ -d "/etc/letsencrypt/live" ] ; then
+
+    realm_domain="$(basename "${RENEWED_LINEAGE}")"
+
+    if [ -n "${realm_domain}" ] && [ -d "/etc/pki/realms/${realm_domain}" ] ; then
+
+        cd "/etc/pki/realms/${realm_domain}" > /dev/null
+
+        # Refresh public PEM chains
+        cat public/cert.pem public/intermediate.pem > public/cert_intermediate.pem
+        cat public/cert.pem public/intermediate.pem /etc/pki/dhparam/set0 > public/cert_intermediate_dhparam.pem
+
+        # Refresh PEM chain with private key
+        cat private/key.pem public/cert_intermediate.pem > private/key_chain.pem
+        chmod 0640 private/key_chain.pem
+        chown root:ssl-cert private/key_chain.pem
+
+        # Refresh PEM chain with private key and Diffie-Hellman parameters
+        cat private/key.pem public/cert_intermediate_dhparam.pem > private/key_chain_dhparam.pem
+        chmod 0640 private/key_chain_dhparam.pem
+        chown root:ssl-cert private/key_chain_dhparam.pem
+
+        # Verify that public and private parts match
+        pub=$(openssl x509 -noout -modulus -in default.crt | openssl md5)
+        key=$(openssl rsa  -noout -modulus -in default.key | openssl md5)
+        if test "${pub}" != "${key}"; then
+             pub=$(openssl x509 -noout -modulus -in public/cert_intermediate.pem | openssl md5)
+             if test "${pub}" == "${key}"; then
+                # Change the symlink to public/cert_intermediate.pem
+                ln -sf -T public/cert_intermediate.pem default.crt > /dev/null
+             fi
+        fi
+    fi
+
+fi

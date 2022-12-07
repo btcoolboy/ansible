@@ -1,8 +1,0 @@
-# vars file
----
-sysfs_dependencies:
-  - sysfsutils
-
-sysfs_actions_supported:
-  - mode
-  - owner

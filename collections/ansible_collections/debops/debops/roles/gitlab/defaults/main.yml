@@ -1,0 +1,733 @@
+---
+# .. vim: foldmarker=[[[,]]]:foldmethod=marker
+
+# .. Copyright (C) 2015-2022 Maciej Delmanowski <drybjed@gmail.com>
+# .. Copyright (C) 2015-2022 DebOps <https://debops.org/>
+# .. SPDX-License-Identifier: GPL-3.0-only
+
+# .. _gitlab__ref_defaults:
+
+# debops.gitlab default variables
+# ===============================
+
+# .. contents:: Sections
+#    :local:
+#
+# .. include:: ../../../../includes/global.rst
+
+# GitLab Omnibus installation [[[
+# -------------------------------
+
+# .. envvar:: gitlab__edition [[[
+#
+# Select the GitLab edition you want to install or manage. The "community"
+# edition contains only the open source components, the "enterprise" edition
+# includes closed source components and can be upgraded with a commercial
+# license. Set to "manual" to allow a manual installation of GitLab Omnibus
+# package which can then be configured by the role.
+gitlab__edition: 'community'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__base_packages [[[
+#
+# List of the default APT packages used to install GitLab Omnibus on a host.
+gitlab__base_packages:
+
+  - '{{ "gitlab-ce"
+        if (gitlab__edition == "community")
+        else ("gitlab-ee"
+              if (gitlab__edition == "enterprise")
+              else []) }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__packages [[[
+#
+# List of additional APT packages which should be installed with GitLab
+# Omnibus.
+gitlab__packages: []
+                                                                   # ]]]
+                                                                   # ]]]
+# UNIX environment [[[
+# --------------------
+
+# .. envvar:: gitlab__user [[[
+#
+# Name of the primary UNIX account used by GitLab Omnibus.
+gitlab__user: 'git'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__group [[[
+#
+# Name of the primary UNIX group used by GitLab Omnibus.
+gitlab__group: 'git'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__additional_groups [[[
+#
+# List of additional UNIX groups which the GitLab Omnibus account should belong
+# to.
+gitlab__additional_groups:
+
+  # The "sshusers" UNIX group permits access to a given UNIX account over SSH
+  - '{{ (ansible_local.system_groups.local_prefix | d("")) + "sshusers" }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__comment [[[
+#
+# The GECOS field of the primary GitLab Omnibus UNIX account.
+gitlab__comment: 'GitLab Omnibus main account'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__home [[[
+#
+# The home directory of the primary GitLab Omnibus UNIX account. This path is
+# used by default by the Omnibus packages and shouldn't be changed recklessly.
+gitlab__home: '/var/opt/gitlab'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__shell [[[
+#
+# The default UNIX shell used by the primary GitLab Omnibus account.
+gitlab__shell: '/bin/sh'
+                                                                   # ]]]
+                                                                   # ]]]
+# Application environment [[[
+# ---------------------------
+
+# .. envvar:: gitlab__fqdn [[[
+#
+# The Fully Qualified Domain Name on which GitLab Omnibus will be available. It
+# might be published :ref:`as a SRV record <dns_configuration_srv_usage>` for
+# GitLab Runners to find the API endpoint automatically.
+gitlab__fqdn: 'code.{{ gitlab__domain }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__domain [[[
+#
+# The DNS domain on which GitLab Omnibus is deployed.
+gitlab__domain: '{{ ansible_domain }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__registry_port [[[
+#
+# By default, GitLab Container registry is published on the same FQDN as the
+# main GitLab application, on a different TCP port.
+gitlab__registry_port: '5050'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__firewall_ports [[[
+#
+# List of TCP ports which should be opened in the :command:`ferm` firewall to
+# allow access to the GitLab services.
+gitlab__firewall_ports:
+
+  - 'http'
+  - 'https'
+  - 'container-registry'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__allow [[[
+#
+# List of IP addresses or CIDR subnets which are allowed to access GitLab
+# Omnibus services, configured on all hosts in the Ansible inventory. If the
+# list is empty, any host can access GitLab.
+gitlab__allow: []
+
+                                                                   # ]]]
+# .. envvar:: gitlab__group_allow [[[
+#
+# List of IP addresses or CIDR subnets which are allowed to access GitLab
+# Omnibus services, configured on hosts in a specific Ansible inventory group.
+# If the list is empty, any host can access GitLab.
+gitlab__group_allow: []
+
+                                                                   # ]]]
+# .. envvar:: gitlab__host_allow [[[
+#
+# List of IP addresses or CIDR subnets which are allowed to access GitLab
+# Omnibus services, configured on specific hosts in the Ansible inventory. If
+# the list is empty, any host can access GitLab.
+gitlab__host_allow: []
+
+                                                                   # ]]]
+# .. envvar:: gitlab__initial_root_password [[[
+#
+# The initial "root" account password set during GitLab Omnibus installation
+# via the $GITLAB_ROOT_PASSWORD environment variable.
+gitlab__initial_root_password: '{{ lookup("password", secret + "/gitlab/credentials/"
+                                                      + "root/initial_password") }}'
+                                                                   # ]]]
+                                                                   # ]]]
+# PKI infrastructure integration [[[
+# ----------------------------------
+
+# .. envvar:: gitlab__pki_enabled [[[
+#
+# Enable or disable support for PKI infrastructure, managed by the
+# :ref:`debops.pki` Ansible role.
+gitlab__pki_enabled: '{{ (ansible_local.pki.enabled | d(False)) | bool }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__pki_path [[[
+#
+# The base path of the PKI infrastructure managed by the :ref:`debops.pki`
+# Ansible role.
+gitlab__pki_path: '{{ ansible_local.pki.path | d("/etc/pki/realms") }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__pki_realm [[[
+#
+# The name of the PKI realm which should be used by GitLab Omnibus installation
+# by default.
+gitlab__pki_realm: '{{ ansible_local.pki.realm | d("domain") }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ssl_default_symlinks [[[
+#
+# List of the symlinks to private key and X.509 certificate used by GitLab
+# Omnibus by default, located in the :file:`/etc/gitlab/ssl/` directory.
+# See :ref:`gitlab__ref_ssl_symlinks` for more details.
+gitlab__ssl_default_symlinks:
+
+  - link: '{{ gitlab__fqdn + ".key" }}'
+    src: '{{ gitlab__pki_path + "/" + gitlab__pki_realm + "/private/key.pem" }}'
+
+  - link: '{{ gitlab__fqdn + ".crt" }}'
+    src: '{{ gitlab__pki_path + "/" + gitlab__pki_realm + "/public/chain.pem" }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ssl_symlinks [[[
+#
+# List of additional symlinks to private keys and X.509 certificates used by
+# GitLab Omnibus, located in the :file:`/etc/gitlab/ssl/` directory.
+# See :ref:`gitlab__ref_ssl_symlinks` for more details.
+gitlab__ssl_symlinks: []
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ssl_default_cacerts [[[
+#
+# List of the symlinks to Certificate Authority certificate used by GitLab
+# Omnibus by default, located in the :file:`/etc/gitlab/trusted-certs/`
+# directory. Syntax is the same as the configuration for private keys and
+# certificates. See :ref:`gitlab__ref_ssl_symlinks` for more details.
+gitlab__ssl_default_cacerts:
+
+  - link: '{{ gitlab__pki_realm + "-root.crt" }}'
+    src: '{{ gitlab__pki_path + "/" + gitlab__pki_realm + "/public/root.pem" }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ssl_cacerts [[[
+#
+# List of additional symlinks to Certificate Authority certificate used by
+# GitLab Omnibus, located in the :file:`/etc/gitlab/trusted-certs/` directory.
+# Syntax is the same as the configuration for private keys and certificates.
+# See :ref:`gitlab__ref_ssl_symlinks` for more details.
+gitlab__ssl_cacerts: []
+                                                                   # ]]]
+                                                                   # ]]]
+# LDAP Authentication configuration [[[
+# -------------------------------------
+
+# More information about LDAP support in GitLab can be found at
+# https://gitlab.com/help/administration/auth/ldap.md
+
+# .. envvar:: gitlab__ldap_enabled [[[
+#
+# Enable or disable LDAP integration.
+gitlab__ldap_enabled: '{{ True
+                          if (ansible_local | d() and ansible_local.ldap | d() and
+                              (ansible_local.ldap.enabled | d()) | bool)
+                          else False }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap_base_dn [[[
+#
+# The base Distinguished Name which should be used to create Distinguished
+# Names of the LDAP directory objects, defined as a YAML list. If this variable
+# is empty, LDAP configuration will not be generated.
+gitlab__ldap_base_dn: '{{ ansible_local.ldap.base_dn | d([]) }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap_device_dn [[[
+#
+# The Distinguished Name of the current host LDAP object, defined as a YAML
+# list. It will be used as a base for the GitLab service account LDAP object.
+# If the list is empty, the role will not create the account LDAP object
+# automatically.
+gitlab__ldap_device_dn: '{{ ansible_local.ldap.device_dn | d([]) }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap_self_rdn [[[
+#
+# The Relative Distinguished Name of the account LDAP object used by the
+# GitLab service to access the LDAP directory.
+gitlab__ldap_self_rdn: 'uid=gitlab'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap_self_object_classes [[[
+#
+# List of the LDAP object classes which will be used to create the LDAP object
+# used by the Gitlab service to access the LDAP directory.
+gitlab__ldap_self_object_classes: [ 'account', 'simpleSecurityObject' ]
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap_self_attributes [[[
+#
+# YAML dictionary that defines the attributes of the LDAP object used by the
+# GitLab service to access the LDAP directory.
+gitlab__ldap_self_attributes:
+  uid: '{{ gitlab__ldap_self_rdn.split("=")[1] }}'
+  userPassword: '{{ gitlab__ldap_bindpw }}'
+  host: '{{ [ansible_fqdn, ansible_hostname] | unique }}'
+  description: 'Account used by the "GitLab" service to access the LDAP directory'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap_binddn [[[
+#
+# The Distinguished Name of the account LDAP object used by the
+# GitLab service to bind to the LDAP directory.
+gitlab__ldap_binddn: '{{ ([gitlab__ldap_self_rdn] + gitlab__ldap_device_dn) | join(",") }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap_bindpw [[[
+#
+# The password stored in the account LDAP object used by the GitLab service to
+# bind to the LDAP directory.
+gitlab__ldap_bindpw: '{{ (lookup("password", secret + "/ldap/credentials/"
+                                 + gitlab__ldap_binddn | to_uuid + ".password length=32"))
+                         if gitlab__ldap_enabled | bool
+                         else "" }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap_label [[[
+#
+# Specify the name of the LDAP server displayed on the login page.
+gitlab__ldap_label: 'LDAP'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap_host [[[
+#
+# FQDN address of the LDAP server to connect to.
+gitlab__ldap_host: '{{ ansible_local.ldap.hosts | d([""]) | first }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap_port [[[
+#
+# The LDAP service port to use for connections.
+gitlab__ldap_port: '{{ ansible_local.ldap.port | d("389") }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap_encryption [[[
+#
+# The encryption method that should be used to connect to the LDAP server.
+# Available methods: ``start_tls``, ``simple_tls``, ``plain``.
+gitlab__ldap_encryption: '{{ "start_tls"
+                             if ((ansible_local.ldap.start_tls | d()) | bool)
+                             else "simple_tls" }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap_timeout [[[
+#
+# Set timeout in seconds for LDAP queries.
+gitlab__ldap_timeout: '10'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap_activedirectory [[[
+#
+# Enable or disable support for ActiveDirectory servers.
+gitlab__ldap_activedirectory: False
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap_account_attribute [[[
+#
+# Name of the LDAP attribute to use for account lookups. On plain LDAP servers
+# it's usually ``uid``, on older ActiveDirectory installations it could be
+# ``sAMAccountName``.
+gitlab__ldap_account_attribute: '{{ "sAMAccountName"
+                                    if (gitlab__ldap_activedirectory | bool)
+                                    else "uid" }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap_user_filter [[[
+#
+# LDAP search query which will be used by the GitLab service to filter the
+# available user accounts.
+gitlab__ldap_user_filter: '(&
+                             (objectClass=inetOrgPerson)
+                             (|
+                               (authorizedService=all)
+                               (authorizedService=gitlab)
+                               (authorizedService=web:public)
+                             )
+                           )'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap_username_or_email_login [[[
+#
+# If this variable is enabled, GitLab will ignore everything
+# after the first '@' in the LDAP username submitted by the user on login.
+#
+# Example:
+# - the user enters ``jane.doe@example.com`` and ``p@ssw0rd`` as LDAP
+# credentials;
+# - GitLab queries the LDAP server with ``jane.doe`` and ``p@ssw0rd``.
+#
+# If you are using "uid: 'userPrincipalName'" on ActiveDirectory you need to
+# disable this setting, because the userPrincipalName contains an '@'.
+gitlab__ldap_username_or_email_login: '{{ True
+                                          if (gitlab__ldap_account_attribute in
+                                              ["uid", "sAMAccountName"])
+                                          else False }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap_block_auto_created_users [[[
+#
+# Enable this setting to keep new LDAP users blocked until they have been
+# cleared by the admin.
+gitlab__ldap_block_auto_created_users: False
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap_lowercase_usernames [[[
+#
+# If enabled, GitLab will convert usernames to lowercase before searching the
+# for the LDAP user accounts.
+gitlab__ldap_lowercase_usernames: True
+                                                                   # ]]]
+                                                                   # ]]]
+# GitLab backup options [[[
+# -------------------------
+
+# .. envvar:: gitlab__backup_enabled [[[
+#
+# When enabled, the role will configure the :command:`cron` service to
+# periodically perform backups of the GitLab Omnibus installation. If this
+# parameter is set to ``False``, the :command:`cron` configuration will be
+# removed.
+gitlab__backup_enabled: True
+
+                                                                   # ]]]
+# .. envvar:: gitlab__backup_frequency [[[
+#
+# Select the GitLab Omnibus backup frequency (either ``daily``, ``weekly`` or
+# ``monthly``).
+gitlab__backup_frequency: 'daily'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__backup_keep_time [[[
+#
+# How long to store backups for, in seconds.
+gitlab__backup_keep_time: '{{ (60 * 60 * 24 * 7) | int }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__backup_path [[[
+#
+# Absolute path to the directory where GitLab Omnibus backups are stored and
+# managed.
+gitlab__backup_path: '/var/opt/gitlab/backups'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__backup_exclude_directories [[[
+#
+# Choose what should be excluded from the backup. An empty list means that
+# nothing will be excluded from the backup.
+# Reference: https://docs.gitlab.com/ee/raketasks/backup_gitlab.html#excluding-specific-directories-from-the-backup
+gitlab__backup_exclude_directories: []
+
+                                                                   # ]]]
+# .. envvar:: gitlab__backup_default_environment [[[
+#
+# YAML dictionary with default environment variables which should be present in
+# the GitLab backup :command:`cron` job. Dictionary keys are the variable
+# names, dictionary values are the variable values. An empty value removes the
+# variable from the generated configuration file.
+gitlab__backup_default_environment:
+  CRON: '1'
+  SKIP: '{{ gitlab__backup_exclude_directories | join(",") }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__backup_environment [[[
+#
+# YAML dictionary with custom environment variables which should be present in
+# the GitLab backup :command:`cron` job. Dictionary keys are the variable
+# names, dictionary values are the variable values. An empty value removes the
+# variable from the generated configuration file. This variable is combined
+# with the default environment variable.
+gitlab__backup_environment: {}
+                                                                   # ]]]
+                                                                   # ]]]
+# GitLab Omnibus configuration file [[[
+# -------------------------------------
+
+# The lists below define the contents of the :file:`/etc/gitlab/gitlab.rb`
+# configuration file which manages the GitLab Omnibus installation. The role
+# maintains the configuration file using the :ref:`universal_configuration`
+# system. See :ref:`gitlab__ref_configuration` for more details.
+
+# .. envvar:: gitlab__default_configuration [[[
+#
+# The default configuration options for GitLab Omnibus defined by the role.
+gitlab__default_configuration:
+
+  - name: 'preamble-comment'
+    title: 'GitLab configuration settings'
+    comment: |
+      This file is generated during initial installation and **is not** modified
+      during upgrades.
+      Check out the latest version of this file to know about the different
+      settings that can be configured, when they were introduced and why:
+      https://gitlab.com/gitlab-org/omnibus-gitlab/blame/master/files/gitlab-config-template/gitlab.rb.template
+
+      Locally, the complete template corresponding to the installed version can be found at:
+      /opt/gitlab/etc/gitlab.rb.template
+
+      You can run `gitlab-ctl diff-config` to compare the contents of the current gitlab.rb with
+      the gitlab.rb.template from the currently running version.
+
+      You can run `gitlab-ctl show-config` to display the configuration that will be generated by
+      running `gitlab-ctl reconfigure`
+    state: 'present'
+
+  - name: 'external_url'
+    title: 'GitLab URL'
+    comment: |
+      URL on which GitLab will be reachable.
+      For more details on configuring external_url see:
+      https://docs.gitlab.com/omnibus/settings/configuration.html#configuring-the-external-url-for-gitlab
+    value: '{{ (("https://") if gitlab__pki_enabled | bool else ("http://"))
+               + gitlab__fqdn }}'
+
+  - name: 'registry_external_url'
+    title: 'GitLab Container Registry URL'
+    comment: |
+      URL on which GitLab Container Registry will be reachable. By default we
+      use the same FQDN as the main GitLab installation with a separate TCP
+      port; see the documentation to find out how to publish the Registry on
+      a separate FQDN.
+    value: '{{ (("https://") if gitlab__pki_enabled | bool else ("http://"))
+               + gitlab__fqdn + ":" + gitlab__registry_port }}'
+
+  - name: 'roles'
+    title: 'Roles for multi-instance GitLab'
+    comment: |
+      The default is to have no roles enabled, which results in GitLab running as an all-in-one instance.
+      Options:
+        redis_sentinel_role redis_master_role redis_replica_role geo_primary_role geo_secondary_role
+        postgres_role consul_role application_role monitoring_role
+      For more details on each role, see:
+      https://docs.gitlab.com/omnibus/roles/README.html#roles
+    value: [ 'redis_sentinel_role', 'redis_master_role' ]
+    state: 'comment'
+
+  - name: 'legend-comment'
+    title: 'Legend'
+    comment: |
+      The following notations at the beginning of each line may be used to
+      differentiate between components of this file and to easily select them using
+      a regex.
+      ## Titles, subtitles etc
+      ##! More information - Description, Docs, Links, Issues etc.
+      Configuration settings have a single # followed by a single space at the
+      beginning; Remove them to enable the setting.
+
+      **Configuration settings below are optional.**
+    state: 'present'
+
+  - name: 'header-comment'
+    raw: |
+      ################################################################################
+      ################################################################################
+      ##                Configuration Settings for GitLab CE and EE                 ##
+      ################################################################################
+      ################################################################################
+
+      ################################################################################
+      ## gitlab.yml configuration
+      ##! Docs: https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/doc/settings/gitlab.yml.md
+      ################################################################################
+    state: 'present'
+    separator: True
+
+  - name: 'gitlab_rails'
+    options:
+
+      - name: 'time_zone'
+        title: 'Set the time zone of the GitLab Omnibus installation'
+        value: '{{ ansible_local.tzdata.timezone | d("UTC") }}'
+        state: 'present'
+
+      - name: 'backup_path'
+        title: 'Absolute path where GitLab backups are stored'
+        value: '{{ gitlab__backup_path }}'
+        state: '{{ "present"
+                   if (gitlab__backup_path != "/var/opt/gitlab/backups")
+                   else "comment" }}'
+
+      - name: 'backup_keep_time'
+        title: 'The duration in seconds to keep backups before they are allowed to be deleted'
+        value: '{{ gitlab__backup_keep_time }}'
+        state: '{{ "present"
+                   if (gitlab__backup_keep_time | string != "604800")
+                   else "comment" }}'
+
+      - name: 'ldap_enabled'
+        title: 'LDAP Settings'
+        comment: |
+          Docs: https://docs.gitlab.com/omnibus/settings/ldap.html
+          **Be careful not to break the indentation in the ldap_servers block. It is
+            in yaml format and the spaces must be retained. Using tabs will not work.**
+        value: '{{ ansible_local.ldap.enabled | d(False) }}'
+        state: '{{ "present" if gitlab__ldap_enabled | bool else "comment" }}'
+
+      - name: 'prevent_ldap_sign_in'
+        value: False
+        state: 'comment'
+
+      - name: 'ldap_servers'
+        title: "**remember to close this block with 'EOS' below**"
+        raw: |
+          gitlab_rails['ldap_servers'] = YAML.load <<-'EOS'
+            main:  # 'main' is the GitLab 'provider ID' of this LDAP server
+              label: '{{ gitlab__ldap_label }}'
+              host: '{{ gitlab__ldap_host }}'
+              port: {{ gitlab__ldap_port }}
+              uid: '{{ gitlab__ldap_account_attribute }}'
+              bind_dn: '{{ gitlab__ldap_binddn }}'
+              password: '{{ gitlab__ldap_bindpw }}'
+              encryption: '{{ gitlab__ldap_encryption }}' # "start_tls" or "simple_tls" or "plain"
+              verify_certificates: true
+              smartcard_auth: false
+              active_directory: {{ gitlab__ldap_activedirectory | lower }}
+              allow_username_or_email_login: {{ gitlab__ldap_username_or_email_login | lower }}
+              lowercase_usernames: {{ gitlab__ldap_lowercase_usernames | lower }}
+              block_auto_created_users: {{ gitlab__ldap_block_auto_created_users | lower }}
+              base: '{{ gitlab__ldap_base_dn | join(",") }}'
+              user_filter: '{{ gitlab__ldap_user_filter }}'
+              ## EE only
+              group_base: ''
+              admin_group: ''
+              sync_ssh_keys: false
+          EOS
+        state: '{{ "present" if gitlab__ldap_enabled | bool else "comment" }}'
+
+  - name: 'nginx'
+    options:
+
+      - name: 'redirect_http_to_https'
+        title: 'Enable HTTP to HTTPS redirection in nginx'
+        value: '{{ True if gitlab__pki_enabled | bool else False }}'
+        state: 'present'
+
+  - name: 'package'
+    options:
+
+      - name: 'modify_kernel_parameters'
+        comment: |
+          Attempt to modify kernel parameters. To skip this in containers where
+          the relevant file system is read-only, set the value to false.
+        value: '{{ False
+                   if ("container" in (ansible_virtualization_tech_guest | d([])))
+                   else True }}'
+        state: '{{ "present"
+                   if ("container" in (ansible_virtualization_tech_guest | d([])))
+                   else "comment" }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__configuration [[[
+#
+# The configuration options for GitLab Omnibus defined on all hosts in the
+# Ansible inventory.
+gitlab__configuration: []
+
+                                                                   # ]]]
+# .. envvar:: gitlab__group_configuration [[[
+#
+# The configuration options for GitLab Omnibus defined on hosts in a specific
+# Ansible inventory group.
+gitlab__group_configuration: []
+
+                                                                   # ]]]
+# .. envvar:: gitlab__host_configuration [[[
+#
+# The configuration options for GitLab Omnibus defined on specific hosts in the
+# Ansible inventory.
+gitlab__host_configuration: []
+
+                                                                   # ]]]
+# .. envvar:: gitlab__combined_configuration [[[
+#
+# Variable which combines all GitLab Omnibus configuration variables and is
+# used in role tasks and templates.
+gitlab__combined_configuration: '{{ gitlab__default_configuration
+                                    + gitlab__configuration
+                                    + gitlab__group_configuration
+                                    + gitlab__host_configuration }}'
+                                                                   # ]]]
+                                                                   # ]]]
+# Configuration for other Ansible roles [[[
+# -----------------------------------------
+
+# .. envvar:: gitlab__etc_services__dependent_list [[[
+#
+# List of custom :file:`/etc/services` to configure for the :ref:`debops.etc_services`
+# Ansible role.
+gitlab__etc_services__dependent_list:
+
+  - name: 'container-registry'
+    port: '{{ gitlab__registry_port }}'
+    protocols: [ 'tcp' ]
+    comment: 'GitLab Omnibus Container Registry'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__keyring__dependent_apt_keys [[[
+#
+# List of APT repositories and GPG keys managed by the :ref:`debops.keyring`
+# Ansible role.
+gitlab__keyring__dependent_apt_keys:
+
+  - id: 'F640 3F65 44A3 8863 DAA0  B6E0 3F01 618A 5131 2F3F'
+    repo: 'deb https://packages.gitlab.com/gitlab/gitlab-ee/debian/ {{ ansible_distribution_release }} main'
+    filename: 'gitlab_ee'
+    state: '{{ "present"
+               if (gitlab__edition == "enterprise")
+               else "absent" }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__extrepo__dependent_sources [[[
+#
+# List of APT repository sources managed by the :ref:`debops.extrepo` Ansible
+# role.
+gitlab__extrepo__dependent_sources:
+
+  - name: 'gitlab_ce'
+    state: '{{ "present"
+               if (gitlab__edition == "community")
+               else "absent" }}'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ferm__dependent_rules [[[
+#
+# Configuration for the :ref:`debops.ferm` Ansible role.
+gitlab__ferm__dependent_rules:
+
+  - name: 'gitlab_services'
+    type: 'accept'
+    by_role: 'debops.gitlab'
+    dport: '{{ gitlab__firewall_ports }}'
+    saddr: '{{ gitlab__allow + gitlab__group_allow + gitlab__host_allow }}'
+    accept_any: True
+    rule_state: 'present'
+
+                                                                   # ]]]
+# .. envvar:: gitlab__ldap__dependent_tasks [[[
+#
+# Configuration for the :ref:`debops.ldap` Ansible role.
+gitlab__ldap__dependent_tasks:
+
+  - name: 'Create GitLab account for {{ gitlab__ldap_device_dn | join(",") }}'
+    dn: '{{ gitlab__ldap_binddn }}'
+    objectClass: '{{ gitlab__ldap_self_object_classes }}'
+    attributes: '{{ gitlab__ldap_self_attributes }}'
+    no_log: '{{ debops__no_log | d(True) }}'
+    state: '{{ "present" if gitlab__ldap_device_dn | d() else "ignore" }}'
+                                                                   # ]]]
+                                                                   # ]]]

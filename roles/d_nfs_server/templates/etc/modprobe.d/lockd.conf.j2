@@ -1,5 +1,0 @@
-{{ ansible_managed | comment }}
-
-{% for line in nfs_server_lockd | default([]) %}
-{{ line }}
-{% endfor %}

@@ -1,0 +1,12 @@
+---
+- name: Servicedelegationtarget member present example
+  hosts: ipaserver
+  become: no
+
+  tasks:
+  - name: Ensure member test/example.com is present in servicedelegationtarget test-delegation-target
+    freeipa.ansible_freeipa.ipaservicedelegationtarget:
+      ipaadmin_password: SomeADMINpassword
+      name: test-delegation-target
+      principal: test/example.com
+      action: member

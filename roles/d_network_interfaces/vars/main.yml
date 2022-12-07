@@ -1,6 +1,0 @@
-# vars file
----
-network_interfaces_service: networking
-
-network_interfaces_all_interfaces_path: /etc/network/interfaces
-network_interfaces_interface_path: /etc/network/interfaces.d

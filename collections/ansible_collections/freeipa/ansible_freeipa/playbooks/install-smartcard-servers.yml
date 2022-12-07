@@ -1,0 +1,8 @@
+---
+- name: Playbook to setup smartcard for IPA server and replicas
+  hosts: ipaserver, ipareplicas
+  become: true
+
+  roles:
+  - role: freeipa.ansible_freeipa.ipasmartcard_server
+    state: present

@@ -1,0 +1,52 @@
+---
+# Copyright (C) 2015-2022 Maciej Delmanowski <drybjed@gmail.com>
+# Copyright (C) 2015-2022 DebOps <https://debops.org/>
+# SPDX-License-Identifier: GPL-3.0-only
+
+
+- name: Manage GitLab Omnibus service
+  collections: [ 'debops.debops', 'debops.roles01',
+                 'debops.roles02', 'debops.roles03' ]
+  hosts: [ 'debops_service_gitlab' ]
+  become: True
+
+  environment: '{{ inventory__environment | d({})
+                   | combine(inventory__group_environment | d({}))
+                   | combine(inventory__host_environment  | d({})) }}'
+
+  roles:
+
+    - role: keyring
+      tags: [ 'role::keyring', 'skip::keyring' ]
+      keyring__dependent_apt_keys:
+        - '{{ gitlab__keyring__dependent_apt_keys }}'
+
+    - role: extrepo
+      tags: [ 'role::extrepo', 'skip::extrepo' ]
+      extrepo__dependent_sources:
+        - '{{ gitlab__extrepo__dependent_sources }}'
+
+    - role: etc_services
+      tags: [ 'role::etc_services', 'skip::etc_services' ]
+      etc_services__dependent_list:
+        - '{{ gitlab__etc_services__dependent_list }}'
+
+    - role: ferm
+      tags: [ 'role::ferm', 'skip::ferm' ]
+      ferm__dependent_rules:
+        - '{{ gitlab__ferm__dependent_rules }}'
+
+    - role: python
+      tags: [ 'role::python', 'skip::python', 'role::ldap' ]
+      python__dependent_packages3:
+        - '{{ ldap__python__dependent_packages3 }}'
+      python__dependent_packages2:
+        - '{{ ldap__python__dependent_packages2 }}'
+
+    - role: ldap
+      tags: [ 'role::ldap', 'skip::ldap' ]
+      ldap__dependent_tasks:
+        - '{{ gitlab__ldap__dependent_tasks }}'
+
+    - role: gitlab
+      tags: [ 'role::gitlab', 'skip::gitlab' ]

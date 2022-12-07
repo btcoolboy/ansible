@@ -1,0 +1,46 @@
+{
+ "collection_info": {
+  "namespace": "debops",
+  "name": "debops",
+  "version": "0.0.0",
+  "authors": [
+   "Maciej Delmanowski <drybjed@gmail.com>",
+   "DebOps Developers <debops-users@lists.debops.org>"
+  ],
+  "readme": "README.md",
+  "tags": [
+   "debian",
+   "ubuntu",
+   "debops",
+   "sysadmin",
+   "cluster",
+   "datacenter"
+  ],
+  "description": "Your Debian-based data center in a box",
+  "license": [
+   "GPL-3.0-or-later"
+  ],
+  "license_file": null,
+  "dependencies": {
+   "ansible.posix": "*",
+   "community.crypto": "*",
+   "community.general": "*",
+   "community.libvirt": "*",
+   "community.mysql": "*",
+   "community.postgresql": "*",
+   "community.rabbitmq": "*"
+  },
+  "repository": "https://github.com/debops/debops",
+  "documentation": "https://docs.debops.org/en/master/ansible/role-index.html",
+  "homepage": "https://debops.org/",
+  "issues": "https://github.com/debops/debops/issues"
+ },
+ "file_manifest_file": {
+  "name": "FILES.json",
+  "ftype": "file",
+  "chksum_type": "sha256",
+  "chksum_sha256": "12853a856697c2ea9f3cbf5e1df9b8c7849db95154ca54716ad90c4033a823db",
+  "format": 1
+ },
+ "format": 1
+}

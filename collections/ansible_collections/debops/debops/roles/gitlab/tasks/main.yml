@@ -1,0 +1,104 @@
+---
+# Copyright (C) 2015-2022 Maciej Delmanowski <drybjed@gmail.com>
+# Copyright (C) 2015-2022 DebOps <https://debops.org/>
+# SPDX-License-Identifier: GPL-3.0-only
+
+- name: Import DebOps global handlers
+  ansible.builtin.import_role:
+    name: 'global_handlers'
+
+- name: Import DebOps secret role
+  ansible.builtin.import_role:
+    name: 'secret'
+
+- name: Make sure that Ansible local facts directory exists
+  ansible.builtin.file:
+    path: '/etc/ansible/facts.d'
+    state: 'directory'
+    mode: '0755'
+
+- name: Save information about GitLab in Ansible Facts
+  ansible.builtin.template:
+    src: 'etc/ansible/facts.d/gitlab.fact.j2'
+    dest: '/etc/ansible/facts.d/gitlab.fact'
+    mode: '0755'
+  notify: [ 'Refresh host facts' ]
+  tags: [ 'meta::facts' ]
+
+- name: Flush handlers if needed
+  ansible.builtin.meta: 'flush_handlers'
+
+- name: Create GitLab UNIX system group
+  ansible.builtin.group:
+    name: '{{ gitlab__group }}'
+    state: 'present'
+    system: True
+
+- name: Create GitLab UNIX system account
+  ansible.builtin.user:
+    name: '{{ gitlab__user }}'
+    group: '{{ gitlab__group }}'
+    groups: '{{ gitlab__additional_groups }}'
+    comment: '{{ gitlab__comment }}'
+    home: '{{ gitlab__home }}'
+    shell: '{{ gitlab__shell }}'
+    state: 'present'
+    append: True
+    system: True
+
+- name: Create GitLab configuration directories
+  ansible.builtin.file:
+    path: '{{ item.path }}'
+    state: 'directory'
+    mode: '{{ item.mode }}'
+  loop:
+    - { path: '/etc/gitlab/ssl',           mode: '0775' }
+    - { path: '/etc/gitlab/trusted-certs', mode: '0755' }
+
+- name: Manage CA certificate symlinks in GitLab environment
+  ansible.builtin.file:  # noqa risky-file-permissions
+    path: '{{ "/etc/gitlab/trusted-certs/" + item.link }}'
+    src:  '{{ item.src }}'
+    state: '{{ item.state | d("link") }}'
+  loop: '{{ q("flattened", (gitlab__ssl_default_cacerts + gitlab__ssl_cacerts)) }}'
+  notify: [ 'Restart GitLab Omnibus' ]
+  when: gitlab__pki_enabled | bool
+
+- name: Manage private key and SSL certificate symlinks in GitLab environment
+  ansible.builtin.file:  # noqa risky-file-permissions
+    path: '{{ "/etc/gitlab/ssl/" + item.link }}'
+    src:  '{{ item.src }}'
+    state: '{{ item.state | d("link") }}'
+  loop: '{{ q("flattened", (gitlab__ssl_default_symlinks + gitlab__ssl_symlinks)) }}'
+  notify: [ 'Restart GitLab Omnibus' ]
+  when: gitlab__pki_enabled | bool
+
+- name: Generate GitLab Omnibus configuration
+  ansible.builtin.template:
+    src: 'etc/gitlab/gitlab.rb.j2'
+    dest: '/etc/gitlab/gitlab.rb'
+    mode: '0600'
+  notify: [ 'Reconfigure GitLab Omnibus' ]
+  no_log: '{{ debops__no_log | d(True) }}'
+
+- name: Remove GitLab Omnibus backup cron job if requested
+  ansible.builtin.file:
+    path: '/etc/cron.d/backup-gitlab-omnibus'
+    state: 'absent'
+  when: not gitlab__backup_enabled | bool
+
+- name: Configure GitLab Omnibus backup cron job
+  ansible.builtin.template:
+    src: 'etc/cron.d/backup-gitlab-omnibus.j2'
+    dest: '/etc/cron.d/backup-gitlab-omnibus'
+    mode: '0644'
+  when: gitlab__backup_enabled | bool
+
+- name: Install GitLab APT packages
+  environment:
+    GITLAB_ROOT_PASSWORD: '{{ gitlab__initial_root_password }}'
+  ansible.builtin.package:
+    name: '{{ q("flattened", gitlab__base_packages + gitlab__packages) }}'
+    state: 'present'
+  register: gitlab__register_packages
+  until: gitlab__register_packages is succeeded

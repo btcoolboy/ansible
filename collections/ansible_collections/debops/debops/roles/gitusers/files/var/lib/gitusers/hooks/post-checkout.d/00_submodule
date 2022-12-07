@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# Copyright (C) 2014-2019 Maciej Delmanowski <drybjed@gmail.com>
+# Copyright (C) 2015-2019 DebOps <https://debops.org/>
+# SPDX-License-Identifier: GPL-3.0-only
+
+# Update submodules
+
+set -e
+
+worktree="$(git config --get deploy.worktree)"
+
+test -d "${worktree}" || mkdir -p "${worktree}"
+
+cd "${worktree}" || exit 1
+
+git submodule sync && git submodule update --init --force --recursive
