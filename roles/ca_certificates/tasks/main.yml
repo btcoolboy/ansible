@@ -1,0 +1,66 @@
+# tasks file
+---
+- name: install dependencies
+  ansible.builtin.apt:
+    name: "{{ ca_certificates_dependencies }}"
+    state: "{{ apt_install_state | default('latest') }}"
+    update_cache: true
+    cache_valid_time: "{{ apt_update_cache_valid_time | default(3600) }}"
+  tags:
+    - configuration
+    - ca-certificates
+    - ca-certificates-install
+    - ca-certificates-install-dependencies
+
+- name: stat directories
+  ansible.builtin.stat:
+    path: "{{ ca_certificates_base_dir }}/{{ item.dest | dirname }}"
+  register: _stat_directories
+  with_items: "{{ ca_certificates_certificate_map }}"
+  tags:
+    - configuration
+    - ca-certificates
+    - ca-certificates-directories
+    - ca-certificates-directories-stat
+
+- name: create directories
+  ansible.builtin.file:
+    path: "{{ ca_certificates_base_dir }}/{{ item.item.dest | dirname }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items: "{{ _stat_directories.results | default([]) }}"
+  when: not item.stat.exists
+  tags:
+    - configuration
+    - ca-certificates
+    - ca-certificates-directories
+    - ca-certificates-directories-create
+
+- name: copy ca files
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ ca_certificates_base_dir }}/{{ item.dest }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0644') }}"
+  with_items: "{{ ca_certificates_certificate_map }}"
+  notify: update ca-certificates
+  tags:
+    - configuration
+    - ca-certificates
+    - ca-certificates-files
+    - ca-certificates-files-copy
+
+- name: trust ca files
+  ansible.builtin.lineinfile:
+    dest: "{{ ca_certificates_trust_file }}"
+    line: "{{ item.dest }}"
+  with_items: "{{ ca_certificates_certificate_map }}"
+  notify: update ca-certificates
+  tags:
+    - configuration
+    - ca-certificates
+    - ca-certificates-files
+    - ca-certificates-files-trust

@@ -1,0 +1,48 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: fedora
+    base: fedora:latest
+    image: fedora:36
+    pre_build_image: false
+    dockerfile: Dockerfile.j2
+    privileged: true
+    command: "/usr/sbin/init"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    tmpfs:
+      - /tmp
+      - /run
+  - name: alma
+    base: almalinux:9.0.0
+    image: almalinux:9
+    pre_build_image: false
+    dockerfile: Dockerfile.j2
+    command: "/usr/sbin/init"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    tmpfs:
+      - /tmp
+      - /run
+    privileged: true
+provisioner:
+  name: ansible
+  inventory:
+    group_vars:
+      all:
+        containerd_repo: ${CONTAINERD_REPO}
+    host_vars:
+      alma:
+        containerd_repo_address: ${CONTAINERD_REPO}/centos/
+lint: |
+  set -e
+  yamllint .
+  ansible-lint .
+  flake8
+verifier:
+  name: testinfra
+  lint:
+    name: flake8

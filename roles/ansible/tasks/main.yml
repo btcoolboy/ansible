@@ -1,0 +1,47 @@
+# tasks file
+---
+- name: install dependencies
+  ansible.builtin.apt:
+    name: "{{ ansible_dependencies }}"
+    state: "{{ apt_install_state | default('latest') }}"
+    update_cache: true
+    cache_valid_time: "{{ apt_update_cache_valid_time | default(3600) }}"
+  tags:
+    - configuration
+    - ansible
+    - ansible-install
+    - ansible-install-dependencies
+
+- name: install ansible (specific version)
+  ansible.builtin.pip:
+    name: ansible
+    version: "{{ ansible_ansible_version }}"
+    executable: "{{ ansible_pip_executable }}"
+  when: "ansible_ansible_version != 'latest'"
+  tags:
+    - configuration
+    - ansible
+    - ansible-install
+    - ansible-install-specific
+
+- name: install ansible (latest version)
+  ansible.builtin.pip:
+    name: ansible
+    state: "{{ ansible_ansible_version }}"
+    executable: "{{ ansible_pip_executable }}"
+  when: "ansible_ansible_version == 'latest'"
+  tags:
+    - configuration
+    - ansible
+    - ansible-install
+    - ansible-install-latest
+
+- name: verify
+  ansible.builtin.command: >
+    ansible --version
+  changed_when: false
+  tags:
+    - configuration
+    - ansible
+    - ansible-install
+    - ansible-install-verify

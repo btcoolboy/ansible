@@ -1,0 +1,10 @@
+# test file
+---
+- hosts: all
+  remote_user: vagrant
+  become: true
+  roles:
+    - ../../
+  post_tasks:
+    - name: include tasks
+      ansible.builtin.include: "{{ playbook_dir }}/tasks/post.yml"

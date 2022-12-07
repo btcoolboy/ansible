@@ -1,0 +1,3 @@
+# defaults file
+---
+nfs_client_mounts: []

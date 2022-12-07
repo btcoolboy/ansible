@@ -1,0 +1,6 @@
+# handlers file
+---
+- name: restart network-interfaces
+  service:
+    name: "{{ network_interfaces_service }}"
+    state: restarted

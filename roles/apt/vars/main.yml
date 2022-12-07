@@ -1,0 +1,3 @@
+# vars file
+---
+apt_apt_conf_file: /etc/apt/apt.conf

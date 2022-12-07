@@ -1,0 +1,5 @@
+# vars file
+---
+bash_dependencies:
+  - bash
+  - athena-jot

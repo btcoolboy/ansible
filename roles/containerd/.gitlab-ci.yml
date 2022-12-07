@@ -1,0 +1,85 @@
+---
+image: docker:stable-dind
+
+stages:
+  - lint
+  - test
+  - merge
+  - release
+
+variables:
+  PYTHONWARNINGS: ignore:Unverified HTTPS request
+
+.onlys_changes: &only_changes
+  changes:
+    - "molecule/**/*"
+    - "defaults/**/*"
+    - "handlers/**/*"
+    - "meta/**/*"
+    - "tasks/**/*"
+    - "templates/**/*"
+    - "vars/**/*"
+    - "*.yaml"
+    - "*.yml"
+
+lint:
+  stage: lint
+  before_script:
+    - sed -i -e "s@http://dl-cdn.alpinelinux.org@${ALPINE_MIRROR}@g" /etc/apk/repositories
+    - echo "$PIP_CONFIG" > /etc/pip.conf
+    - apk add --no-cache python3 python3-dev py3-pip py3-wheel gcc git curl build-base autoconf automake py3-cryptography linux-headers musl-dev libffi-dev openssl-dev openssh
+    - python3 --version
+    - python3 -m pip install -r requirements-test.txt -q
+    - ansible-galaxy collection install -v ${GALAXY_PROXY}/community-docker-2.4.0.tar.gz
+    - ansible --version
+    - molecule --version
+  script:
+    - molecule lint
+
+test-all:
+  stage: test
+  only:
+    <<: *only_changes
+  before_script:
+    - sed -i -e "s@http://dl-cdn.alpinelinux.org@${ALPINE_MIRROR}@g" /etc/apk/repositories
+    - echo "$PIP_CONFIG" > /etc/pip.conf
+    - apk add --no-cache python3 python3-dev py3-pip py3-wheel gcc git curl build-base autoconf automake py3-cryptography linux-headers musl-dev libffi-dev openssl-dev openssh
+    - python3 --version
+    - python3 -m pip install -r requirements-test.txt -q
+    - ansible-galaxy collection install -v ${GALAXY_PROXY}/community-docker-2.4.0.tar.gz
+    - ansible --version
+    - molecule --version
+  script:
+    - molecule test
+
+new-tag:
+  stage: release
+  image:
+    name: marcelocorreia/semver
+    entrypoint: [""]
+  only:
+    <<: *only_changes
+    refs:
+      - master
+  except:
+    refs:
+      - tags
+      - schedules
+  script:
+    - git config user.email "${GITLAB_USER_EMAIL}"
+    - git config user.name "${GITLAB_USER_NAME}"
+    - git remote add api-origin https://oauth2:${GITLAB_ACCESS_TOKEN}@gitlab.com/${CI_PROJECT_PATH}
+    - if [ -z "$(git tag --points-at HEAD)" ] ; then git tag $(semver -c -i patch $(git describe --tags --abbrev=0)); fi
+    - git push api-origin --tags
+
+publish:
+  stage: release
+  image:
+    name: ansible/ansible-runner
+    entrypoint: [""]
+  only:
+    refs:
+      - tags
+  script:
+    # - ansible-galaxy login --api-key "${GALAXY_TOKEN}" --github-token "${GITHUB_TOKEN}"
+    - ansible-galaxy import incubateur-pe containerd --token "${GALAXY_TOKEN}"

@@ -1,0 +1,3 @@
+# defaults file
+---
+logrotated_logrotate_d_files: {}

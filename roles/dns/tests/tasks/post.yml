@@ -1,0 +1,21 @@
+# post test file
+---
+- name: install test dependencies
+  ansible.builtin.apt:
+    name:
+      - dnsutils
+    state: "{{ apt_install_state | default('latest') }}"
+    update_cache: true
+    cache_valid_time: "{{ apt_update_cache_valid_time | default(3600) }}"
+
+- name: test dns installation  # noqa risky-shell-pipe
+  ansible.builtin.shell: >
+    nslookup example.com
+    | grep 'Server'
+    | awk '{print $2}'
+    | grep -q '8.8.8.8'
+    && (echo 'Configuration test: pass' && exit 0)
+    || (echo 'Configuration test: fail' && exit 1)
+  args:
+    warn: false
+  changed_when: false

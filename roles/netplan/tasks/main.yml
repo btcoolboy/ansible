@@ -1,0 +1,13 @@
+# tasks file
+---
+- import_tasks: install.yml
+  tags:
+    - configuration
+    - netplan
+    - netplan-install
+
+- import_tasks: configure.yml
+  tags:
+    - configuration
+    - netplan
+    - netplan-configure

@@ -1,0 +1,4 @@
+# defaults file
+---
+ansible_python_version_major: 2
+ansible_ansible_version: latest

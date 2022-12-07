@@ -1,0 +1,66 @@
+# tasks file
+---
+- name: include variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "_{{ ansible_distribution_release }}.yml"
+    - "_{{ ansible_distribution | lower }}.yml"
+    - _default.yml
+  tags:
+    - configuration
+    - sudoers
+    - sudoers-include-variables
+
+- name: install
+  apt:
+    name: "{{ sudoers_dependencies }}"
+    state: "{{ apt_install_state | default('latest') }}"
+    update_cache: true
+    cache_valid_time: "{{ apt_update_cache_valid_time | default(3600) }}"
+  tags:
+    - configuration
+    - sudoers
+    - sudoers-install
+
+- name: update /etc/sudoers.d directory permissions
+  file:
+    path: /etc/sudoers.d
+    state: directory
+    owner: root
+    group: root
+    mode: "{{ sudoers_sudoers_d_directory_mode }}"
+  when: sudoers_sudoers_d_directory_mode is defined
+  tags:
+    - configuration
+    - sudoers
+    - sudoers-configuration
+    - sudoers-configuration-sudoers-d
+
+- name: update specific configuration files
+  template:
+    src: etc/sudoers.d/sudoers.j2
+    dest: "/etc/sudoers.d/{{ item.key }}"
+    validate: "visudo -cf %s"
+    owner: root
+    group: root
+    mode: 0440
+  with_dict: "{{ sudoers_sudoers_d_files }}"
+  tags:
+    - configuration
+    - sudoers
+    - sudoers-configuration
+    - sudoers-configuration-sudoers-d
+
+- name: update global configuration file
+  template:
+    src: etc/sudoers.j2
+    dest: /etc/sudoers
+    validate: "visudo -cf %s"
+    owner: root
+    group: root
+    mode: 0440
+  tags:
+    - configuration
+    - sudoers
+    - sudoers-configuration
+    - sudoers-configuration-sudoers

@@ -1,0 +1,134 @@
+# tasks file
+---
+- name: update configuration file - /etc/apt/sources.list
+  ansible.builtin.template:
+    src: "etc/apt/sources.list.{{ ansible_distribution }}.j2"
+    dest: /etc/apt/sources.list
+    owner: root
+    group: root
+    mode: 0644
+  register: apt_config_updated
+  when: apt_manage_sources_list
+  tags:
+    - configuration
+    - apt
+    - apt-configuration
+
+- name: update configuration file - /etc/apt/apt.conf
+  ansible.builtin.template:
+    src: "{{ apt_apt_conf_file.lstrip('/') }}.j2"
+    dest: "{{ apt_apt_conf_file }}"
+    owner: root
+    group: root
+    mode: 0644
+  when: apt_etc_apt_apt_conf | length > 0
+  tags:
+    - configuration
+    - apt
+    - apt-configuration
+
+- name: remove configuration files - /etc/apt/apt.conf.d/*
+  ansible.builtin.file:
+    path: "/etc/apt/apt.conf.d/{{ item }}"
+    state: absent
+  with_items: "{{ apt_etc_apt_apt_conf_d_files_absent }}"
+  tags:
+    - configuration
+    - apt
+    - apt-configuration
+
+- name: ensure directory exists - /var/lib/apt/lists/
+  ansible.builtin.file:
+    path: /var/lib/apt/lists/
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  tags:
+    - configuration
+    - apt
+    - apt-update
+
+- name: update
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: "{{ 0 if apt_config_updated is defined and apt_config_updated.changed else apt_update_cache_valid_time }}"
+  when: apt_update
+  tags:
+    - configuration
+    - apt
+    - apt-update
+
+- name: dpkg --configure
+  ansible.builtin.command: >
+    dpkg --configure -a
+  args:
+    warn: false
+  changed_when: _dpkg_configure.stdout_lines | length > 0
+  register: _dpkg_configure
+  when: apt_dpkg_configure
+  tags:
+    - configuration
+    - apt
+    - apt-dpkg-configure
+
+- name: install dependencies
+  ansible.builtin.apt:
+    name: "{{ apt_dependencies }}"
+    state: "{{ apt_install_state }}"
+  tags:
+    - configuration
+    - apt
+    - apt-dependencies
+
+- name: upgrade
+  ansible.builtin.apt:
+    upgrade: "{{ apt_upgrade_type }}"
+    update_cache: true
+    dpkg_options: "{{ apt_upgrade_dpkg_options | join(',') }}"
+  when: apt_upgrade
+  tags:
+    - configuration
+    - apt
+    - apt-upgrade
+
+- name: clean
+  ansible.builtin.command: >
+    apt-get -y clean
+  args:
+    warn: false
+  changed_when: false
+  when: apt_clean
+  tags:
+    - configuration
+    - apt
+    - apt-clean
+
+- name: install
+  ansible.builtin.apt:
+    name: "{{ apt_install }}"
+    state: "{{ apt_install_state }}"
+  tags:
+    - configuration
+    - apt
+    - apt-install
+
+- name: remove
+  ansible.builtin.apt:
+    name: "{{ apt_remove }}"
+    state: absent
+    purge: "{{ apt_remove_purge }}"
+  tags:
+    - configuration
+    - apt
+    - apt-remove
+
+- name: autoremove
+  ansible.builtin.apt:
+    autoremove: true
+    dpkg_options: "{{ apt_upgrade_dpkg_options | join(',') }}"
+  when: apt_autoremove
+  tags:
+    - configuration
+    - apt
+    - apt-autoremove
