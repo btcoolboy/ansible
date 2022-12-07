@@ -1,25 +1,28 @@
-[ubuntu]
-ubuntu-template ansible_host=10.200.101.160
-[ubuntu:children]
-k8s
-adm
-docker
 
 [debian]
 debian-template ansible_host=10.200.101.162
 127.0.0.1 ansible_connection=local
 
-[k8s]
-k8s-master[01:03]
-k8s-worker[01:06]
+[ubuntu]
+ubuntu-template ansible_host=10.200.101.160
 
-[adm]
+[ubuntu:children]
+ubuntu-adm
+ubuntu-docker
+ubuntu-k8s
+
+[ubuntu-adm]
 k8s-adm
 
-[docker]
+[ubuntu-docker]
 ubuntu-docker-template ansible_host=10.200.101.161
-[docker:children]
-ceph
 
-[ceph]
+[ubuntu-docker:children]
+ubuntu-docker-ceph
+
+[ubuntu-docker-ceph]
 ceph-[01:03]
+
+[ubuntu-k8s]
+k8s-master[01:03]
+k8s-worker[01:06]
