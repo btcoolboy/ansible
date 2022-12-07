@@ -1,17 +1,23 @@
 [debian]
+[debian:children]
+debian-common
+
+[debian-common]
 debian-template ansible_host=10.200.101.162
 127.0.0.1 ansible_connection=local
 
 [ubuntu]
-ubuntu-template ansible_host=10.200.101.160
-
 [ubuntu:children]
 ubuntu-adm
+ubuntu-common
 ubuntu-docker
 ubuntu-k8s
 
 [ubuntu-adm]
 k8s-adm
+
+[ubuntu-common]
+ubuntu-template ansible_host=10.200.101.160
 
 [ubuntu-docker]
 ubuntu-docker-template ansible_host=10.200.101.161
