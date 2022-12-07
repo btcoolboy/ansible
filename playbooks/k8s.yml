@@ -1,5 +1,5 @@
 ---
-- hosts: k8s
+- hosts: ubuntu-k8s
   tasks:
     - name: Install a list of packages
       apt:
