@@ -21,8 +21,8 @@
         state: started
         enabled: yes
   roles:
-    - role: c_chrony
-    - role: c_containerd
+    - role: chrony
+    - role: containerd
       vars:
         containerd_repo: http://vm-data-20.cloud.lab:8081/repository/docker-yum/
         containerd_repo_address: http://vm-data-20.cloud.lab:8081/repository/docker-yum/centos/
