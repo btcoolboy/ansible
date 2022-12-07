@@ -1,25 +1,25 @@
 ---
 - hosts: debian
   roles:
-    - role: d_dns
+    - role: dns
       vars:
         dns_domain: cloud.lab
         dns_nameservers: [10.200.101.20, 10.200.101.254]
         dns_searches: [cloud.lab]
-    - role: d_apt
+    - role: apt
       vars:
         apt_manage_sources_list: true
         apt_debian_mirror: http://vm-data-20.cloud.lab:8081/repository/debian/ 
         apt_debian_security_mirror: http://vm-data-20.cloud.lab:8081/repository/debian-security/ 
         apt_debian_contrib_nonfree_enable: true
-    - role: d_bash
-    - role: d_vim
-    - role: d_ca_certificates
+    - role: bash
+    - role: vim
+    - role: ca_certificates
       vars:
         ca_certificates_certificate_map:
           - src: ca.crt 
             dest: cloud.lab/ca.crt
-    - role: d_sudoers
+    - role: sudoers
       vars:
         sudoers_sudoers:
           defaults:
@@ -34,7 +34,7 @@
               entry: "ALL=(ALL) NOPASSWD:ALL"
             - name: "%sudo"
               entry: "ALL=(ALL:ALL) ALL"
-    - role: d_ssh_keys
+    - role: ssh_keys
       vars:
         ssh_keys_private_keys:
           - owner: debian
@@ -45,6 +45,6 @@
         ssh_keys_authorized_keys:
           - owner: debian
             src: files/id_rsa.pub
-    - role: d_timezone
+    - role: timezone
       vars:
         timezone_zone: Asia/Shanghai
