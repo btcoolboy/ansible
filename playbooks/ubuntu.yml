@@ -1,7 +1,7 @@
 ---
 - hosts: ubuntu
   roles:
-    - role: d_apt
+    - role: apt
       vars:
         apt_manage_sources_list: true
         apt_ubuntu_mirror: http://vm-data-20.cloud.lab:8081/repository/ubuntu/
@@ -11,7 +11,7 @@
         ca_certificates_certificate_map:
           - src: ca.crt
             dest: cloud.lab/ca.crt
-    - role: d_sudoers
+    - role: sudoers
       vars:
         sudoers_sudoers:
           defaults:
@@ -26,7 +26,7 @@
               entry: "ALL=(ALL) ALL"
             - name: "%sudo"
               entry: "ALL=(ALL:ALL) NOPASSWD:ALL"
-    - role: d_ssh_keys
+    - role: ssh_keys
       vars:
         ssh_keys_private_keys:
           - owner: ubuntu
@@ -37,7 +37,7 @@
         ssh_keys_authorized_keys:
           - owner: ubuntu
             src: files/id_rsa.pub
-    - role: d_timezone
+    - role: timezone
       vars:
         timezone_zone: Asia/Shanghai
-    - role: c_chrony
+    - role: chrony
