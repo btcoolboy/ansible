@@ -1,5 +1,5 @@
 ---
-- hosts: ubuntu-adm
+- hosts: ubuntu_adm
   roles:
     - role: d_user
       vars:
