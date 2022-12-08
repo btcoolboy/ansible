@@ -1,5 +1,5 @@
 ---
-- hosts: rocky
+- hosts: rocky_k8s
   remote_user: rocky
   tasks:
     - name: Install a list of packages
