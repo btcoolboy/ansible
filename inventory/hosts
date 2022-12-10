@@ -16,7 +16,7 @@ ubuntu_k8s
 ubuntu-template ansible_host=10.200.101.160
 
 [ubuntu_docker]
-ubuntu-docker-template ansible_host=10.200.101.161
+ubuntu-docker
 
 [ubuntu_docker:children]
 ubuntu_docker_ceph
