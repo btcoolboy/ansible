@@ -26,7 +26,7 @@ ceph-[01:03]
 
 [ubuntu_k8s]
 k8s-master[01:03]
-k8s-worker[01:06]
+k8s-worker[01:05]
 
 [ubuntu_k8s:children]
 ubuntu_k8s_adm
