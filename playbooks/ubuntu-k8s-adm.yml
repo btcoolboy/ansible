@@ -1,5 +1,5 @@
 ---
-- hosts: ubuntu_adm
+- hosts: ubuntu_k8s_adm
   roles:
     - role: user
       vars:
