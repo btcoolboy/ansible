@@ -4,15 +4,16 @@
     - name: Install a list of packages
       apt:
         pkg:
-        - open-iscsi
-        - xfsprogs
-        - socat
+        - ceph-common
         - conntrack
         - ebtables
         - ipset
         - ipvsadm
         - nfs-common
-        - ceph-common
+        - open-iscsi
+        - socat
+        - uidmap
+        - xfsprogs
         update_cache: yes
         state: present
     - name: Make sure iscsid is running
