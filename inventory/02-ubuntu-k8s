@@ -1,0 +1,3 @@
+[ubuntu_k8s_common]
+k8s-master[01:03]
+k8s-worker[01:05]
