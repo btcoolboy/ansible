@@ -1,18 +1,22 @@
+# 00-debian.yml
 [debian]
 [debian:children]
 debian_common
 
+# 00-ubuntu.yml
 [ubuntu]
 [ubuntu:children]
 ubuntu_common
 ubuntu_docker
 ubuntu_k8s
 
+# 01-ubuntu-docker.yml
 [ubuntu_docker]
 [ubuntu_docker:children]
 ubuntu_docker_ceph
 ubuntu_docker_common
 
+# 01-ubuntu-k8s.yml
 [ubuntu_k8s]
 [ubuntu_k8s:children]
 ubuntu_k8s_adm
