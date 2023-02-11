@@ -1,2 +1,8 @@
+[ubuntu]
+[ubuntu:children]
+ubuntu_common
+ubuntu_docker
+ubuntu_k8s
+
 [ubuntu_common]
 ubuntu-template ansible_host=10.200.101.160
