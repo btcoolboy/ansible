@@ -1,2 +1,6 @@
+[ubuntu_k8s]
+[ubuntu_k8s:children]
+ubuntu_k8s_adm
+
 [ubuntu_k8s_adm]
 k8s-adm

@@ -1,6 +1,9 @@
+[ubuntu]
+[ubuntu:children]
+ubuntu_docker
+
 [ubuntu_docker]
 [ubuntu_docker:children]
-ubuntu_docker_ceph
 ubuntu_docker_common
 
 [ubuntu_docker_common]
