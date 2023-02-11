@@ -1,6 +1,2 @@
 [ubuntu]
-[ubuntu:children]
-ubuntu_common
-
-[ubuntu_common]
 ubuntu-template ansible_host=10.200.101.160
