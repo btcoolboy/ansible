@@ -1,7 +1,7 @@
 ---
 - hosts: ubuntu_k8s
   tasks:
-    - name: Install a list of packages
+    - name: Install packages
       apt:
         pkg:
         - ceph-common
