@@ -23,6 +23,7 @@
         repo: "deb http://vm-data-20.cloud.lab:8081/repository/ceph/debian-quincy/ {{ ansible_distribution_release }} main"
         state: present
         filename: ceph-v17
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('20.04', '=')
   roles:
     - role: apt
       vars:
