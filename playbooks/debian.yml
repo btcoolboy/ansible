@@ -1,5 +1,29 @@
 ---
 - hosts: debian
+  tasks:
+    - name: Add Ceph apt key.
+      ansible.builtin.get_url:
+        url: "http://vm-data-20.cloud.lab:8081/repository/ceph/keys/release.asc"
+        dest: /etc/apt/trusted.gpg.d/ceph.asc
+        mode: '0644'
+        force: true
+      register: add_repository_key
+      ignore_errors: true
+    - name: Ensure curl is present (on older systems without SNI).
+      package: name=curl state=present
+      when: add_repository_key is failed
+    - name: Add Ceph apt key (alternative for older systems without SNI).
+      shell: >
+        curl -sSL "http://vm-data-20.cloud.lab:8081/repository/ceph/keys/release.asc" | apt-key add -
+      args:
+        warn: false
+      when: add_repository_key is failed
+    - name: Add Ceph repository
+      ansible.builtin.apt_repository:
+        repo: "deb http://vm-data-20.cloud.lab:8081/repository/ceph/debian-quincy/ {{ ansible_distribution_release }} main"
+        state: present
+        filename: ceph-v17
+      when: ansible_distribution == 'Debian' and ansible_distribution_version is version('11', '=')
   roles:
     - role: dns
       vars:
@@ -48,3 +72,4 @@
     - role: timezone
       vars:
         timezone_zone: Asia/Shanghai
+    - role: chrony
