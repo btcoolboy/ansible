@@ -3,14 +3,11 @@
   roles:
     - role: docker
       vars:
-        docker_repo_url: http://vm-data-20.cloud.lab:8081/repository/docker-apt
+        docker_repo_url: https://nexus3.cloud.lab/repository/docker
         docker_install_compose_plugin: true
         docker_daemon_options:
-          insecure-registries:
-            - http://10.200.101.20:8084
-            - http://10.200.101.20:8083
-            - http://10.200.101.20:8082
           registry-mirrors:
-            - http://10.200.101.20:8084
-            - http://10.200.101.20:8083
-            - http://10.200.101.20:8082
+            - https://registry-docker.cloud.lab
+            - https://registry-quay.cloud.lab
+            - https://registry-k8s.cloud.lab
+            - https://upload-docker.cloud.lab

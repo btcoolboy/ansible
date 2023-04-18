@@ -24,20 +24,20 @@
   roles:
     - role: containerd
       vars:
-        containerd_repo: http://vm-data-20.cloud.lab:8081/repository/docker-apt/
+        containerd_repo: https://nexus3.cloud.lab/repository/docker/
         containerd_registry_mirrors:
           - name: docker.io
             endpoint:
-              - http://10.200.101.20:8083
+              - https://registry-docker.cloud.lab
           - name: quay.io
             endpoint:
-              - http://10.200.101.20:8084
+              - https://registry-quay.cloud.lab 
           - name: gcr.io
             endpoint:
-              - http://10.200.101.20:8083
+              - https://registry-k8s.cloud.lab
           - name: k8s.gcr.io
             endpoint:
-              - http://10.200.101.20:8083
+              - https://registry-k8s.cloud.lab
           - name: registry.k8s.io
             endpoint:
-              - http://10.200.101.20:8083
+              - https://registry-k8s.cloud.lab
