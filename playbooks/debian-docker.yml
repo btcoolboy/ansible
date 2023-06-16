@@ -1,0 +1,13 @@
+---
+- hosts: debian_docker
+  roles:
+    - role: docker
+      vars:
+        docker_repo_url: https://nexus3.cloud.lab/repository/docker
+        docker_install_compose_plugin: true
+        docker_daemon_options:
+          registry-mirrors:
+            - https://registry-docker.cloud.lab
+            - https://registry-quay.cloud.lab
+            - https://registry-k8s.cloud.lab
+            - https://upload-docker.cloud.lab
