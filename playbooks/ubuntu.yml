@@ -27,7 +27,6 @@
   roles:
     - role: apt
       vars:
-        apt_manage_sources_list: true
         apt_ubuntu_mirror: https://nexus3.cloud.lab/repository/ubuntu/
         apt_ubuntu_security_mirror: https://nexus3.cloud.lab/repository/ubuntu/
     - role: ca_certificates

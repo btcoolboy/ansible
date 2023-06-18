@@ -1,8 +1,8 @@
 # defaults file
 ---
-apt_manage_sources_list: false
+apt_manage_sources_list: true
 
-apt_src_enable: true
+apt_src_enable: false
 apt_backports_enable: true
 
 # Ubuntu specific
