@@ -1,3 +1,4 @@
 [debian]
-debian-template ansible_host=10.200.101.162
+10.200.101.162
 127.0.0.1 ansible_connection=local
+10.200.101.164

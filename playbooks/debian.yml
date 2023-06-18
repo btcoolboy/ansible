@@ -37,12 +37,12 @@
         apt_debian_security_mirror: https://nexus3.cloud.lab/repository/debian-security/ 
         apt_debian_contrib_nonfree_enable: true
     - role: bash
-    - role: vim
     - role: ca_certificates
       vars:
         ca_certificates_certificate_map:
-          - src: ca.crt 
+          - src: ca.crt
             dest: cloud.lab/ca.crt
+    - role: vim
     - role: sudoers
       vars:
         sudoers_sudoers:
