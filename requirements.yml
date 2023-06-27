@@ -3,7 +3,9 @@ collections:
   - name: 'git+https://github.com/debops/debops#/ansible/,v3.0.5'
 
   - name: freeipa.ansible_freeipa
-    src: https://github.com/freeipa/ansible-freeipa
+    type: git
+    version: v1.11.0
+    source: https://github.com/freeipa/ansible-freeipa.git
 
 roles:
 # common
