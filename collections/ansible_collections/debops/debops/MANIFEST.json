@@ -2,7 +2,7 @@
  "collection_info": {
   "namespace": "debops",
   "name": "debops",
-  "version": "0.0.0",
+  "version": "3.0.5",
   "authors": [
    "Maciej Delmanowski <drybjed@gmail.com>",
    "DebOps Developers <debops-users@lists.debops.org>"
@@ -20,7 +20,18 @@
   ],
   "description": "Your Debian-based data center in a box",
   "license": [
-   "GPL-3.0-or-later"
+   "AGPL-3.0-only",
+   "Apache-2.0",
+   "BSD-4-Clause",
+   "CC-BY-3.0",
+   "CC-BY-SA-4.0",
+   "CC0-1.0",
+   "GPL-2.0-only",
+   "GPL-2.0-or-later",
+   "GPL-3.0-only",
+   "GPL-3.0-or-later",
+   "MIT",
+   "OLDAP-2.8"
   ],
   "license_file": null,
   "dependencies": {
@@ -35,7 +46,7 @@
    "community.rabbitmq": "*"
   },
   "repository": "https://github.com/debops/debops",
-  "documentation": "https://docs.debops.org/en/master/ansible/role-index.html",
+  "documentation": "https://docs.debops.org/en/stable-3.0/ansible/role-index.html",
   "homepage": "https://debops.org/",
   "issues": "https://github.com/debops/debops/issues"
  },
@@ -43,7 +54,7 @@
   "name": "FILES.json",
   "ftype": "file",
   "chksum_type": "sha256",
-  "chksum_sha256": "934ccaac5f9e9011834ac3bf84661b132cd8253743490828b4b6200a8a3dd229",
+  "chksum_sha256": "35d73e5c05b678d11f37e6fab4235cf7b3d98f00596468e6d4fb5f5abbe867aa",
   "format": 1
  },
  "format": 1

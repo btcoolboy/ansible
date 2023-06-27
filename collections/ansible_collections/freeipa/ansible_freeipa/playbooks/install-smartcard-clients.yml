@@ -1,0 +1,8 @@
+---
+- name: Playbook to setup smartcard for IPA clients
+  hosts: ipaclients
+  become: true
+
+  roles:
+  - role: freeipa.ansible_freeipa.ipasmartcard_client
+    state: present

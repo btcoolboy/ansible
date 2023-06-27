@@ -1,0 +1,166 @@
+---
+- name: Test ipatrust
+  hosts: "{{ ipa_test_host | default('ipaserver') }}"
+  become: true
+  gather_facts: false
+
+  vars:
+    adserver:
+      domain: "{{ winserver_domain | default('windows.local')}}"
+      realm: "{{ winserver_realm | default(winserver_domain) | default('windows.local') | upper }}"
+      password: "{{ winserver_admin_password | default('SomeW1Npassword') }}"
+    ipaserver:
+      domain: "{{ ipaserver_domain | default('ipa.test')}}"
+      realm: "{{ ipaserver_realm | default(ipaserver_domain) | default('ipa.test') | upper }}"
+    trust_exists: 'Realm name: {{ adserver.domain }}'
+    ad_range_exists: 'Range name: {{ adserver.realm }}_id_range'
+    ipa_range_exists: 'Range name: {{ ipaserver.realm }}_subid_range'
+
+  tasks:
+  - name: Run tust tests, if supported by environment
+    when: trust_test_is_supported | default(false)
+    block:
+    - name: Delete test trust
+      freeipa.ansible_freeipa.ipatrust:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        realm: "{{ adserver.domain }}"
+        state: absent
+
+    - name: Clear test idranges
+      ansible.builtin.shell: |
+        kinit -c test_krb5_cache admin <<< SomeADMINpassword
+        ipa idrange-del {{ adserver.realm }}_id_range || true
+        ipa idrange-del {{ ipaserver.realm }}_subid_range || true
+        kdestroy -c test_krb5_cache -q -A
+
+    - name: Add trust with range_type 'ipa-ad-trust'
+      freeipa.ansible_freeipa.ipatrust:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        realm: "{{ adserver.domain }}"
+        admin: Administrator
+        trust_type: ad
+        range_type: ipa-ad-trust
+        password: "{{ adserver.password }}"
+        state: present
+      register: result
+      failed_when: result.failed or not result.changed
+
+    - name: Check if 'ipa-ad-trust' trust exists
+      ansible.builtin.shell: |
+        echo 'SomeADMINpassword' | kinit admin
+        ipa trust-find
+        kdestroy -c test_krb5_cache -q -A
+      register: check_add_trust
+      failed_when: "trust_exists not in check_add_trust.stdout"
+
+    - name: Add trust with range_type 'ipa-ad-trust', again
+      freeipa.ansible_freeipa.ipatrust:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        realm: "{{ adserver.domain }}"
+        admin: Administrator
+        range_type: ipa-ad-trust
+        password: "{{ adserver.password }}"
+        state: present
+      register: result
+      failed_when: result.failed or result.changed
+
+    - name: Delete 'ipa-ad-trust' trust
+      freeipa.ansible_freeipa.ipatrust:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        realm: "{{ adserver.domain }}"
+        state: absent
+      register: result
+      failed_when: result.failed or not result.changed
+
+    - name: Check if 'ipa-ad-trust' trust was removed
+      ansible.builtin.shell: |
+        kinit -c test_krb5_cache admin <<< SomeADMINpassword
+        ipa trust-find
+        kdestroy -c test_krb5_cache -q -A
+      register: check_add_trust
+      failed_when: "trust_exists in check_add_trust.stdout"
+
+    - name: Delete 'ipa-ad-trust' trust, again
+      freeipa.ansible_freeipa.ipatrust:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        realm: "{{ adserver.domain }}"
+        state: absent
+      register: result
+      failed_when: result.failed or result.changed
+
+    - name: Clear test idranges
+      ansible.builtin.shell: |
+        kinit -c test_krb5_cache admin <<< SomeADMINpassword
+        ipa idrange-del {{ adserver.realm }}_id_range || true
+        ipa idrange-del {{ ipaserver.realm }}_subid_range || true
+        kdestroy -c test_krb5_cache -q -A
+
+    - name: Add trust with range_type 'ipa-ad-trust-posix'
+      freeipa.ansible_freeipa.ipatrust:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        realm: "{{ adserver.domain }}"
+        admin: Administrator
+        range_type: ipa-ad-trust-posix
+        password: "{{ adserver.password }}"
+        state: present
+      register: result
+      failed_when: result.failed or not result.changed
+
+    - name: Check if 'ipa-ad-trust-posix' trust exists
+      ansible.builtin.shell: |
+        kinit -c test_krb5_cache admin <<< SomeADMINpassword
+        ipa trust-find
+        kdestroy -c test_krb5_cache -q -A
+      register: check_add_trust
+      failed_when: "trust_exists not in check_add_trust.stdout"
+
+    - name: Add trust with range_type 'ipa-ad-trust-posix', again
+      freeipa.ansible_freeipa.ipatrust:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        realm: "{{ adserver.domain }}"
+        admin: Administrator
+        range_type: ipa-ad-trust-posix
+        password: "{{ adserver.password }}"
+        state: present
+      register: result
+      failed_when: result.failed or result.changed
+
+    - name: Delete 'ipa-ad-trust-posix' trust
+      freeipa.ansible_freeipa.ipatrust:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        realm: "{{ adserver.domain }}"
+        state: absent
+      register: result
+      failed_when: result.failed or not result.changed
+
+    - name: Check if trust 'ipa-ad-trust-posix' was removed
+      ansible.builtin.shell: |
+        kinit -c test_krb5_cache admin <<< SomeADMINpassword
+        ipa trust-find
+        kdestroy -c test_krb5_cache -q -A
+      register: check_del_trust
+      failed_when: "trust_exists in check_del_trust.stdout"
+
+    - name: Delete 'ipa-ad-trust-posix' trust, again
+      freeipa.ansible_freeipa.ipatrust:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        realm: "{{ adserver.domain }}"
+        state: absent
+      register: result
+      failed_when: result.failed or result.changed
+
+    - name: Clear test idranges
+      ansible.builtin.shell: |
+        kinit -c test_krb5_cache admin <<< SomeADMINpassword
+        ipa idrange-del {{ adserver.realm }}_id_range || true
+        ipa idrange-del {{ ipaserver.realm }}_subid_range || true
+        kdestroy -c test_krb5_cache -q -A

@@ -1,0 +1,105 @@
+---
+- name: Test group
+  hosts: ipaserver
+  become: yes
+  gather_facts: yes
+
+  vars:
+      ad_user: "{{ test_ad_user | default('AD\\aduser') }}"
+      ad_domain: "{{ test_ad_domain | default('ad.ipa.test') }}"
+
+  tasks:
+    - name: Include tasks ../env_freeipa_facts.yml
+      ansible.builtin.include_tasks: ../env_freeipa_facts.yml
+
+    - name: Execute tests if ipa_verison >= 4.8.7 and trust test environment is supported
+      when: ipa_version is version("4.8.7", ">=") and trust_test_is_supported | default(false)
+      block:
+      - name: Create idoverrideuser.
+        ansible.builtin.shell: |
+          kinit -c idoverride_cache admin <<< SomeADMINpassword
+          ipa idoverrideuser-add "Default Trust View" {{ ad_user }}
+          kdestroy -A -q -c idoverride_cache
+
+      - name: Remove testing groups.
+        freeipa.ansible_freeipa.ipagroup:
+          ipaadmin_password: SomeADMINpassword
+          name:
+          - idovergroup
+          state: absent
+
+      - name: Add group with idoverrideuser.
+        freeipa.ansible_freeipa.ipagroup:
+          ipaadmin_password: SomeADMINpassword
+          name: idovergroup
+          idoverrideuser: "{{ ad_user }}"
+        register: result
+        failed_when: result.failed or not result.changed
+
+      - name: Add group with idoverrideuser, again.
+        freeipa.ansible_freeipa.ipagroup:
+          ipaadmin_password: SomeADMINpassword
+          name: idovergroup
+          idoverrideuser: "{{ ad_user }}"
+        register: result
+        failed_when: result.failed or result.changed
+
+      - name: Remove idoverrideuser member.
+        freeipa.ansible_freeipa.ipagroup:
+          ipaadmin_password: SomeADMINpassword
+          name: idovergroup
+          idoverrideuser: "{{ ad_user }}"
+          action: member
+          state: absent
+        register: result
+        failed_when: result.failed or not result.changed
+
+      - name: Remove idoverrideuser member, again.
+        freeipa.ansible_freeipa.ipagroup:
+          ipaadmin_password: SomeADMINpassword
+          name: idovergroup
+          idoverrideuser: "{{ ad_user }}"
+          action: member
+          state: absent
+        register: result
+        failed_when: result.failed or result.changed
+
+      - name: Add idoverrideuser member.
+        freeipa.ansible_freeipa.ipagroup:
+          ipaadmin_password: SomeADMINpassword
+          name: idovergroup
+          idoverrideuser: "{{ ad_user }}"
+          action: member
+        register: result
+        failed_when: result.failed or not result.changed
+
+      - name: Add idoverrideuser member, again.
+        freeipa.ansible_freeipa.ipagroup:
+          ipaadmin_password: SomeADMINpassword
+          name: idovergroup
+          idoverrideuser: "{{ ad_user }}"
+          action: member
+        register: result
+        failed_when: result.failed or result.changed
+
+      - name: Cleanup idoverrideuser member.
+        freeipa.ansible_freeipa.ipagroup:
+          ipaadmin_password: SomeADMINpassword
+          name: idovergroup
+          idoverrideuser: "{{ ad_user }}"
+          state: absent
+
+      - name: Remove testing groups.
+        freeipa.ansible_freeipa.ipagroup:
+          ipaadmin_password: SomeADMINpassword
+          name:
+          - idovergroup
+          state: absent
+
+      always:
+      - name: Remove idoverrideuser.
+        ansible.builtin.shell:
+          cmd: |
+            kinit -c idoverride_cache admin <<< SomeADMINpassword
+            ipa idoverrideuser-del "Default Trust View" {{ ad_user }}
+            kdestroy -A -q -c idoverride_cache

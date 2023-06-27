@@ -1,0 +1,42 @@
+---
+exclude_paths:
+  - .ansible-freeipa-tests/
+  - .cache/
+  - .github/
+  - .pre-commit-config.yaml
+  - .tox/
+  - .venv/
+  - .yamllint
+  - molecule/
+  - tests/azure/
+  - meta/runtime.yml
+  - requirements-docker.yml
+  - requirements-podman.yml
+
+kinds:
+  - playbook: '**/tests/**/test_*.yml'
+  - playbook: '**/playbooks/**/*.yml'
+  - playbook: '**/tests/ca-less/install_*_without_ca.yml'
+  - playbook: '**/tests/ca-less/clean_up_certificates.yml'
+  - playbook: '**/tests/external-signed-ca-with-automatic-copy/install-server-with-external-ca-with-automatic-copy.yml'
+  - playbook: '**/tests/external-signed-ca-with-manual-copy/install-server-with-external-ca-with-manual-copy.yml'
+  - playbook: '**/tests/user/create_users_json.yml'
+  - tasks: '**/tasks_*.yml'
+  - tasks: '**/env_*.yml'
+
+parseable: true
+
+quiet: false
+
+skip_list:
+  - '301'  # Commands should not change things if nothing needs doing'
+  - '305'  # Use shell only when shell functionality is required
+  - '306'  # risky-shell-pipe
+  - yaml   # yamllint should be executed separately.
+  - experimental   # Do not run any experimental tests
+  - name[template] # Allow Jinja templating inside task names
+  - var-naming
+
+use_default_rules: true
+
+verbosity: 1

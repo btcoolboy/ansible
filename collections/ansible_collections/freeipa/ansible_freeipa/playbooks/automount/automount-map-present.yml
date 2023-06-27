@@ -1,0 +1,12 @@
+---
+- name: Automount map present example
+  hosts: ipaserver
+  become: no
+
+  tasks:
+  - name: Ensure map TestMap is present
+    freeipa.ansible_freeipa.ipaautomountmap:
+      ipaadmin_password: SomeADMINpassword
+      name: TestMap
+      location: TestLocation
+      desc: "this is a test map"

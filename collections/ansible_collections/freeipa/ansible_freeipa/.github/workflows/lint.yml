@@ -1,0 +1,90 @@
+---
+name: Run Linters
+on:
+  - push
+  - pull_request
+jobs:
+  ansible_lint:
+    name: Verify ansible-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v4.3.0
+        with:
+          python-version: "3.x"
+      - name: Run ansible-lint
+        run: |
+          pip install "ansible-core >=2.14,<2.15" ansible-lint
+          utils/build-galaxy-release.sh -ki
+          cd .galaxy-build
+          ansible-lint
+
+  yamllint:
+    name: Verify yamllint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v4.3.0
+        with:
+          python-version: "3.x"
+      - name: Run yaml-lint
+        uses: ibiqlik/action-yamllint@v3.1.1
+
+  pydocstyle:
+    name: Verify pydocstyle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v4.3.0
+        with:
+          python-version: "3.x"
+      - name: Run pydocstyle
+        run: |
+            pip install pydocstyle
+            pydocstyle
+
+  flake8:
+    name: Verify flake8
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v4.3.0
+        with:
+          python-version: "3.x"
+      - name: Run flake8
+        run: |
+            pip install flake8 flake8-bugbear
+            flake8
+
+  pylint:
+    name: Verify pylint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v4.3.0
+        with:
+          python-version: "3.x"
+      - name: Run pylint
+        run: |
+            pip install pylint==2.14.4 wrapt==1.14.0
+            pylint plugins roles --disable=import-error
+
+  shellcheck:
+    name: Shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.1.0
+        with:
+          fetch-depth: 0
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@master

@@ -1,0 +1,11 @@
+---
+- name: Servicedelegationtarget absent example
+  hosts: ipaserver
+  become: no
+
+  tasks:
+  - name: Ensure servicedelegationtarget test-delegation-target is absent
+    freeipa.ansible_freeipa.ipaservicedelegationtarget:
+      ipaadmin_password: SomeADMINpassword
+      name: test-delegation-target
+      state: absent

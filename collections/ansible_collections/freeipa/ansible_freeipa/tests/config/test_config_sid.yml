@@ -1,0 +1,128 @@
+---
+- name: Test config
+  hosts: "{{ ipa_test_host | default('ipaserver') }}"
+  become: no
+  gather_facts: no
+
+  tasks:
+
+  - name: Set FreeIPA facts.
+    ansible.builtin.include_tasks: ../env_freeipa_facts.yml
+
+  # GET CURRENT CONFIG
+
+  - name: Return current values of the global configuration options
+    freeipa.ansible_freeipa.ipaconfig:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+    register: previous
+
+  # TESTS
+  - name: Test config sid
+    # only run tests if version supports enable-sid
+    when: ipa_version is version("4.9.8", ">=")
+    block:
+    - name: Check if SID is enabled.
+      freeipa.ansible_freeipa.ipaconfig:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        enable_sid: yes
+      check_mode: yes
+      register: sid_disabled
+
+    - name: Ensure netbios_name can't be changed without SID enabled.  # noqa 503
+      freeipa.ansible_freeipa.ipaconfig:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        netbios_name: IPATESTPLAY
+      register: result
+      failed_when: not result.failed and "SID generation must be enabled" in result.msg
+      when: sid_disabled.changed
+
+    - name: Ensure SIDs can't be changed without SID enabled.  # noqa 503
+      freeipa.ansible_freeipa.ipaconfig:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        add_sids: yes
+      register: result
+      failed_when: not result.failed and "SID generation must be enabled" in result.msg
+      when: sid_disabled.changed
+
+    - name: Ensure SID is enabled.
+      freeipa.ansible_freeipa.ipaconfig:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        enable_sid: yes
+      register: result
+      failed_when: result.failed or previous.config.enable_sid == result.changed
+
+    - name: Ensure SID is enabled, again.
+      freeipa.ansible_freeipa.ipaconfig:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        enable_sid: yes
+      register: result
+      failed_when: result.failed or result.changed
+
+    - name: Try to Ensure SID is disabled.
+      freeipa.ansible_freeipa.ipaconfig:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        enable_sid: no
+      register: result
+      failed_when: not result.failed or "SID cannot be disabled." not in result.msg
+
+    - name: Ensure netbios_name is "IPATESTPLAY"
+      freeipa.ansible_freeipa.ipaconfig:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        enable_sid: yes
+        netbios_name: IPATESTPLAY
+      register: result
+      failed_when: result.failed or not result.changed
+
+    - name: Ensure netbios_name is "IPATESTPLAY", again
+      freeipa.ansible_freeipa.ipaconfig:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        netbios_name: IPATESTPLAY
+      register: result
+      failed_when: result.failed or result.changed
+
+    - name: Ensure netbios_name cannot be set with lowercase characters
+      freeipa.ansible_freeipa.ipaconfig:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        netbios_name: IPATESTplay
+      register: result
+      failed_when:
+        (not result.failed
+         and "Up to 15 characters and only uppercase ASCII letters, digits and dashes are allowed" not in result.message)
+
+    - name: Ensure netbios_name cannot be set different lowercase characters
+      freeipa.ansible_freeipa.ipaconfig:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        netbios_name: otherPLAY
+      register: result
+      failed_when:
+        (not result.failed
+         and "Up to 15 characters and only uppercase ASCII letters, digits and dashes are allowed" not in result.message)
+
+    # add_sids is not idempotent as it always tries to generate the missing
+    # SIDs for users and groups.
+    - name: Add SIDs to users and groups.
+      freeipa.ansible_freeipa.ipaconfig:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        add_sids: yes
+
+    # REVERT TO PREVIOUS CONFIG
+    always:
+    # Once SID is enabled, it cannot be reverted.
+    - name: Revert netbios_name to original configuration
+      freeipa.ansible_freeipa.ipaconfig:
+        ipaadmin_password: SomeADMINpassword
+        ipaapi_context: "{{ ipa_context | default(omit) }}"
+        netbios_name: "{{ previous.config.netbios_name | default(omit) }}"
+        enable_sid: yes

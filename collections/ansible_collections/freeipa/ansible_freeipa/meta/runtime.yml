@@ -1,0 +1,41 @@
+---
+action_groups:
+  freeipa.ansible_freeipa.modules:
+  - ipaautomember
+  - ipaautomountkey
+  - ipaautomountlocation
+  - ipaautomountmap
+  - ipacert
+  - ipaconfig
+  - ipadelegation
+  - ipadnsconfig
+  - ipadnsforwardzone
+  - ipadnsrecord
+  - ipadnszone
+  - ipagroup
+  - ipahbacrule
+  - ipahbacsvc
+  - ipahbacsvcgroup
+  - ipahost
+  - ipahostgroup
+  - ipaidrange
+  - ipalocation
+  - ipanetgroup
+  - ipapermission
+  - ipaprivilege
+  - ipapwpolicy
+  - iparole
+  - ipaselfservice
+  - ipaserver
+  - ipaservice
+  - ipaservicedelegationrule
+  - ipaservicedelegationtarget
+  - ipasudocmd
+  - ipasudocmdgroup
+  - ipasudorule
+  - ipatopologysegment
+  - ipatopologysuffix
+  - ipatrust
+  - ipauser
+  - ipavault
+requires_ansible: '>=2.9'

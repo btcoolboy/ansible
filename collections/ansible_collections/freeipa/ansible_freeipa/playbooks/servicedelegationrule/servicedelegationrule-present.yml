@@ -1,0 +1,10 @@
+---
+- name: Servicedelegationrule present example
+  hosts: ipaserver
+  become: no
+
+  tasks:
+  - name: Ensure servicedelegationrule test-delegation-rule is present
+    freeipa.ansible_freeipa.ipaservicedelegationrule:
+      ipaadmin_password: SomeADMINpassword
+      name: test-delegation-rule

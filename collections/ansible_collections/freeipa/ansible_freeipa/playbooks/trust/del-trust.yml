@@ -1,0 +1,11 @@
+---
+- name: Playbook to delete trust
+  hosts: ipaserver
+  become: true
+
+  tasks:
+    - name: Ensure the trust is absent
+      freeipa.ansible_freeipa.ipatrust:
+        ipaadmin_password: SomeADMINpassword
+        realm: windows.local
+        state: absent

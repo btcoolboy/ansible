@@ -1,0 +1,11 @@
+---
+- name: Dnszone present
+  hosts: ipaserver
+  become: true
+
+  tasks:
+  - name: Ensure zone is present.
+    freeipa.ansible_freeipa.ipadnszone:
+      ipaadmin_password: SomeADMINpassword
+      name: testzone.local
+      state: present
