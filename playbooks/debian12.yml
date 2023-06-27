@@ -1,5 +1,5 @@
 ---
-- hosts: debian
+- hosts: debian12
   tasks:
     - name: Add Ceph apt key.
       ansible.builtin.get_url:

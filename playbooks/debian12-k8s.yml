@@ -1,5 +1,5 @@
 ---
-- hosts: debian_containerd
+- hosts: debian12_k8s
   tasks:
     - name: Install packages
       apt:
