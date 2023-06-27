@@ -37,12 +37,13 @@ options:
     version_added: '0.2.0'
 seealso:
 - module: community.postgresql.postgresql_info
+attributes:
+  check_mode:
+    support: full
 author:
 - Andrew Klychkov (@Andersson007)
 extends_documentation_fragment:
 - community.postgresql.postgres
-notes:
-- Supports C(check_mode).
 '''
 
 EXAMPLES = r'''
@@ -204,7 +205,8 @@ def main():
     if cursor:
         # If connection established:
         result["is_available"], result["server_version"] = pg_ping.do()
-        db_connection.rollback()
+        cursor.close()
+        db_connection.close()
 
     module.exit_json(**result)
 

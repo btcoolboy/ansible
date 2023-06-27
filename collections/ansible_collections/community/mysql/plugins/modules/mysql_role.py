@@ -53,7 +53,7 @@ options:
       - Append the privileges defined by the I(priv) option to the existing ones
         for this role instead of overwriting them. Mutually exclusive with I(subtract_privs).
     type: bool
-    default: no
+    default: false
 
   subtract_privs:
     description:
@@ -62,7 +62,7 @@ options:
         Mutually exclusive with I(append_privs).
     version_added: '3.2.0'
     type: bool
-    default: no
+    default: false
 
   members:
     description:
@@ -80,7 +80,7 @@ options:
         for this role instead of overwriting them.
       - Mutually exclusive with the I(detach_members) and I(admin) option.
     type: bool
-    default: no
+    default: false
 
   detach_members:
     description:
@@ -88,7 +88,7 @@ options:
         instead of overwriting all the current members.
       - Mutually exclusive with the I(append_members) and I(admin) option.
     type: bool
-    default: no
+    default: false
 
   set_default_role_all:
     description:
@@ -96,7 +96,7 @@ options:
       - If C(yes), runs B(SET DEFAULT ROLE ALL TO) each of the I(members) when changed.
       - If you want to avoid this behavior, set this option to C(no) explicitly.
     type: bool
-    default: yes
+    default: true
 
   state:
     description:
@@ -112,14 +112,14 @@ options:
       - Check if mysql allows login as root/nopassword before trying supplied credentials.
       - If success, passed I(login_user)/I(login_password) will be ignored.
     type: bool
-    default: no
+    default: false
 
   members_must_exist:
     description:
       - When C(yes), the module fails if any user in I(members) does not exist.
       - When C(no), users in I(members) which don't exist are simply skipped.
     type: bool
-    default: yes
+    default: true
 
 notes:
   - Pay attention that the module runs C(SET DEFAULT ROLE ALL TO)
@@ -181,7 +181,7 @@ EXAMPLES = r'''
     members:
     - 'alice@%'
     - 'bob@%'
-    set_default_role_all: no
+    set_default_role_all: false
 
 # Assuming that the role developers exists,
 # add john to the current members
@@ -189,7 +189,7 @@ EXAMPLES = r'''
   community.mysql.mysql_role:
     name: developers
     state: present
-    append_members: yes
+    append_members: true
     members:
     - 'joe@localhost'
 
@@ -208,7 +208,7 @@ EXAMPLES = r'''
     name: readers
     state: present
     priv: 'fiction.*:UPDATE'
-    append_privs: yes
+    append_privs: true
 
 - name: Create role with the 'SELECT' and 'UPDATE' privileges in db1 and db2
   community.mysql.mysql_role:
@@ -224,7 +224,7 @@ EXAMPLES = r'''
     name: readers
     members:
     - 'joe@localhost'
-    detach_members: yes
+    detach_members: true
 
 - name: Remove the role readers if exists
   community.mysql.mysql_role:
@@ -258,7 +258,7 @@ EXAMPLES = r'''
   community.mysql.mysql_role:
     state: present
     name: foo
-    subtract_privs: yes
+    subtract_privs: true
     priv:
       'db1.*': DELETE
 
@@ -266,8 +266,8 @@ EXAMPLES = r'''
   community.mysql.mysql_role:
     state: present
     name: foo
-    append_members: yes
-    members_must_exist: no
+    append_members: true
+    members_must_exist: false
     members:
     - 'existing_user@localhost'
     - 'not_existing_user@localhost'
@@ -276,8 +276,8 @@ EXAMPLES = r'''
   community.mysql.mysql_role:
     state: present
     name: foo
-    detach_members: yes
-    members_must_exist: no
+    detach_members: true
+    members_must_exist: false
     members:
     - 'existing_user@localhost'
     - 'not_existing_user@localhost'
@@ -1008,7 +1008,8 @@ def main():
                 cursor, db_conn = mysql_connect(module, 'root', '', config_file,
                                                 ssl_cert, ssl_key, ssl_ca, db,
                                                 connect_timeout=connect_timeout,
-                                                check_hostname=check_hostname)
+                                                check_hostname=check_hostname,
+                                                autocommit=True)
             except Exception:
                 pass
 
@@ -1016,7 +1017,8 @@ def main():
             cursor, db_conn = mysql_connect(module, login_user, login_password,
                                             config_file, ssl_cert, ssl_key,
                                             ssl_ca, db, connect_timeout=connect_timeout,
-                                            check_hostname=check_hostname)
+                                            check_hostname=check_hostname,
+                                            autocommit=True)
 
     except Exception as e:
         module.fail_json(msg='unable to connect to database, '

@@ -29,7 +29,7 @@ options:
     description:
       - Indicate that the 'password' field is a `mysql_native_password` hash.
     type: bool
-    default: no
+    default: false
   host:
     description:
       - The 'host' part of the MySQL username.
@@ -41,7 +41,7 @@ options:
         to all hostnames for a given user.
       - This option cannot be used when creating users.
     type: bool
-    default: no
+    default: false
   priv:
     description:
       - "MySQL privileges string in the format: C(db.table:priv1,priv2)."
@@ -66,7 +66,7 @@ options:
       - Append the privileges defined by priv to the existing ones for this
         user instead of overwriting existing ones. Mutually exclusive with I(subtract_privs).
     type: bool
-    default: no
+    default: false
   subtract_privs:
     description:
       - Revoke the privileges defined by the I(priv) option and keep other existing privileges.
@@ -74,7 +74,7 @@ options:
         Mutually exclusive with I(append_privs).
     version_added: '3.2.0'
     type: bool
-    default: no
+    default: false
   tls_requires:
     description:
       - Set requirement for secure transport as a dictionary of requirements (see the examples).
@@ -87,7 +87,7 @@ options:
     description:
       - Whether binary logging should be enabled or disabled for the connection.
     type: bool
-    default: yes
+    default: true
   force_context:
     description:
       - Sets the С(mysql) system database as context for the executed statements (it will be used
@@ -99,7 +99,7 @@ options:
       - See U(https://dev.mysql.com/doc/refman/8.0/en/replication-options-replica.html#option_mysqld_replicate-ignore-db)
         for a description on how replication filters work (filtering on the replica).
     type: bool
-    default: no
+    default: false
     version_added: '3.1.0'
   state:
     description:
@@ -113,11 +113,11 @@ options:
       - Check if mysql allows login as root/nopassword before trying supplied credentials.
       - If success, passed I(login_user)/I(login_password) will be ignored.
     type: bool
-    default: no
+    default: false
   update_password:
     description:
       - C(always) will update passwords if they differ. This affects I(password) and the combination of I(plugin), I(plugin_hash_string), I(plugin_auth_string).
-      - C(on_create) will only set the password or the combination of plugin, plugin_hash_string, plugin_auth_string for newly created users.
+      - C(on_create) will only set the password or the combination of I(plugin), I(plugin_hash_string), I(plugin_auth_string) for newly created users.
       - "C(on_new_username) works like C(on_create), but it tries to reuse an existing password: If one different user
         with the same username exists, or multiple different users with the same username and equal C(plugin) and
         C(authentication_string) attribute, the existing C(plugin) and C(authentication_string) are used for the
@@ -138,16 +138,23 @@ options:
   plugin_auth_string:
     description:
       - User's plugin auth_string (``CREATE USER user IDENTIFIED WITH plugin BY plugin_auth_string``).
+      - If I(plugin) is ``pam`` (MariaDB) or ``auth_pam`` (MySQL) an optional I(plugin_auth_string) can be used to choose a specific PAM service.
     type: str
     version_added: '0.1.0'
   resource_limits:
     description:
       - Limit the user for certain server resources. Provided since MySQL 5.6 / MariaDB 10.2.
       - "Available options are C(MAX_QUERIES_PER_HOUR: num), C(MAX_UPDATES_PER_HOUR: num),
-        C(MAX_CONNECTIONS_PER_HOUR: num), C(MAX_USER_CONNECTIONS: num)."
+        C(MAX_CONNECTIONS_PER_HOUR: num), C(MAX_USER_CONNECTIONS: num), C(MAX_STATEMENT_TIME: num) (supported only for MariaDB since collection version 3.7.0)."
       - Used when I(state=present), ignored otherwise.
     type: dict
     version_added: '0.1.0'
+  session_vars:
+    description:
+      - "Dictionary of session variables in form of C(variable: value) to set at the beginning of module execution."
+      - Cannot be used to set global variables, use the M(community.mysql.mysql_variables) module instead.
+    type: dict
+    version_added: '3.6.0'
 
 notes:
    - "MySQL server installs with default I(login_user) of C(root) and no password.
@@ -189,7 +196,7 @@ EXAMPLES = r'''
 - name: Removes all anonymous user accounts
   community.mysql.mysql_user:
     name: ''
-    host_all: yes
+    host_all: true
     state: absent
 
 - name: Create database user with name 'bob' and password '12345' with all database privileges
@@ -203,16 +210,19 @@ EXAMPLES = r'''
   community.mysql.mysql_user:
     name: bob
     password: '*EE0D72C1085C46C5278932678FBE2C6A782821B4'
-    encrypted: yes
+    encrypted: true
     priv: '*.*:ALL'
     state: present
 
+# Set session var wsrep_on=off before creating the user
 - name: Create database user with password and all database privileges and 'WITH GRANT OPTION'
   community.mysql.mysql_user:
     name: bob
     password: 12345
     priv: '*.*:ALL,GRANT'
     state: present
+    session_vars:
+      wsrep_on: off
 
 - name: Create user with password, all database privileges and 'WITH GRANT OPTION' in db1 and db2
   community.mysql.mysql_user:
@@ -264,7 +274,7 @@ EXAMPLES = r'''
     If mysql allows root/nopassword login, try it without the credentials first.
     If it's not allowed, pass the credentials
   community.mysql.mysql_user:
-    check_implicit_admin: yes
+    check_implicit_admin: true
     login_user: root
     login_password: 123456
     name: sally
@@ -273,7 +283,7 @@ EXAMPLES = r'''
 - name: Ensure no user named 'sally' exists at all
   community.mysql.mysql_user:
     name: sally
-    host_all: yes
+    host_all: true
     state: absent
 
 - name: Specify grants composed of more than one word
@@ -305,7 +315,7 @@ EXAMPLES = r'''
     password: 12345
     priv: "*.*:USAGE"
     state: present
-    sql_log_bin: no
+    sql_log_bin: false
 
 - name: Create user 'bob' authenticated with plugin 'AWSAuthenticationPlugin'
   community.mysql.mysql_user:
@@ -325,7 +335,7 @@ EXAMPLES = r'''
 - name: Ensure bob does not have the DELETE privilege
   community.mysql.mysql_user:
     name: bob
-    subtract_privs: yes
+    subtract_privs: true
     priv:
       'db1.*': DELETE
 
@@ -340,7 +350,11 @@ RETURN = '''#'''
 from ansible.module_utils.basic import AnsibleModule
 from ansible_collections.community.mysql.plugins.module_utils.database import SQLParseError
 from ansible_collections.community.mysql.plugins.module_utils.mysql import (
-    mysql_connect, mysql_driver, mysql_driver_fail_msg, mysql_common_argument_spec
+    mysql_connect,
+    mysql_driver,
+    mysql_driver_fail_msg,
+    mysql_common_argument_spec,
+    set_session_vars,
 )
 from ansible_collections.community.mysql.plugins.module_utils.user import (
     convert_priv_dict_to_str,
@@ -384,6 +398,7 @@ def main():
         plugin_auth_string=dict(default=None, type='str'),
         resource_limits=dict(type='dict'),
         force_context=dict(type='bool', default=False),
+        session_vars=dict(type='dict'),
     )
     module = AnsibleModule(
         argument_spec=argument_spec,
@@ -418,6 +433,8 @@ def main():
     plugin_hash_string = module.params["plugin_hash_string"]
     plugin_auth_string = module.params["plugin_auth_string"]
     resource_limits = module.params["resource_limits"]
+    session_vars = module.params["session_vars"]
+
     if priv and not isinstance(priv, (str, dict)):
         module.fail_json(msg="priv parameter must be str or dict but %s was passed" % type(priv))
 
@@ -432,19 +449,22 @@ def main():
         if check_implicit_admin:
             try:
                 cursor, db_conn = mysql_connect(module, "root", "", config_file, ssl_cert, ssl_key, ssl_ca, db,
-                                                connect_timeout=connect_timeout, check_hostname=check_hostname)
+                                                connect_timeout=connect_timeout, check_hostname=check_hostname, autocommit=True)
             except Exception:
                 pass
 
         if not cursor:
             cursor, db_conn = mysql_connect(module, login_user, login_password, config_file, ssl_cert, ssl_key, ssl_ca, db,
-                                            connect_timeout=connect_timeout, check_hostname=check_hostname)
+                                            connect_timeout=connect_timeout, check_hostname=check_hostname, autocommit=True)
     except Exception as e:
         module.fail_json(msg="unable to connect to database, check login_user and login_password are correct or %s has the credentials. "
                              "Exception message: %s" % (config_file, to_native(e)))
 
     if not sql_log_bin:
         cursor.execute("SET SQL_LOG_BIN=0;")
+
+    if session_vars:
+        set_session_vars(module, cursor, session_vars)
 
     get_impl(cursor)
 

@@ -2,7 +2,7 @@
  "collection_info": {
   "namespace": "community",
   "name": "crypto",
-  "version": "2.9.0",
+  "version": "2.14.0",
   "authors": [
    "Ansible (github.com/ansible)"
   ],
@@ -27,7 +27,8 @@
    "GPL-3.0-or-later",
    "Apache-2.0",
    "BSD-2-Clause",
-   "BSD-3-Clause"
+   "BSD-3-Clause",
+   "PSF-2.0"
   ],
   "license_file": null,
   "dependencies": {},
@@ -40,7 +41,7 @@
   "name": "FILES.json",
   "ftype": "file",
   "chksum_type": "sha256",
-  "chksum_sha256": "a845a408620d20fc98ca06618e4fd03c6019175d9c5f0cd320f5cdc84c82b921",
+  "chksum_sha256": "b1f04aa94c0ac2a75ae7c56654a6e2bfb418a3660a310d3468f119d988ed04f9",
   "format": 1
  },
  "format": 1

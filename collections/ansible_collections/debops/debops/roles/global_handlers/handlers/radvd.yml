@@ -4,10 +4,10 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Test radvd and restart
-  ansible.builtin.command: radvd --configtest
+  command: radvd --configtest
   notify: [ 'Restart radvd' ]
 
 - name: Restart radvd
-  ansible.builtin.service:
+  service:
     name: 'radvd'
     state: 'restarted'

@@ -16,7 +16,7 @@
   pre_tasks:
 
     - name: Prepare mcli environment
-      ansible.builtin.import_role:
+      import_role:
         name: 'mcli'
         tasks_from: 'main_env'
       tags: [ 'role::mcli', 'role::keyring', 'role::golang' ]

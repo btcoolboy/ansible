@@ -5,7 +5,7 @@
     mysql_params: &mysql_params
       login_user: '{{ mysql_user }}'
       login_password: '{{ mysql_password }}'
-      login_host: 127.0.0.1
+      login_host: '{{ mysql_host }}'
 
   block:
 

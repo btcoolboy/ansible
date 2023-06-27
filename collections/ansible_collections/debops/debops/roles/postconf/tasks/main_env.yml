@@ -4,5 +4,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Prepare postconf environment
-  ansible.builtin.set_fact:
+  set_fact:
     postconf__env_capabilities: '{{ lookup("template", "lookup/postconf__env_capabilities.j2") }}'

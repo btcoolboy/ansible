@@ -24,6 +24,13 @@ description:
 requirements:
   - dnspython
 author: "Loic Blot (@nerzhul)"
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     state:
         description:
@@ -38,27 +45,27 @@ options:
         type: str
     port:
         description:
-            - Use this TCP port when connecting to C(server).
+            - Use this TCP port when connecting to O(server).
         default: 53
         type: int
     key_name:
         description:
-            - Use TSIG key name to authenticate against DNS C(server)
+            - Use TSIG key name to authenticate against DNS O(server)
         type: str
     key_secret:
         description:
-            - Use TSIG key secret, associated with C(key_name), to authenticate against C(server)
+            - Use TSIG key secret, associated with O(key_name), to authenticate against O(server)
         type: str
     key_algorithm:
         description:
-            - Specify key algorithm used by C(key_secret).
+            - Specify key algorithm used by O(key_secret).
         choices: ['HMAC-MD5.SIG-ALG.REG.INT', 'hmac-md5', 'hmac-sha1', 'hmac-sha224', 'hmac-sha256', 'hmac-sha384',
                   'hmac-sha512']
         default: 'hmac-md5'
         type: str
     zone:
         description:
-            - DNS record will be modified on this C(zone).
+            - DNS record will be modified on this O(zone).
             - When omitted DNS will be queried to attempt finding the correct zone.
             - Starting with Ansible 2.7 this parameter is optional.
         type: str
@@ -269,12 +276,16 @@ class RecordManager(object):
             if lookup.rcode() in [dns.rcode.SERVFAIL, dns.rcode.REFUSED]:
                 self.module.fail_json(msg='Zone lookup failure: \'%s\' will not respond to queries regarding \'%s\'.' % (
                     self.module.params['server'], self.module.params['record']))
-            try:
-                zone = lookup.authority[0].name
-                if zone == name:
-                    return zone.to_text()
-            except IndexError:
-                pass
+            # If the response contains an Answer SOA RR whose name matches the queried name,
+            # this is the name of the zone in which the record needs to be inserted.
+            for rr in lookup.answer:
+                if rr.rdtype == dns.rdatatype.SOA and rr.name == name:
+                    return rr.name.to_text()
+            # If the response contains an Authority SOA RR whose name is a subdomain of the queried name,
+            # this SOA name is the zone in which the record needs to be inserted.
+            for rr in lookup.authority:
+                if rr.rdtype == dns.rdatatype.SOA and name.fullcompare(rr.name)[0] == dns.name.NAMERELN_SUBDOMAIN:
+                    return rr.name.to_text()
             try:
                 name = name.parent()
             except dns.name.NoParent:

@@ -737,6 +737,127 @@ releases:
       name: openssl_privatekey_convert
       namespace: ''
     release_date: '2022-01-10'
+  2.10.0:
+    changes:
+      bugfixes:
+      - openssl_csr, openssl_csr_pipe - prevent invalid values for ``crl_distribution_points``
+        that do not have one of ``full_name``, ``relative_name``, and ``crl_issuer``
+        (https://github.com/ansible-collections/community.crypto/pull/560).
+      - openssl_publickey_info - do not crash with internal error when public key
+        cannot be parsed (https://github.com/ansible-collections/community.crypto/pull/551).
+      release_summary: Bugfix and feature release.
+    fragments:
+    - 2.10.0.yml
+    - 551-publickey-info.yml
+    - 560-openssl_csr-crl_distribution_points.yml
+    plugins:
+      filter:
+      - description: Retrieve information from OpenSSL Certificate Signing Requests
+          (CSR)
+        name: openssl_csr_info
+        namespace: null
+      - description: Retrieve information from OpenSSL private keys
+        name: openssl_privatekey_info
+        namespace: null
+      - description: Retrieve information from OpenSSL public keys in PEM format
+        name: openssl_publickey_info
+        namespace: null
+      - description: Split PEM file contents into multiple objects
+        name: split_pem
+        namespace: null
+      - description: Retrieve information from X.509 certificates in PEM format
+        name: x509_certificate_info
+        namespace: null
+      - description: Retrieve information from X.509 CRLs in PEM format
+        name: x509_crl_info
+        namespace: null
+    release_date: '2023-01-02'
+  2.11.0:
+    changes:
+      bugfixes:
+      - action plugin helper - fix handling of deprecations for ansible-core 2.14.2
+        (https://github.com/ansible-collections/community.crypto/pull/572).
+      - execution environment binary dependencies (bindep.txt) - fix ``python3-pyOpenSSL``
+        dependency resolution on RHEL 9+ / CentOS Stream 9+ platforms (https://github.com/ansible-collections/community.crypto/pull/575).
+      - various plugins - remove unnecessary imports (https://github.com/ansible-collections/community.crypto/pull/569).
+      minor_changes:
+      - get_certificate - adds ``ciphers`` option for custom cipher selection (https://github.com/ansible-collections/community.crypto/pull/571).
+      release_summary: Feature and bugfix release.
+    fragments:
+    - 2.11.0.yml
+    - 571_get_certificate_ciphers.yaml
+    - 572-action-module.yml
+    - 575-bindep-python3-pyOpenSSL.yml
+    - remove-unneeded-imports.yml
+    release_date: '2023-02-23'
+  2.11.1:
+    changes:
+      release_summary: Maintenance release with improved documentation.
+    fragments:
+    - 2.11.1.yml
+    release_date: '2023-03-24'
+  2.12.0:
+    changes:
+      minor_changes:
+      - get_certificate - add ``asn1_base64`` option to control whether the ASN.1
+        included in the ``extensions`` return value is binary data or Base64 encoded
+        (https://github.com/ansible-collections/community.crypto/pull/592).
+      release_summary: Feature release.
+    fragments:
+    - 2.12.0.yml
+    - 592-get_certificate-base64.yml
+    release_date: '2023-04-16'
+  2.13.0:
+    changes:
+      bugfixes:
+      - openssh_keypair - always generate a new key pair if the private key does not
+        exist. Previously, the module would fail when ``regenerate=fail`` without
+        an existing key, contradicting the documentation (https://github.com/ansible-collections/community.crypto/pull/598).
+      - x509_crl - remove problem with ansible-core 2.16 due to ``AnsibleModule``
+        is now validating the ``mode`` parameter's values (https://github.com/ansible-collections/community.crypto/issues/596).
+      deprecated_features:
+      - x509_crl - the ``mode`` option is deprecated; use ``crl_mode`` instead. The
+        ``mode`` option will change its meaning in community.crypto 3.0.0, and will
+        refer to the CRL file's mode instead (https://github.com/ansible-collections/community.crypto/issues/596).
+      minor_changes:
+      - x509_crl - the ``crl_mode`` option has been added to replace the existing
+        ``mode`` option (https://github.com/ansible-collections/community.crypto/issues/596).
+      release_summary: Bugfix and maintenance release.
+    fragments:
+    - 2.13.0.yml
+    - 596-x509_crl-mode.yml
+    - 598-openssh_keypair-generate-new-key.yml
+    release_date: '2023-05-01'
+  2.13.1:
+    changes:
+      bugfixes:
+      - execution environment definition - fix installation of ``python3-pyOpenSSL``
+        package on CentOS and RHEL (https://github.com/ansible-collections/community.crypto/pull/606).
+      - execution environment definition - fix source of ``python3-pyOpenSSL`` package
+        for Rocky Linux 9+ (https://github.com/ansible-collections/community.crypto/pull/606).
+      release_summary: Bugfix release.
+    fragments:
+    - 2.13.1.yml
+    - 606-ee-rocky.yml
+    release_date: '2023-05-21'
+  2.14.0:
+    changes:
+      minor_changes:
+      - acme_certificate - allow to use no challenge by providing ``no challenge``
+        for the ``challenge`` option. This is needed for ACME servers where validation
+        is done without challenges (https://github.com/ansible-collections/community.crypto/issues/613,
+        https://github.com/ansible-collections/community.crypto/pull/615).
+      - acme_certificate - validate and wait for challenges in parallel instead handling
+        them one after another (https://github.com/ansible-collections/community.crypto/pull/617).
+      - x509_certificate_info - added support for certificates in DER format when
+        using ``path`` parameter (https://github.com/ansible-collections/community.crypto/issues/603).
+      release_summary: Feature release.
+    fragments:
+    - 2.14.0.yml
+    - 615-no-challenge.yml
+    - 617-acme_certificate-parallel.yml
+    - 622-der-format-support.yml
+    release_date: '2023-06-15'
   2.2.0:
     changes:
       bugfixes:

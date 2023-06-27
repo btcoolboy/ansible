@@ -4,19 +4,19 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Import custom Ansible plugins
-  ansible.builtin.import_role:
+  import_role:
     name: 'ansible_plugins'
 
 - name: Import DebOps global handlers
-  ansible.builtin.import_role:
+  import_role:
     name: 'global_handlers'
 
 - name: Import DebOps secret role
-  ansible.builtin.import_role:
+  import_role:
     name: 'secret'
 
 - name: Install OpenDKIM support
-  ansible.builtin.package:
+  package:
     name: '{{ q("flattened", (opendkim__base_packages
                               + opendkim__packages)) }}'
     state: 'present'
@@ -25,7 +25,7 @@
   when: ansible_pkg_mgr == 'apt'
 
 - name: Divert original OpenDKIM configuration
-  debops.debops.dpkg_divert:
+  dpkg_divert:
     path: '{{ item }}'
   loop:
     - '/etc/opendkim.conf'
@@ -33,7 +33,7 @@
   when: ansible_pkg_mgr == 'apt'
 
 - name: Make sure Ansible local facts directory exists
-  ansible.builtin.file:
+  file:
     dest: '/etc/ansible/facts.d'
     state: 'directory'
     owner: 'root'
@@ -41,7 +41,7 @@
     mode: '0755'
 
 - name: Configure OpenDKIM local facts
-  ansible.builtin.template:
+  template:
     src: 'etc/ansible/facts.d/opendkim.fact.j2'
     dest: '/etc/ansible/facts.d/opendkim.fact'
     owner: 'root'
@@ -51,10 +51,10 @@
   tags: [ 'meta::facts' ]
 
 - name: Re-read local facts if they have been modified
-  ansible.builtin.meta: 'flush_handlers'
+  meta: 'flush_handlers'
 
 - name: Generate OpenDKIM configuration from /etc
-  ansible.builtin.template:
+  template:
     src: 'etc/opendkim.conf.j2'
     dest: '/etc/opendkim.conf'
     owner: 'root'
@@ -63,14 +63,14 @@
   notify: [ 'Check opendkim and reload' ]
 
 - name: Generate OpenDKIM configuration from /etc/default
-  ansible.builtin.template:
+  template:
     src: 'etc/default/opendkim.j2'
     dest: '/etc/default/opendkim'
     mode: '0644'
   notify: [ 'Check opendkim and reload' ]
 
 - name: Ensure that opendkim.service.d directory exists
-  ansible.builtin.file:
+  file:
     path: '/etc/systemd/system/opendkim.service.d'
     state: 'directory'
     owner: 'root'
@@ -78,10 +78,10 @@
     mode: '0755'
   when: (ansible_service_mgr == 'systemd' and
          ansible_distribution_release not in
-         ['trusty', 'xenial', 'bionic'])
+         [ 'wheezy', 'jessie', 'precise', 'trusty', 'xenial', 'bionic' ])
 
 - name: Fix OpenDKIM issues with systemd
-  ansible.builtin.template:
+  template:
     src: 'etc/systemd/system/opendkim.service.d/pid-socket.conf.j2'
     dest: '/etc/systemd/system/opendkim.service.d/pid-socket.conf'
     owner: 'root'
@@ -90,10 +90,10 @@
   notify: [ 'Reload service manager', 'Check opendkim and restart' ]
   when: (ansible_service_mgr == 'systemd' and
          ansible_distribution_release not in
-         ['trusty', 'xenial', 'bionic'])
+         [ 'wheezy', 'jessie', 'precise', 'trusty', 'xenial', 'bionic' ])
 
 - name: Ensure that DomainKey directory exists
-  ansible.builtin.file:
+  file:
     path: '{{ opendkim__dkimkeys_path }}'
     state: 'directory'
     owner: '{{ opendkim__user }}'
@@ -101,7 +101,7 @@
     mode: '0700'
 
 - name: Install helper scripts on Ansible Controller
-  ansible.builtin.copy:
+  copy:
     src: 'secret/opendkim/lib/'
     dest: '{{ secret + "/opendkim/lib/" }}'
     mode: '0755'
@@ -111,7 +111,7 @@
 
 - name: Generate DomainKeys on Ansible Controller
   community.crypto.openssl_privatekey:
-    size:  '{{ item.size | d(opendkim__default_key_size) }}'
+    size:  '{{ item.size  | d(opendkim__default_key_size) }}'
     type:  '{{ (item.type | d("rsa")) | upper }}'
     path:  '{{ secret + "/opendkim/domainkeys/"
                + (item.domain | d(opendkim__domain)) + "_"
@@ -119,22 +119,24 @@
     regenerate: '{{ item.regenerate | d("full_idempotence"
                                         if ansible_version.full is version("2.10", ">=")
                                         else omit) }}'
-  loop: '{{ q("flattened", opendkim__combined_keys) }}'
+  with_flattened:
+    - '{{ opendkim__combined_keys }}'
   become: False
   delegate_to: 'localhost'
   no_log: '{{ debops__no_log | d(True) }}'
 
 - name: Remove DomainKeys from hosts when requested
-  ansible.builtin.file:
+  file:
     path: '{{ opendkim__dkimkeys_path + "/"
               + (item.domain | d(opendkim__domain)) + "_"
               + (item.selector | d(item.name | d(item))) + ".pem" }}'
     state: 'absent'
-  loop: '{{ q("flattened", opendkim__combined_keys) }}'
-  when: item.state | d('present') == 'absent'
+  with_flattened:
+    - '{{ opendkim__combined_keys }}'
+  when: item.state|d('present') == 'absent'
 
 - name: Download DomainKeys from Ansible Controller
-  ansible.builtin.copy:
+  copy:
     src:  '{{ secret + "/opendkim/domainkeys/"
               + (item.domain | d(opendkim__domain)) + "_"
               + (item.selector | d(item.name | d(item))) + ".pem" }}'
@@ -144,12 +146,13 @@
     owner: 'root'
     group: '{{ opendkim__group }}'
     mode: '0640'
-  loop: '{{ q("flattened", opendkim__combined_keys) }}'
-  when: item.state | d('present') != 'absent'
+  with_flattened:
+    - '{{ opendkim__combined_keys }}'
+  when: item.state|d('present') != 'absent'
   no_log: '{{ debops__no_log | d(True) }}'
 
 - name: Generate key configuration files
-  ansible.builtin.template:
+  template:
     src: 'etc/dkimkeys/{{ item }}.j2'
     dest: '{{ opendkim__dkimkeys_path + "/" + item }}'
     owner: 'root'
@@ -159,11 +162,11 @@
   with_items: [ 'KeyTable', 'SigningTable', 'TrustedHosts' ]
 
 - name: Create OpenDKIM socket directory in Postfix chroot
-  ansible.builtin.file:
+  file:
     path: '/var/spool/postfix/opendkim'
     state: 'directory'
     owner: '{{ opendkim__user }}'
     group: '{{ opendkim__postfix_group }}'
     mode: '02750'
-  when: opendkim__postfix_integration | bool
+  when: opendkim__postfix_integration|bool
   notify: [ 'Check opendkim and restart' ]

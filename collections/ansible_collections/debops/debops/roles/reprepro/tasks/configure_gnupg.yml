@@ -4,19 +4,19 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Check if GnuPG directory exists
-  ansible.builtin.stat:
+  stat:
     path: '{{ reprepro__home + "/.gnupg/gpg.conf" }}'
   register: reprepro__register_gpg
 
 - name: Check if GnuPG snapshot exists on Ansible Controller
-  ansible.builtin.stat:
+  stat:
     path: '{{ reprepro__gpg_snapshot_path + "/" + reprepro__gpg_snapshot_name }}'
   register: reprepro__register_gpg_snapshot
   delegate_to: 'localhost'
   become: False
 
 - name: Restore GnuPG snapshots
-  ansible.builtin.unarchive:
+  unarchive:
     src: '{{ reprepro__gpg_snapshot_path + "/" + reprepro__gpg_snapshot_name }}'
     dest: '{{ reprepro__home }}'
     mode: 'u=rwX,g=,o='
@@ -24,7 +24,7 @@
         not reprepro__register_gpg.stat.exists
 
 - name: Ensure that ~/.gnupg directory exists
-  ansible.builtin.file:
+  file:
     path: '{{ reprepro__home + "/.gnupg" }}'
     state: 'directory'
     owner: '{{ reprepro__user }}'
@@ -32,7 +32,7 @@
     mode: '0700'
 
 - name: Configure reprepro GnuPG instance
-  ansible.builtin.template:
+  template:
     src: 'home/reprepro/gnupg/gpg.conf.j2'
     dest: '{{ reprepro__home + "/.gnupg/gpg.conf" }}'
     owner: '{{ reprepro__user }}'
@@ -40,12 +40,12 @@
     mode: '0644'
 
 - name: Check if private keys are present
-  ansible.builtin.find:
+  find:
     paths: '{{ reprepro__home + "/.gnupg/private-keys-v1.d/" }}'
   register: reprepro__register_private_keys
 
 - name: Create repository key template
-  ansible.builtin.template:
+  template:
     src: 'home/reprepro/gnupg-key-template.j2'
     dest: '{{ reprepro__home + "/.gnupg-key-template" }}'
     owner: '{{ reprepro__user }}'
@@ -54,7 +54,7 @@
   when: reprepro__register_private_keys.matched == 0
 
 - name: Generate automatic signing key
-  ansible.builtin.command: 'gpg --batch --gen-key .gnupg-key-template'
+  command: 'gpg --batch --gen-key .gnupg-key-template'
   args:
     chdir: '{{ reprepro__home }}'
   register: reprepro__register_keygen
@@ -63,7 +63,7 @@
   when: reprepro__register_private_keys.matched == 0
 
 - name: Archive ~/.gnupg directory
-  community.general.archive:
+  archive:
     path: '{{ reprepro__home + "/.gnupg" }}'
     dest: '{{ reprepro__home + "/" + reprepro__gpg_snapshot_name }}'
     owner: '{{ reprepro__user }}'
@@ -72,20 +72,20 @@
   register: reprepro__register_gpg_archive
 
 - name: Upload ~/.gnupg archive to Ansible Controller
-  ansible.builtin.fetch:  # noqa no-handler
+  fetch:  # noqa no-handler
     src: '{{ reprepro__home + "/" + reprepro__gpg_snapshot_name }}'
     dest: '{{ reprepro__gpg_snapshot_path + "/" + reprepro__gpg_snapshot_name }}'
     flat: True
   when: reprepro__register_gpg_archive is changed
 
 - name: Remove old automatic signing key
-  ansible.builtin.file:  # noqa no-handler
+  file:  # noqa no-handler
     path: '{{ reprepro__home + "/" + reprepro__gpg_public_filename }}'
     state: 'absent'
   when: reprepro__register_keygen is changed
 
 - name: Export automatic signing key
-  ansible.builtin.shell: 'gpg --armor --export "{{ reprepro__gpg_email }}" > "{{ reprepro__home + "/" + reprepro__gpg_public_filename }}"'
+  shell: 'gpg --armor --export "{{ reprepro__gpg_email }}" > "{{ reprepro__home + "/" + reprepro__gpg_public_filename }}"'
   args:
     creates: '{{ reprepro__home + "/" + reprepro__gpg_public_filename }}'
   become: True

@@ -113,7 +113,8 @@ logrotate__default_config:
       rotate 1
     state: '{{ "present"
                if (ansible_distribution_release in
-                   (["stretch", "trusty", "xenial", "bionic"]))
+                   ([ "wheezy", "jessie", "stretch",
+                      "precise", "trusty", "xenial", "bionic" ]))
                else "absent" }}'
 
   - log: '/var/log/btmp'
@@ -124,7 +125,8 @@ logrotate__default_config:
       rotate 1
     state: '{{ "present"
                if (ansible_distribution_release in
-                   (["stretch", "trusty", "xenial", "bionic"]))
+                   ([ "wheezy", "jessie", "stretch",
+                      "precise", "trusty", "xenial", "bionic" ]))
                else "absent" }}'
 
                                                                    # ]]]
@@ -157,7 +159,7 @@ logrotate__dependent_config: []
                                                                    # ]]]
 # .. envvar:: logrotate__combined_config [[[
 #
-# Variable which combines all the log rotation configuration varibles for use
+# Variable which combines all the log rotation configuration variables for use
 # in the tasks. See :ref:`logrotate__config` for more details.
 logrotate__combined_config: '{{ logrotate__config
                                 + logrotate__group_config

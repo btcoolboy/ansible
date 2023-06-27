@@ -1,3 +1,4 @@
+---
 # Copyright: (c) 2019, Andrew Klychkov (@Andersson007) <aaklychkov@mail.ru>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
@@ -5,7 +6,7 @@
     mysql_params: &mysql_params
       login_user: '{{ mysql_user }}'
       login_password: '{{ mysql_password }}'
-      login_host: 127.0.0.1
+      login_host: '{{ mysql_host }}'
 
   block:
     # Get primary log file and log pos:

@@ -3,10 +3,6 @@
 # GNU General Public License v3.0+ (see LICENSES/GPL-3.0-or-later.txt or https://www.gnu.org/licenses/gpl-3.0.txt)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-- name: Gather package facts
-  package_facts:
-    manager: auto
-
 - name: On kernel >= 5.9 use performance flags
   block:
     - name: Create and open (check)
@@ -21,8 +17,8 @@
         persistent: true
         pbkdf:
           iteration_time: 0.1
-      check_mode: yes
-      become: yes
+      check_mode: true
+      become: true
       register: create_open_check
     - name: Create and open
       luks_device:
@@ -36,7 +32,7 @@
         perf_no_read_workqueue: true
         perf_no_write_workqueue: true
         persistent: true
-      become: yes
+      become: true
       register: create_open
     - name: Create and open (idempotent)
       luks_device:
@@ -50,7 +46,7 @@
         perf_no_read_workqueue: true
         perf_no_write_workqueue: true
         persistent: true
-      become: yes
+      become: true
       register: create_open_idem
     - name: Create and open (idempotent, check)
       luks_device:
@@ -64,8 +60,8 @@
         perf_no_read_workqueue: true
         perf_no_write_workqueue: true
         persistent: true
-      check_mode: yes
-      become: yes
+      check_mode: true
+      become: true
       register: create_open_idem_check
     - assert:
         that:
@@ -76,7 +72,7 @@
 
     - name: Dump LUKS Header
       command: "cryptsetup luksDump {{ cryptfile_device }}"
-      become: yes
+      become: true
       register: luks_header
     - assert:
         that:
@@ -87,7 +83,7 @@
 
     - name: Dump device mapper table
       command: "dmsetup table {{ create_open.name }}"
-      become: yes
+      become: true
       register: dm_table
     - assert:
         that:
@@ -100,8 +96,8 @@
       luks_device:
         name: "{{ cryptfile_device }}"
         state: absent
-      become: yes
+      become: true
 
   when:
     - ansible_facts.kernel is version('5.9.0', '>=')
-    - ansible_facts.packages['cryptsetup'][0].version is version('2.3.4', '>=')
+    - cryptsetup_version is version('2.3.4', '>=')

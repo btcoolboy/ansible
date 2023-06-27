@@ -4,12 +4,14 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Update Postwhite in the background using async
-  ansible.builtin.command: /usr/local/lib/postwhite
+  command: /usr/local/lib/postwhite
   async: '1800'
   poll: '0'
   when: postwhite__initial_update_method == 'async'
 
 - name: Update Postwhite in the background using batch
-  ansible.builtin.shell: |
+  shell: |
     echo '/usr/local/lib/postwhite' | batch > /dev/null 2>&1
+  args:
+    executable: 'bash'
   when: postwhite__initial_update_method == 'batch'

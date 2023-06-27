@@ -54,12 +54,13 @@ apt_cacher_ng__deploy_state: 'present'
 # This variable allows you to change which configuration files this role is
 # going to create and which permissions to use for them.
 #
-# ``path``
-#   String, required, defines the path to the configuration file on the host.
-#
 # ``src``
-#   String, optional, defines the path to the template file. Defaults to
-#   ``path`` with any leading ``/`` removed.
+#   String, optional, defaults to ``{{ item.path }}``. Corresponds with the
+#   name of the template file.
+#
+# ``path``
+#   String, required. Corresponds with the target name and
+#   provides the default name of the template file.
 #
 # ``owner``
 #   String, optional, defaults to ``root``. Unix user which owns the
@@ -78,19 +79,19 @@ apt_cacher_ng__deploy_state: 'present'
 #
 apt_cacher_ng__configuration_files:
 
-  - path: '/etc/apt-cacher-ng/backends_debian'
+  - path: 'etc/apt-cacher-ng/backends_debian'
     mode: '0644'
-  - path: '/etc/apt-cacher-ng/backends_ubuntu'
+  - path: 'etc/apt-cacher-ng/backends_ubuntu'
     mode: '0644'
-  - path: '/etc/apt-cacher-ng/backends_gentoo'
+  - path: 'etc/apt-cacher-ng/backends_gentoo'
     mode: '0644'
     divert: False
-  - path: '/etc/apt-cacher-ng/acng.conf'
+  - path: 'etc/apt-cacher-ng/acng.conf'
     mode: '0644'
-  - path: '/etc/apt-cacher-ng/security.conf'
+  - path: 'etc/apt-cacher-ng/security.conf'
     group: 'apt-cacher-ng'
     mode: '0640'
-  - path: '/etc/apt-cacher-ng/userinfo.html'
+  - path: 'etc/apt-cacher-ng/userinfo.html'
     mode: '0644'
     divert: False
                                                                    # ]]]
@@ -201,7 +202,7 @@ apt_cacher_ng__max_download_speed_kib: ''
 # Set to an empty string to let the package scripts from Apt-Cacher NG decide
 # which upstream mirror to use.
 apt_cacher_ng__upstream_mirror_debian: '{{ ansible_local.apt.default_sources_map.Debian[0]
-                                            | d("http://deb.debian.org/debian") }}'
+                                           |d("http://deb.debian.org/debian") }}'
 
                                                                    # ]]]
 # .. envvar:: apt_cacher_ng__upstream_mirror_ubuntu [[[
@@ -211,7 +212,7 @@ apt_cacher_ng__upstream_mirror_debian: '{{ ansible_local.apt.default_sources_map
 # Set to an empty string to let the package scripts from Apt-Cacher NG decide
 # which upstream mirror to use.
 apt_cacher_ng__upstream_mirror_ubuntu: '{{ ansible_local.apt.default_sources_map.Ubuntu[0]
-                                            | d("http://archive.ubuntu.com/ubuntu") }}'
+                                           |d("http://archive.ubuntu.com/ubuntu") }}'
 
                                                                    # ]]]
 # .. envvar:: apt_cacher_ng__upstream_mirror_gentoo [[[
@@ -220,7 +221,7 @@ apt_cacher_ng__upstream_mirror_ubuntu: '{{ ansible_local.apt.default_sources_map
 # One mirror per line.
 # Set to an empty string to let the package scripts from Apt-Cacher NG decide
 # which upstream mirror to use.
-apt_cacher_ng__upstream_mirror_gentoo: '{{ ansible_local.apt.default_sources_map.Gentoo[0] | d("") }}'
+apt_cacher_ng__upstream_mirror_gentoo: '{{ ansible_local.apt.default_sources_map.Gentoo[0]|d("") }}'
                                                                    # ]]]
                                                                    # ]]]
 # Cache directory [[[
@@ -487,7 +488,13 @@ apt_cacher_ng__etc_services__dependent_list:
 # .. envvar:: apt_cacher_ng__apt_preferences__dependent_list [[[
 #
 # Configuration for the :ref:`debops.apt_preferences` role.
-apt_cacher_ng__apt_preferences__dependent_list: []
+apt_cacher_ng__apt_preferences__dependent_list:
+
+  - package: 'apt-cacher-ng libssl*'
+    backports: [ 'wheezy', 'jessie' ]
+    reason: 'http://httpredir.debian.org/debian is not included in the deb_mirrors.gz file of apt-cacher-ng as of 0.8.0-3 (latest in Debian Jessie). This can result in unnecessary resource (bandwidth, storage) usage. https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=782643'
+    by_role: 'debops.apt_cacher_ng'
+    delete: '{{ apt_cacher_ng__deploy_state != "present" }}'
 
                                                                    # ]]]
 # .. envvar:: apt_cacher_ng__ferm__dependent_rules [[[
@@ -498,9 +505,9 @@ apt_cacher_ng__ferm__dependent_rules:
 
   - type: 'accept'
     dport: [ 'acng' ]
-    saddr: '{{ (apt_cacher_ng__allow | d([]) | list) +
-               (apt_cacher_ng__group_allow | d([]) | list) +
-               (apt_cacher_ng__host_allow | d([]) | list) }}'
+    saddr: '{{ (apt_cacher_ng__allow|d([]) | list) +
+      (apt_cacher_ng__group_allow   |d([]) | list) +
+      (apt_cacher_ng__host_allow    |d([]) | list) }}'
     accept_any: True
     interface: '{{ apt_cacher_ng__interfaces }}'
     weight: '40'
@@ -574,7 +581,7 @@ apt_cacher_ng__nginx__servers:
     filename: 'debops.apt_cacher_ng_https'
     enabled: True
     allow: '{{ apt_cacher_ng__allow + apt_cacher_ng__group_allow + apt_cacher_ng__host_allow }}'
-    state: '{{ "present" if (ansible_local.pki | d()) else "absent" }}'
+    state: '{{ "present" if (ansible_local.pki|d()) else "absent" }}'
     listen: False
     webroot_create: False
     type: 'proxy'

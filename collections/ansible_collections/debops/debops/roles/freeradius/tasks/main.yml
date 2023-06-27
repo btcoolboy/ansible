@@ -4,34 +4,35 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Import custom Ansible plugins
-  ansible.builtin.import_role:
+  import_role:
     name: 'ansible_plugins'
 
 - name: Import DebOps global handlers
-  ansible.builtin.import_role:
+  import_role:
     name: 'global_handlers'
 
 - name: Import DebOps secret role
-  ansible.builtin.import_role:
+  import_role:
     name: 'secret'
 
 - name: Install FreeRADIUS packages
-  ansible.builtin.package:
+  package:
     name: '{{ item }}'
     state: 'present'
-  loop: '{{ q("flattened", freeradius__base_packages
-                           + freeradius__packages) }}'
+  with_flattened:
+    - '{{ freeradius__base_packages }}'
+    - '{{ freeradius__packages }}'
   register: freeradius__register_packages
   until: freeradius__register_packages is succeeded
 
 - name: Enable FreeRADIUS service in systemd to start at boot time
-  ansible.builtin.systemd:
+  systemd:
     name: 'freeradius.service'
     enabled: True
   when: ansible_service_mgr == 'systemd'
 
 - name: Make sure that Ansible local facts directory exists
-  ansible.builtin.file:
+  file:
     path: '/etc/ansible/facts.d'
     state: 'directory'
     owner: 'root'
@@ -39,7 +40,7 @@
     mode: '0755'
 
 - name: Save FreeRADIUS local facts
-  ansible.builtin.template:
+  template:
     src: 'etc/ansible/facts.d/freeradius.fact.j2'
     dest: '/etc/ansible/facts.d/freeradius.fact'
     owner: 'root'
@@ -49,10 +50,10 @@
   tags: [ 'meta::facts' ]
 
 - name: Update Ansible facts if they were modified
-  ansible.builtin.meta: 'flush_handlers'
+  meta: 'flush_handlers'
 
 - name: Get list of FreeRADIUS Conffiles
-  ansible.builtin.command: cat /var/lib/dpkg/info/freeradius-config.conffiles
+  command: cat /var/lib/dpkg/info/freeradius-config.conffiles
   register: freeradius__register_conffiles
   changed_when: False
   check_mode: False
@@ -62,26 +63,26 @@
     divert_path: '{{ freeradius__conf_base_path + "/" + (item.filename | d(item.name)) }}'
     divert_divert: '{{ freeradius__conf_base_path + "/"
                        + (item.divert_filename
-                          | d((((item.filename | d(item.name)) | dirname + "/.")
-                               if ((item.filename | d(item.name)) | dirname) else ".")
-                              + (item.filename | d(item.name)) | basename + ".dpkg-divert")) }}'
-  debops.debops.dpkg_divert:
+                          | d((((item.filename | d(item.name))|dirname + "/.")
+                               if ((item.filename | d(item.name))|dirname) else ".")
+                              + (item.filename | d(item.name))|basename + ".dpkg-divert")) }}'
+  dpkg_divert:
     path: '{{ divert_path }}'
     divert: '{{ divert_divert }}'
-    state: '{{ item.state | d("present") }}'
+    state: '{{ item.state|d("present") }}'
     delete: True
   loop: '{{ freeradius__combined_configuration | debops.debops.parse_kv_items }}'
   loop_control:
-    label: '{{ {"path": divert_path,
+    label: '{{ {"path":   divert_path,
                 "divert": divert_divert,
-                "state": item.state | d("present")} }}'
+                "state":  item.state|d("present")} }}'
   notify: [ 'Check freeradius configuration and restart' ]
-  when: (item.name | d() and item.divert | d(False) | bool and
-         item.state | d('present') in ['present', 'absent'])
+  when: (item.name|d() and item.divert|d(False)|bool and
+         item.state|d('present') in [ 'present', 'absent' ])
   no_log: '{{ debops__no_log | d(item.no_log) | d(False) }}'
 
 - name: Create missing configuration directories
-  ansible.builtin.file:
+  file:
     path: '{{ (freeradius__conf_base_path + "/" + (item.filename | d(item.name))) | dirname }}'
     state: 'directory'
     owner: '{{ freeradius__user }}'
@@ -90,43 +91,43 @@
   with_items: '{{ freeradius__combined_configuration | debops.debops.parse_kv_items }}'
   loop_control:
     label: '{{ {"path": ((freeradius__conf_base_path + "/" + (item.filename | d(item.name))) | dirname)} }}'
-  when: (item.name | d() and item.state | d('present') not in ['absent', 'ignore', 'init'] and
-         (item.link_src | d() or item.options | d() or item.raw | d()))
+  when: (item.name|d() and item.state|d('present') not in [ 'absent', 'ignore', 'init' ] and
+         (item.link_src|d() or item.options|d() or item.raw|d()))
   no_log: '{{ debops__no_log | d(item.no_log) | d(False) }}'
 
 - name: Generate FreeRADIUS configuration files
-  ansible.builtin.template:
+  template:
     src:   'etc/freeradius/template.conf.j2'
     dest:  '{{ freeradius__conf_base_path + "/" + (item.filename | d(item.name)) }}'
     owner: '{{ item.owner | d(freeradius__user) }}'
     group: '{{ item.group | d(freeradius__group) }}'
-    mode:  '{{ item.mode | d("0640") }}'
+    mode:  '{{ item.mode  | d("0640") }}'
   with_items: '{{ freeradius__combined_configuration | debops.debops.parse_kv_items }}'
   notify: [ 'Check freeradius configuration and restart' ]
-  when: (item.name | d() and item.state | d('present') not in ['absent', 'ignore', 'init'] and
-         not item.link_src | d() and (item.options | d() or item.raw | d()))
+  when: (item.name|d() and item.state|d('present') not in [ 'absent', 'ignore', 'init' ] and
+         not item.link_src|d() and (item.options|d() or item.raw|d()))
   no_log: '{{ debops__no_log | d(item.no_log) | d(False) }}'
 
 - name: Create configuration file symlinks
-  ansible.builtin.file:
+  file:
     dest: '{{ freeradius__conf_base_path + "/" + (item.filename | d(item.name)) }}'
     src: '{{ item.link_src }}'
     state: 'link'
     owner: '{{ item.owner | d(freeradius__user) }}'
     group: '{{ item.group | d(freeradius__group) }}'
-    mode:  '{{ item.mode | d("0640") }}'
+    mode:  '{{ item.mode  | d("0640") }}'
   with_items: '{{ freeradius__combined_configuration | debops.debops.parse_kv_items }}'
   notify: [ 'Check freeradius configuration and restart' ]
-  when: (item.name | d() and item.state | d('present') not in ['absent', 'ignore', 'init'] and
-         item.link_src | d())
+  when: (item.name|d() and item.state|d('present') not in [ 'absent', 'ignore', 'init' ] and
+         item.link_src|d())
   no_log: '{{ debops__no_log | d(item.no_log) | d(False) }}'
 
 - name: Remove FreeRADIUS configuration files
-  ansible.builtin.file:
+  file:
     dest: '{{ freeradius__conf_base_path + "/" + (item.filename | d(item.name)) }}'
     state: 'absent'
   with_items: '{{ freeradius__combined_configuration | debops.debops.parse_kv_items }}'
   notify: [ 'Check freeradius configuration and restart' ]
-  when: (item.name | d() and not item.divert | d(False) | bool and
-         item.state | d('present') == 'absent')
+  when: (item.name|d() and not item.divert|d(False)|bool and
+         item.state|d('present') == 'absent')
   no_log: '{{ debops__no_log | d(item.no_log) | d(False) }}'

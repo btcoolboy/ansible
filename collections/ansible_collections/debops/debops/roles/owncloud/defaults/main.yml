@@ -34,10 +34,10 @@
 #
 # List of base packages required by ownCloud.
 owncloud__base_packages:
-  - '{{ ["owncloud-complete-files"]
+  - '{{ [ "owncloud-complete-files" ]
         if (owncloud__variant == "owncloud")
         else [] }}'
-  - '{{ ["curl", "unzip"]
+  - '{{ [ "curl", "unzip" ]
         if (owncloud__variant == "nextcloud")
         else [] }}'
 
@@ -47,11 +47,11 @@ owncloud__base_packages:
   ## FIXME: Collaborative document editing in ownCloud is now done with Collabora Online.
   ## FIXME: Is it necessary to install all LibreOffice packages? https://github.com/owncloud/documents#known-issues
   ## Upstream documentation does not specify it more clearly. Installing ``libreoffice`` just to be sure.
-  - '{{ ["libreoffice"] if (owncloud__app_documents_libreoffice_enabled | bool) else [] }}'
+  - '{{ [ "libreoffice" ] if (owncloud__app_documents_libreoffice_enabled|bool) else [] }}'
 
   ## Useful for debugging. Refer to `owncloud__base_php_packages` for the PHP packages
-  - '{{ ["smbclient"] if (owncloud__smb_support | bool) else [] }}'
-  - '{{ ["libsmbclient"] if (owncloud__smb_support | bool and owncloud__release is version_compare("9.0", ">=")) else [] }}'
+  - '{{ [ "smbclient" ] if (owncloud__smb_support|bool) else [] }}'
+  - '{{ [ "libsmbclient" ] if (owncloud__smb_support|bool and owncloud__release is version_compare("9.0", ">=")) else [] }}'
 
 
 # .. envvar:: owncloud__required_php_packages
@@ -108,19 +108,19 @@ owncloud__base_php_packages:
   - 'ldap'
   - 'soap'
 
-  - '{{ ["apcu"] if (owncloud__apcu_enabled | bool) else [] }}'
-  - '{{ ["mysql"] if (owncloud__database in ["mariadb", "mysql"]) else [] }}'
-  - '{{ ["pgsql"] if (owncloud__database in ["postgresql"]) else [] }}'
-  - '{{ ["redis"] if (owncloud__redis_enabled | bool) else [] }}'
+  - '{{ [ "apcu" ] if (owncloud__apcu_enabled|bool) else [] }}'
+  - '{{ [ "mysql" ] if (owncloud__database in [ "mariadb", "mysql" ]) else [] }}'
+  - '{{ [ "pgsql" ] if (owncloud__database in [ "postgresql" ]) else [] }}'
+  - '{{ [ "redis" ] if (owncloud__redis_enabled | bool) else [] }}'
 
   ## Seems to be required at least for PHP7.0 to fix:
   ## PHP Warning: PHP Startup: Unable to load dynamic library '/usr/lib/php/20151012/redis.so'
   ## - /usr/lib/php/20151012/redis.so: undefined symbol: igbinary_serialize in Unknown on line 0
-  - '{{ ["igbinary"]
+  - '{{ [ "igbinary" ]
         if (not (ansible_distribution == "Ubuntu" and (ansible_distribution_version is version_compare("15.10", "<"))))
         else [] }}'
 
-  - '{{ ["libsmbclient"] if (owncloud__smb_support | bool and owncloud__release is version_compare("8.9.9", "<=")) else [] }}'
+  - '{{ [ "libsmbclient" ] if (owncloud__smb_support|bool and owncloud__release is version_compare("8.9.9", "<=")) else [] }}'
 
   ## Included in normal PHP installations but require it here because it is
   ## used internally by the role:
@@ -251,7 +251,7 @@ owncloud__upstream_key_fingerprint: '2880 6A87 8AE4 23A2 8372 792E D758 99B9 A72
 # .. envvar:: owncloud__keyserver [[[
 #
 # URL of the OpenPGP keyserver used to obtain OpenPGP keys.
-owncloud__keyserver: '{{ ansible_local.keyring.keyserver | d("hkp://keyserver.ubuntu.com") }}'
+owncloud__keyserver: '{{ ansible_local.keyring.keyserver|d("hkp://keyserver.ubuntu.com") }}'
                                                                    # ]]]
                                                                    # ]]]
 # .. ownCloud upgrades [[[1
@@ -379,7 +379,7 @@ owncloud__post_upgrade_hook_host_list: []
 # * ``owncloud`` (legacy variant, not recommended for new deployments, not well tested)
 # * ``nextcloud`` (Main supported variant in the future. Currently supported on Debian stretch, refer to `issue 45 <https://github.com/debops/ansible-owncloud/issues/45>`_ for details)
 #
-owncloud__variant: '{{ ansible_local.owncloud.variant | d("nextcloud") }}'
+owncloud__variant: '{{ ansible_local.owncloud.variant|d("nextcloud") }}'
 
 
 # .. envvar:: owncloud__variant_download_url_map
@@ -497,7 +497,7 @@ owncloud__apt_repo_source: '{{ "deb https://" + owncloud__apt_repo_base + "/" +
 # .. envvar:: owncloud__app_user
 #
 # User that will be used for the ownCloud instance.
-owncloud__app_user: '{{ ansible_local.nginx.user | d("www-data") }}'
+owncloud__app_user: '{{ ansible_local.nginx.user|d("www-data") }}'
 
 
 # .. envvar:: owncloud__app_group
@@ -511,9 +511,11 @@ owncloud__app_group: '{{ owncloud__app_user }}'
 # Directory under which ownCloud will be installed.
 owncloud__app_home: '{{ "/var/www/owncloud"
                         if (owncloud__variant == "owncloud")
-                        else ((ansible_local.nginx.www
-                              if (ansible_local.nginx.www | d())
-                              else "/srv/www") + "/" + owncloud__system_user) }}'
+                        else (
+                          (ansible_local.nginx.www
+                          if (ansible_local.nginx.www|d())
+                          else "/srv/www") + "/" + owncloud__system_user
+                        ) }}'
 
 
 # .. envvar:: owncloud__data_path
@@ -572,26 +574,26 @@ owncloud__apcu_enabled: True
 # requirement is not meet for Ubuntu trusty (neither in the release repos nor
 # in backports) thus Redis will not be enabled automatically by the role.
 # Refer to the `official ownCloud documentation <https://doc.owncloud.org/server/10.3/admin_manual/configuration/server/caching_configuration.html#redis-configuration>`__ for details.
-owncloud__redis_enabled: '{{ ansible_local.redis_server.installed | d() | bool and
+owncloud__redis_enabled: '{{ ansible_local.redis_server.installed|d() | bool and
                              (not (ansible_distribution == "Ubuntu" and ansible_distribution_release == "trusty")) }}'
 
 
 # .. envvar:: owncloud__redis_host
 #
 # Redis server to use when :envvar:`owncloud__redis_enabled` is ``True``.
-owncloud__redis_host: '{{ ansible_local.redis_server.host | d("localhost") }}'
+owncloud__redis_host: '{{ ansible_local.redis_server.host|d("localhost") }}'
 
 
 # .. envvar:: owncloud__redis_port
 #
 # Network port on which the Redis server is listening on.
-owncloud__redis_port: '{{ ansible_local.redis_server.port | d("6379") }}'
+owncloud__redis_port: '{{ ansible_local.redis_server.port|d("6379") }}'
 
 
 # .. envvar:: owncloud__redis_password
 #
 # Redis server authentication password.
-owncloud__redis_password: '{{ ansible_local.redis_server.password | d(omit) }}'
+owncloud__redis_password: '{{ ansible_local.redis_server.password|d(omit) }}'
 
 # .. Database configuration [[[1
 #
@@ -657,19 +659,19 @@ owncloud__database_map:
   # MySQL/MariaDB database.
   mariadb:
     dbtype: 'mysql'
-    dbname: '{{ owncloud__database_name | d(owncloud__app_user) }}'
-    dbuser: '{{ owncloud__database_user | d(owncloud__app_user) }}'
+    dbname: '{{ owncloud__database_name|d(owncloud__app_user) }}'
+    dbuser: '{{ owncloud__database_user|d(owncloud__app_user) }}'
     dbpass: '{{ owncloud__database_password }}'
-    dbhost: '{{ owncloud__database_server | d("localhost") }}'
+    dbhost: '{{ owncloud__database_server|d("localhost") }}'
     dbtableprefix: ''
 
   # PostgreSQL database on localhost, connection through Unix socket, no default password.
   postgresql:
     dbtype: 'pgsql'
-    dbname: '{{ owncloud__database_name | d(owncloud__app_user) }}'
-    dbuser: '{{ owncloud__database_user | d(owncloud__app_user) }}'
+    dbname: '{{ owncloud__database_name|d(owncloud__app_user) }}'
+    dbuser: '{{ owncloud__database_user|d(owncloud__app_user) }}'
     dbpass: ''
-    dbhost: '{{ owncloud__database_server | d("/var/run/postgresql") }}'
+    dbhost: '{{ owncloud__database_server|d("/var/run/postgresql") }}'
     dbtableprefix: ''
 
   sqlite:
@@ -686,7 +688,7 @@ owncloud__database_map:
 #
 # Default admin username, in the form 'admin-$USER'.
 # Set to ``False`` to disable automatic username and password.
-owncloud__admin_username: 'admin-{{ lookup("env", "USER") }}'
+owncloud__admin_username: 'admin-{{ lookup("env","USER") }}'
 
 
 # .. envvar:: owncloud__admin_password_path
@@ -708,7 +710,7 @@ owncloud__password_length: 20
 # Default admin password.
 # A random password will be generate by default as documented by the :ref:`debops.secret` role.
 owncloud__admin_password: '{{ lookup("password", owncloud__admin_password_path
-                              + " length=" + (owncloud__password_length | string)) }}'
+                              + " length=" + (owncloud__password_length|string)) }}'
 
 
 # .. envvar:: owncloud__autosetup
@@ -797,7 +799,7 @@ owncloud__app_user_webfinger_support: False
 # This variable is used internally, controlled by other variables of this role.
 owncloud__role_config:
 
-  trusted_domains: '{{ [owncloud__fqdn] if owncloud__fqdn is string else owncloud__fqdn }}'
+  trusted_domains: '{{ [ owncloud__fqdn ] if owncloud__fqdn is string else owncloud__fqdn }}'
 
   ## https://github.com/owncloud/core/issues/22257
   ## TODO: Temporary workaround until all package maintainers have caught up.
@@ -806,22 +808,22 @@ owncloud__role_config:
   'updatechecker': '{{ True if (owncloud__variant in ["nextcloud"]) else False }}'
 
   'memcache.local':
-    state: '{{ "present" if (owncloud__apcu_enabled | bool or owncloud__redis_enabled | bool) else "absent" }}'
-    value: '{{ "\\OC\\Memcache\\Redis" if (owncloud__redis_enabled | bool) else "\\OC\\Memcache\\APCu" }}'
+    state: '{{ "present" if (owncloud__apcu_enabled|bool or owncloud__redis_enabled|bool) else "absent" }}'
+    value: '{{ "\\OC\\Memcache\\Redis" if (owncloud__redis_enabled|bool) else "\\OC\\Memcache\\APCu" }}'
 
   'memcache.locking':
-    state: '{{ "present" if (owncloud__redis_enabled | bool) else "absent" }}'
+    state: '{{ "present" if (owncloud__redis_enabled|bool) else "absent" }}'
     value: '\\OC\\Memcache\\Redis'
 
   'redis':
-    state: '{{ "present" if (owncloud__redis_enabled | bool) else "absent" }}'
+    state: '{{ "present" if (owncloud__redis_enabled|bool) else "absent" }}'
     value:
       host: '{{ owncloud__redis_host }}'
-      port: '{{ owncloud__redis_port | int }}'
+      port: '{{ owncloud__redis_port|int }}'
       password: '{{ owncloud__redis_password }}'
 
   'tempdirectory':
-    state: '{{ "present" if (owncloud__temp_path | d()) else "absent" }}'
+    state: '{{ "present" if (owncloud__temp_path|d()) else "absent" }}'
     value: '{{ owncloud__temp_path }}'
 
 # .. envvar:: owncloud__release_channel
@@ -1084,13 +1086,13 @@ owncloud__role_occ_cmd_list:
   ## is setup by this role using packages.
   ## Since ownCloud 9 it is called `updatenotification`.
   - command: 'app:disable updater'
-    when: '{{ owncloud__release is version_compare("8.2", "<=") }}'  # noqa jinja[spacing]
+    when: '{{ owncloud__release is version_compare("8.2", "<=") }}'
 
   - command: 'app:enable user_ldap'
-    when: '{{ owncloud__ldap_enabled | bool }}'  # noqa jinja[spacing]
+    when: '{{ owncloud__ldap_enabled|bool }}'
 
   - command: 'app:enable files_external'
-    when: '{{ owncloud__smb_support | bool }}'  # noqa jinja[spacing]
+    when: '{{ owncloud__smb_support|bool }}'
 
 
 # .. envvar:: owncloud__occ_cmd_list
@@ -1179,8 +1181,8 @@ owncloud__user_files_host: []
 # configures only default one. If you need something more complex you can
 # use :envvar:`owncloud__occ_cmd_list`.
 owncloud__ldap_enabled: '{{ True
-                            if (ansible_local | d() and ansible_local.ldap | d() and
-                                (ansible_local.ldap.enabled | d()) | bool)
+                            if (ansible_local|d() and ansible_local.ldap|d() and
+                                (ansible_local.ldap.enabled|d())|bool)
                             else False }}'
 
 
@@ -1198,7 +1200,7 @@ owncloud_ldap_update_settings: True
 # The base Distinguished Name which should be used to create Distinguished
 # Names of the LDAP directory objects, defined as a YAML list. If this variable
 # is empty, automated Nextcloud LDAP configuration will not be performed.
-owncloud__ldap_base_dn: '{{ ansible_local.ldap.base_dn | d([]) }}'
+owncloud__ldap_base_dn: '{{ ansible_local.ldap.base_dn|d([]) }}'
 
                                                                    # ]]]
 
@@ -1220,7 +1222,7 @@ owncloud__ldap_base_users_dn: '{{ owncloud__ldap_base_dn | join(",") }}'
 # list. It will be used as a base for the Nextcloud service account LDAP
 # object. If the list is empty, the role will not create the account LDAP
 # object automatically.
-owncloud__ldap_device_dn: '{{ ansible_local.ldap.device_dn | d([]) }}'
+owncloud__ldap_device_dn: '{{ ansible_local.ldap.device_dn|d([]) }}'
 
                                                                    # ]]]
 # .. envvar:: owncloud__ldap_self_rdn [[[
@@ -1244,7 +1246,7 @@ owncloud__ldap_self_object_classes: [ 'account', 'simpleSecurityObject' ]
 owncloud__ldap_self_attributes:
   uid: '{{ owncloud__ldap_self_rdn.split("=")[1] }}'
   userPassword: '{{ owncloud__ldap_bindpw }}'
-  host: '{{ [ansible_fqdn, ansible_hostname] | unique }}'
+  host: '{{ [ ansible_fqdn, ansible_hostname ] | unique }}'
   description: 'Account used by the "Nextcloud" service to access the LDAP directory'
 
                                                                    # ]]]
@@ -1252,7 +1254,7 @@ owncloud__ldap_self_attributes:
 #
 # The Distinguished Name of the account LDAP object used by the
 # Nextcloud service to bind to the LDAP directory.
-owncloud__ldap_binddn: '{{ ([owncloud__ldap_self_rdn] + owncloud__ldap_device_dn) | join(",") }}'
+owncloud__ldap_binddn: '{{ ([ owncloud__ldap_self_rdn ] + owncloud__ldap_device_dn) | join(",") }}'
 
                                                                    # ]]]
 # .. envvar:: owncloud__ldap_bindpw [[[
@@ -1262,7 +1264,7 @@ owncloud__ldap_binddn: '{{ ([owncloud__ldap_self_rdn] + owncloud__ldap_device_dn
 owncloud__ldap_bindpw: '{{ (lookup("password", secret + "/ldap/credentials/"
                                    + owncloud__ldap_binddn | to_uuid + ".password length=32 "
                                    + "chars=ascii_letters,digits,!@_#$%^&*"))
-                           if owncloud__ldap_enabled | bool
+                           if owncloud__ldap_enabled|bool
                            else "" }}'
 
                                                                    # ]]]
@@ -1270,7 +1272,7 @@ owncloud__ldap_bindpw: '{{ (lookup("password", secret + "/ldap/credentials/"
 #
 # List of LDAP URIs that point to the directory servers which should be used by
 # Nextcloud.
-owncloud__ldap_uri: '{{ ansible_local.ldap.uri | d([]) }}'
+owncloud__ldap_uri: '{{ ansible_local.ldap.uri|d([]) }}'
 
                                                                    # ]]]
 # .. envvar:: owncloud__ldap_primary_server [[[
@@ -1458,10 +1460,10 @@ owncloud__ldap_expert_username_attr: ''
 # The configuration database configID to use for the LDAP configuration managed
 # by the role.
 owncloud__ldap_config_id: '{{ ansible_local.owncloud.ldap_config_id
-                              if (ansible_local.owncloud.ldap_config_id | d())
+                              if (ansible_local.owncloud.ldap_config_id|d())
                               else (owncloud__register_ldap_config_id.stdout
-                                    if (owncloud__register_ldap_config_id | d() and
-                                        owncloud__register_ldap_config_id.stdout | d())
+                                    if (owncloud__register_ldap_config_id|d() and
+                                        owncloud__register_ldap_config_id.stdout|d())
                                     else "") }}'
 
 
@@ -1563,7 +1565,7 @@ owncloud__ldap_default_config:
     value: '1'
 
   - name: 'ldapDefaultPPolicyDN'
-    value: '{{ (["cn=Default Password Policy", "ou=Password Policies"]
+    value: '{{ ([ "cn=Default Password Policy", "ou=Password Policies" ]
                 + owncloud__ldap_base_dn) | join(",") }}'
 
                                                                    # ]]]
@@ -1664,7 +1666,7 @@ owncloud__mail_smtpport: '25'
 # if you want to be able to configure/change this via the admin web interface.
 owncloud__mail_conf_map:
   mail_domain: '{{ owncloud__mail_domain }}'
-  mail_from_address: '{{ owncloud__mail_from_address }}'
+  mail_from_address: '{{ owncloud__mail_from_address  }}'
   mail_smtpmode: '{{ owncloud__mail_smtpmode }}'
   mail_smtphost: '{{ owncloud__mail_smtphost }}'
   mail_smtpport: '{{ owncloud__mail_smtpport }}'
@@ -1854,11 +1856,11 @@ owncloud__theme_conf_map:
 # Variable containing the webserver which should be used.
 # Refer to :ref:`owncloud__ref_getting_started` for how to switch webservers.
 owncloud__webserver: '{{ ansible_local.owncloud.webserver
-                         if (ansible_local.owncloud.webserver | d())
+                         if (ansible_local.owncloud.webserver|d())
                          else ("apache"
-                               if (ansible_local.apache.enabled | d() | bool)
+                               if (ansible_local.apache.enabled|d()|bool)
                                else ("nginx"
-                                     if (ansible_local.nginx.enabled | d() | bool)
+                                     if (ansible_local.nginx.enabled|d()|bool)
                                      else "no-webserver-detected")) }}'
 
                                                                    # ]]]
@@ -2003,13 +2005,13 @@ owncloud__ldap__dependent_tasks:
     objectClass: '{{ owncloud__ldap_self_object_classes }}'
     attributes: '{{ owncloud__ldap_self_attributes }}'
     no_log: '{{ debops__no_log | d(True) }}'
-    state: '{{ "present" if owncloud__ldap_device_dn | d() else "ignore" }}'
+    state: '{{ "present" if owncloud__ldap_device_dn|d() else "ignore" }}'
 
   - name: 'Enable password management by {{ owncloud__ldap_binddn }}'
-    dn: '{{ (["cn=Password Reset Agent", "ou=Roles"] + owncloud__ldap_base_dn) | join(",") }}'
+    dn: '{{ ([ "cn=Password Reset Agent", "ou=Roles" ] + owncloud__ldap_base_dn) | join(",") }}'
     attributes:
       roleOccupant: '{{ owncloud__ldap_binddn }}'
-    state: '{{ "present" if owncloud__ldap_device_dn | d() else "ignore" }}'
+    state: '{{ "present" if owncloud__ldap_device_dn|d() else "ignore" }}'
 
                                                                    # ]]]
 # .. envvar:: owncloud__mariadb__dependent_databases [[[
@@ -2102,7 +2104,7 @@ owncloud__apache__dependent_vhosts:
     root: '{{ owncloud__app_home }}'
     options: '+FollowSymLinks'
     allow_override: 'All'
-    root_directives: |  # noqa var-spacing
+    root_directives: |
       <IfModule mod_dav.c>
             Dav off
       </IfModule>
@@ -2114,7 +2116,7 @@ owncloud__apache__dependent_vhosts:
       ## Tested while uploading with:
       ## while true; do df -h /tmp|tail -n 1; sleep 0.1; done
       ## Currently configured in PHP Apache scope: owncloud__php__dependent_configuration
-      {% if owncloud__php_temp_path | d() %}
+      {% if owncloud__php_temp_path|d() %}
       <IfModule mod_php5.c>
         php_value sys_temp_dir '{{ owncloud__php_temp_path }}'
       </IfModule>
@@ -2271,7 +2273,7 @@ owncloud__nginx__dependent_servers:
           return 404;
 
       - pattern: '~ \.php(?:$|/)'
-        options: |  # noqa var-spacing
+        options: |
           # Ensure this block, which passes PHP files to the PHP process, is above the blocks
           # which handle static assets (as seen below). If this block is not declared first,
           # then Nginx will encounter an infinite rewriting loop when it prepends `/index.php`
@@ -2297,9 +2299,9 @@ owncloud__nginx__dependent_servers:
 
           fastcgi_intercept_errors on;
           {% if (ansible_local.nginx.version
-                 if (ansible_local.nginx.version | d())
+                 if (ansible_local.nginx.version|d())
                  else "0.0")
-                is version_compare("1.7.11", '>=') %}
+                is version_compare("1.7.11",'>=') %}
           fastcgi_request_buffering off;
           {% endif %}
 
@@ -2311,7 +2313,7 @@ owncloud__nginx__dependent_servers:
           expires 6M;         # Cache-Control policy borrowed from `.htaccess`
           access_log off;     # Optional: Don't log access to assets
 
-          {% if not (owncloud__nginx_access_log_assets | bool) %}
+          {% if not (owncloud__nginx_access_log_assets|bool) %}
           access_log off;
           {% endif %}
 
@@ -2324,7 +2326,7 @@ owncloud__nginx__dependent_servers:
           try_files $uri /index.php$request_uri;
           expires 7d;         # Cache-Control policy borrowed from `.htaccess`
 
-          {% if not (owncloud__nginx_access_log_assets | bool) %}
+          {% if not (owncloud__nginx_access_log_assets|bool) %}
           access_log off;
           {% endif %}
 
@@ -2371,7 +2373,7 @@ owncloud__php__dependent_configuration:
 
   - filename: '10-owncloud'
     by_role: 'debops.owncloud'
-    state: '{{ "present" if (((owncloud__apcu_enabled | bool) and (owncloud__release is match("8\.1"))) or
+    state: '{{ "present" if (((owncloud__apcu_enabled|bool) and (owncloud__release is match("8\.1"))) or
             ((owncloud__variant in ["nextcloud"]) and
             (owncloud__release is version_compare("21.0", ">="))))
             else "absent" }}'
@@ -2400,7 +2402,7 @@ owncloud__php__dependent_configuration:
   - filename: 'debops.owncloud'
     path: 'apache2/conf.d/'
     by_role: 'debops.owncloud'
-    state: '{{ (owncloud__php_temp_path | d() and owncloud__webserver == "apache") | ternary("present", "absent") }}'
+    state: '{{ (owncloud__php_temp_path|d() and owncloud__webserver == "apache") | ternary("present", "absent") }}'
     sections:
 
       - options: |

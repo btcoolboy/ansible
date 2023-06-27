@@ -15,6 +15,7 @@ options:
       - The username this module should use to establish its PostgreSQL session.
     type: str
     default: postgres
+    aliases: [ login ]
   login_password:
     description:
       - The password this module should use to establish its PostgreSQL session.
@@ -26,11 +27,13 @@ options:
       - If you have connection issues when using C(localhost), try to use C(127.0.0.1) instead.
     default: ''
     type: str
+    aliases: [ host ]
   login_unix_socket:
     description:
       - Path to a Unix domain socket for local connections.
     type: str
     default: ''
+    aliases: [ unix_socket ]
   port:
     description:
       - Database port to connect to.
@@ -51,6 +54,16 @@ options:
       - If the file exists, the server's certificate will be verified to be signed by one of these authorities.
     type: str
     aliases: [ ssl_rootcert ]
+  ssl_cert:
+    description:
+      - Specifies the file name of the client SSL certificate.
+    type: path
+    version_added: '2.4.0'
+  ssl_key:
+    description:
+      - Specifies the location for the secret key used for the client certificate.
+    type: path
+    version_added: '2.4.0'
   connect_params:
     description:
       - Any additional parameters to be passed to libpg.
@@ -58,16 +71,22 @@ options:
     type: dict
     default: {}
     version_added: '2.3.0'
+
+attributes:
+  check_mode:
+    description: Can run in check_mode and return changed status prediction without modifying target.
+
 notes:
 - The default authentication assumes that you are either logging in as or sudo'ing to the C(postgres) account on the host.
 - To avoid "Peer authentication failed for user postgres" error,
   use postgres user as a I(become_user).
-- This module uses psycopg2, a Python PostgreSQL database adapter. You must
-  ensure that psycopg2 is installed on the host before using this module.
+- This module uses C(psycopg2), a Python PostgreSQL database adapter. You must
+  ensure that C(psycopg2) is installed on the host before using this module.
 - If the remote host is the PostgreSQL server (which is the default case), then
   PostgreSQL must also be installed on the remote host.
-- For Ubuntu-based systems, install the postgresql, libpq-dev, and python-psycopg2 packages
+- For Ubuntu-based systems, install the C(postgresql), C(libpq-dev), and C(python-psycopg2) packages
   on the remote host before using this module.
 - The ca_cert parameter requires at least Postgres version 8.4 and I(psycopg2) version 2.4.3.
+
 requirements: [ psycopg2 ]
 '''

@@ -5,24 +5,24 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Import custom Ansible plugins
-  ansible.builtin.import_role:
+  import_role:
     name: 'ansible_plugins'
 
 - name: Build and install Go packages
-  ansible.builtin.include_tasks: 'golang_build_install.yml'
+  include_tasks: 'golang_build_install.yml'
   loop_control:
     loop_var: 'build'
   loop: '{{ q("flattened", golang__combined_packages) | debops.debops.parse_kv_items }}'
-  when: build.name | d() and build.state | d('present') not in [ 'absent', 'ignore' ]
+  when: build.name|d() and build.state|d('present') not in [ 'absent', 'ignore' ]
 
 - name: Make sure that Ansible local facts directory exists
-  ansible.builtin.file:
+  file:
     path: '/etc/ansible/facts.d'
     state: 'directory'
     mode: '0755'
 
 - name: Save Go local facts
-  ansible.builtin.template:
+  template:
     src: 'etc/ansible/facts.d/golang.fact.j2'
     dest: '/etc/ansible/facts.d/golang.fact'
     mode: '0755'
@@ -32,5 +32,5 @@
   # An exception to the rule. Role needs to refresh facts without executing any
   # other pending handlers.
 - name: Update Ansible facts if they were modified
-  ansible.builtin.setup:  # noqa no-handler
+  action: 'setup'  # noqa no-handler
   when: golang__register_facts is changed

@@ -17,3 +17,9 @@ def use_old_user_mgmt(cursor):
 
 def supports_identified_by_password(cursor):
     return True
+
+
+def server_supports_alter_user(cursor):
+    version = get_server_version(cursor)
+
+    return LooseVersion(version) >= LooseVersion("10.2")

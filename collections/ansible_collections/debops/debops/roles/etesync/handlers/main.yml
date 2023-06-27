@@ -4,8 +4,8 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Restart gunicorn for etesync
-  ansible.builtin.service:
+  service:
     name: 'gunicorn@etesync'
     state: 'restarted'
-  when: (ansible_local | d() and ansible_local.gunicorn | d() and
-         ansible_local.gunicorn.installed | bool)
+  when: (ansible_local|d() and ansible_local.gunicorn|d() and
+         ansible_local.gunicorn.installed|bool)

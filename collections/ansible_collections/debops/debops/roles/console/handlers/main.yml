@@ -4,11 +4,11 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Reload sysvinit
-  ansible.builtin.command: telinit q
+  command: telinit q
 
 # FIXME: To be integrated in the 'nfs' role
 #- name: Restart remote-fs.target
-#  ansible.builtin.systemd:
+#  systemd:
 #    daemon_reload: True
 #    state: 'restarted'
 #    name: 'remote-fs.target'

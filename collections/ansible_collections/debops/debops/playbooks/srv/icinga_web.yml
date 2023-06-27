@@ -16,7 +16,7 @@
   pre_tasks:
 
     - name: Apply keyring configuration for php environment
-      ansible.builtin.import_role:
+      import_role:
         name: 'keyring'
       vars:
         keyring__dependent_apt_keys:
@@ -30,7 +30,7 @@
               'role::php', 'role::nginx', 'role::postgresql', 'role::mariadb' ]
 
     - name: Prepare php environment
-      ansible.builtin.import_role:
+      import_role:
         name: 'php'
         tasks_from: 'main_env'
       tags: [ 'role::php', 'role::php:env', 'role::logrotate' ]
@@ -43,6 +43,7 @@
         - '{{ icinga_web__apt_preferences__dependent_list }}'
         - '{{ php__apt_preferences__dependent_list }}'
         - '{{ nginx__apt_preferences__dependent_list }}'
+        - '{{ postgresql__apt_preferences__dependent_list | d([]) }}'
 
     - role: cron
       tags: [ 'role::cron', 'skip::cron' ]
@@ -110,7 +111,7 @@
       mariadb__dependent_users:
         - '{{ icinga_web__mariadb__dependent_users }}'
       when: icinga_web__database_type == 'mariadb' or
-            icinga_web__x509_enabled | bool
+            icinga_web__x509_enabled|bool
 
     - role: icinga_web
       tags: [ 'role::icinga_web', 'skip::icinga_web' ]

@@ -1,7 +1,4 @@
 ---
-- name: alias mysql command to include default options
-  set_fact:
-    mysql_command: "mysql -u{{ mysql_user }} -p{{ mysql_password }} -P{{ mysql_primary_port }} --protocol=tcp"
 
 - name: set fact tls_enabled
   command: "{{ mysql_command }} \"-e SHOW VARIABLES LIKE 'have_ssl';\""
@@ -13,7 +10,7 @@
     mysql_parameters: &mysql_params
       login_user: '{{ mysql_user }}'
       login_password: '{{ mysql_password }}'
-      login_host: 127.0.0.1
+      login_host: '{{ mysql_host }}'
       login_port: '{{ mysql_primary_port }}'
   when: tls_enabled
   block:
@@ -29,6 +26,7 @@
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_1 }}'
+        host_all: true
         state: absent
       ignore_errors: yes
 
@@ -46,7 +44,7 @@
         mode: getprimary
         login_user: '{{ user_name_1 }}'
         login_password: '{{ user_password_1 }}'
-        login_host: 127.0.0.1
+        login_host: '{{ mysql_host }}'
         login_port: '{{ mysql_primary_port }}'
         ca_cert: /tmp/cert.pem
       register: result
@@ -55,19 +53,21 @@
     - assert:
         that:
           - result is failed
-      when: connector_name is search('pymysql')
+      when:
+        - connector_name == 'pymysql'
 
     - assert:
         that:
           - result is succeeded
-      when: connector_name is not search('pymysql')
+      when:
+        - connector_name != 'pymysql'
 
     - name: attempt connection with newly created user ignoring hostname
       mysql_replication:
         mode: getprimary
         login_user: '{{ user_name_1 }}'
         login_password: '{{ user_password_1 }}'
-        login_host: 127.0.0.1
+        login_host: '{{ mysql_host }}'
         login_port: '{{ mysql_primary_port }}'
         ca_cert: /tmp/cert.pem
         check_hostname: no
@@ -82,5 +82,5 @@
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_1 }}'
-        host: 127.0.0.1
+        host: '{{ gateway_addr }}'
         state: absent

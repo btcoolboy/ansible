@@ -27,7 +27,7 @@ Required:
 {% endif %}
 {# Main template #}
 {# ============= #}
-{% if item.comment | d() %}
+{% if item.comment|d() %}
 # {{ item.comment }}
 
 {% endif %}
@@ -42,4 +42,3 @@ table nat {
 {% else %}
 # Cannot configure DMZ, public or private IP addresses not specified
 {% endif %}
-

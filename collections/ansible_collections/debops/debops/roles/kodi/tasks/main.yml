@@ -6,7 +6,7 @@
 # http://kodi.wiki/view/HOW-TO:Autostart_Kodi_for_Linux
 
 - name: Ensure specified packages are in there desired state
-  ansible.builtin.package:
+  package:
     name: '{{ q("flattened", kodi__base_packages) }}'
     state: '{{ "present" if (kodi__deploy_state == "present") else "absent" }}'
   register: kodi__register_packages
@@ -15,13 +15,13 @@
 
 # System user and group [[[
 - name: Create Kodi system group
-  ansible.builtin.group:
+  group:
     name: '{{ kodi__group }}'
     state: '{{ "present" if (kodi__deploy_state == "present") else "absent" }}'
     system: True
 
 - name: Create Kodi system user
-  ansible.builtin.user:
+  user:
     name: '{{ kodi__user }}'
     group: '{{ kodi__group }}'
     groups: '{{ kodi__groups | join(",") | default(omit) }}'
@@ -34,16 +34,16 @@
 # ]]]
 
 - name: Create polkit configuration
-  ansible.builtin.template:
+  template:
     src: 'etc/polkit-1/localauthority/50-local.d/kodi-actions.pkla.j2'
     dest: '/etc/polkit-1/localauthority/50-local.d/kodi-actions.pkla'
     owner: 'root'
     group: 'root'
     mode: '0644'
-  when: kodi__polkit_action | d()
+  when: kodi__polkit_action|d()
 
 - name: Remove polkit configuration
-  ansible.builtin.file:
+  file:
     path: '/etc/polkit-1/localauthority/50-local.d/kodi-actions.pkla'
     state: 'absent'
-  when: not kodi__polkit_action | d()
+  when: not kodi__polkit_action|d()

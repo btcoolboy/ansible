@@ -4,16 +4,10 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Restart smstools
-  ansible.builtin.service:
-    name: 'smstools'
-    state: 'restarted'
+  service: name=smstools state=restarted
 
 - name: Restart xinetd
-  ansible.builtin.service:
-    name: 'xinetd'
-    state: 'restarted'
+  service: name=xinetd state=restarted
 
 - name: Reload xinetd
-  ansible.builtin.service:
-    name: 'xinetd'
-    state: 'reloaded'
+  service: name=xinetd state=reloaded

@@ -4,25 +4,25 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Import custom Ansible plugins
-  ansible.builtin.import_role:
+  import_role:
     name: 'ansible_plugins'
 
 - name: Import DebOps global handlers
-  ansible.builtin.import_role:
+  import_role:
     name: 'global_handlers'
 
 - name: Pre hooks
-  ansible.builtin.include_tasks: '{{ lookup("debops.debops.task_src", "stunnel/pre_main.yml") }}'
+  include: '{{ lookup("debops.debops.task_src", "stunnel/pre_main.yml") }}'
 
 - name: Install required packages
-  ansible.builtin.package:
-    name: '{{ q("flattened", (["stunnel4", "openssl", "ssl-cert"])) }}'
+  package:
+    name: '{{ q("flattened", ([ "stunnel4", "openssl", "ssl-cert" ])) }}'
     state: 'present'
   register: stunnel__register_packages
   until: stunnel__register_packages is succeeded
 
 - name: Configure default variables
-  ansible.builtin.template:
+  template:
     src: 'etc/default/stunnel4.j2'
     dest: '/etc/default/stunnel4'
     owner: 'root'
@@ -31,7 +31,7 @@
   notify: [ 'Restart stunnel' ]
 
 - name: Add stunnel user to ssl-cert system group
-  ansible.builtin.user:
+  user:
     name: 'stunnel4'
     state: 'present'
     createhome: False
@@ -39,7 +39,7 @@
     append: True
 
 - name: Remove SSL tunnels if requested
-  ansible.builtin.file:
+  file:
     path: '/etc/stunnel/{{ item.filename | default(item.name) }}.conf'
     state: 'absent'
   with_items: "{{ stunnel_services }}"
@@ -48,7 +48,7 @@
   notify: [ 'Restart stunnel' ]
 
 - name: Configure SSL tunnels
-  ansible.builtin.template:
+  template:
     src: 'etc/stunnel/service.conf.j2'
     dest: '/etc/stunnel/{{ item.filename | default(item.name) }}.conf'
     owner: 'root'
@@ -60,4 +60,4 @@
   notify: [ 'Restart stunnel' ]
 
 - name: Post hooks
-  ansible.builtin.include_tasks: '{{ lookup("debops.debops.task_src", "stunnel/post_main.yml") }}'
+  include: '{{ lookup("debops.debops.task_src", "stunnel/post_main.yml") }}'

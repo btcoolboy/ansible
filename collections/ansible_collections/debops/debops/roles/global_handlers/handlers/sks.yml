@@ -4,6 +4,4 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Restart sks
-  ansible.builtin.service:
-    name: 'sks'
-    state: 'restarted'
+  service: name=sks state=restarted

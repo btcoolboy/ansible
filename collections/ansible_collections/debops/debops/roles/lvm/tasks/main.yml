@@ -1,23 +1,23 @@
 ---
 # Copyright (C) 2015-2016 Maciej Delmanowski <drybjed@gmail.com>
-# Copyright (C) 2015-2022 DebOps <https://debops.org/>
+# Copyright (C) 2015-2016 DebOps <https://debops.org/>
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Install LVM support
-  ansible.builtin.package:
+  package:
     name:  '{{ q("flattened", lvm__packages) }}'
     state: 'present'
   register: lvm__register_packages
   until: lvm__register_packages is succeeded
 
 - name: Divert original lvm.conf
-  debops.debops.dpkg_divert:
+  dpkg_divert:
     path: '/etc/lvm/lvm.conf'
 
 - name: Check LVM version
   environment:
     LC_MESSAGES: 'C'
-  ansible.builtin.shell: set -o nounset -o pipefail -o errexit &&
+  shell: set -o nounset -o pipefail -o errexit &&
          dpkg-query -W -f='${Version}\n' 'lvm2' | grep -v '^$' | cut -d- -f1
   args:
     executable: 'bash'
@@ -26,7 +26,7 @@
   check_mode: False
 
 - name: Lookup base LVM configuration
-  ansible.builtin.include_vars: '{{ item }}'
+  include_vars: '{{ item }}'
   with_first_found:
     - '{{ "lvm_config_" + lvm__config_lookup + ".yml" }}'
     - '{{ "lvm_config_" + lvm__register_version.stdout + ".yml" }}'
@@ -35,7 +35,7 @@
     - 'lvm_config_default.yml'
 
 - name: Configure LVM
-  ansible.builtin.template:
+  template:
     src: 'etc/lvm/lvm.conf.j2'
     dest: '/etc/lvm/lvm.conf'
     owner: 'root'
@@ -43,15 +43,16 @@
     mode: '0644'
 
 - name: Enable/disable lvm2-lvmetad socket
-  ansible.builtin.systemd:
+  systemd:
     name: 'lvm2-lvmetad.socket'
     state: '{{ "started" if lvm__global_use_lvmetad else "stopped" }}'
     enabled: '{{ lvm__global_use_lvmetad }}'
-  when: (ansible_distribution_release in ['stretch', 'trusty', 'xenial',
-                                          'bionic'])
+  when: (ansible_distribution_release in [ 'wheezy', 'jessie', 'stretch',
+                                           'precise', 'trusty', 'xenial',
+                                           'bionic' ])
 
 - name: Manage LVM
-  ansible.builtin.include_tasks: manage_lvm.yml
-  when: (((ansible_system_capabilities_enforced | d()) | bool and
+  include: manage_lvm.yml
+  when: (((ansible_system_capabilities_enforced|d())|bool and
           "cap_sys_admin" in ansible_system_capabilities) or
-         not (ansible_system_capabilities_enforced | d(True)) | bool)
+         not (ansible_system_capabilities_enforced|d(True))|bool)

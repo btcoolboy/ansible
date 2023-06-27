@@ -4,10 +4,6 @@ from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
 import pytest
-try:
-    from unittest.mock import MagicMock
-except ImportError:
-    from mock import MagicMock
 
 from ansible_collections.community.mysql.plugins.module_utils.user import (
     handle_grant_on_col,
@@ -15,7 +11,6 @@ from ansible_collections.community.mysql.plugins.module_utils.user import (
     normalize_col_grants,
     sort_column_order
 )
-from ..utils import dummy_cursor_class
 
 
 @pytest.mark.parametrize(

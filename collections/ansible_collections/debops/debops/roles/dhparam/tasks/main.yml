@@ -5,15 +5,15 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Import DebOps global handlers
-  ansible.builtin.import_role:
+  import_role:
     name: 'global_handlers'
 
 - name: Import DebOps secret role
-  ansible.builtin.import_role:
+  import_role:
     name: 'secret'
 
-- name: Check Ansible Controller library version  # noqa no-shorthand
-  ansible.builtin.shell: |
+- name: Check Ansible Controller library version
+  shell: |
     set -o nounset -o pipefail -o errexit &&
     {% if dhparam__source_library == 'gnutls' %}
     certtool --version | head -n 1 | awk '{print $NF}'
@@ -31,7 +31,7 @@
   tags: [ 'meta::provision' ]
 
 - name: Assert that required software is installed
-  ansible.builtin.assert:
+  assert:
     that:
       - 'dhparam__register_version is defined and dhparam__register_version.stdout'
   delegate_to: 'localhost'
@@ -40,7 +40,7 @@
   tags: [ 'meta::provision' ]
 
 - name: Create required directories on Ansible Controller
-  ansible.builtin.file:
+  file:
     path: '{{ dhparam__source_path }}'
     state: 'directory'
     mode: '0755'
@@ -49,8 +49,8 @@
   run_once: True
   tags: [ 'meta::provision' ]
 
-- name: Generate Diffie-Hellman params on Ansible Controller  # noqa no-shorthand
-  ansible.builtin.command: |
+- name: Generate Diffie-Hellman params on Ansible Controller
+  command: |
     {% if dhparam__source_library == 'gnutls' %}
     certtool --generate-dh-params
              --outfile {{ dhparam__source_path + "/" + dhparam__prefix + item + dhparam__suffix }}
@@ -67,7 +67,7 @@
   tags: [ 'meta::provision' ]
 
 - name: Install encryption software
-  ansible.builtin.package:
+  package:
     name: '{{ q("flattened", (dhparam__base_packages + dhparam__packages)) }}'
     state: 'present'
   when: dhparam__deploy_state in ['present']
@@ -76,7 +76,7 @@
   tags: [ 'meta::provision' ]
 
 - name: Create required directories
-  ansible.builtin.file:
+  file:
     path: '{{ dhparam__hook_path }}'
     state: 'directory'
     owner: 'root'
@@ -86,7 +86,7 @@
   notify: [ 'Regenerate DH parameters on first install' ]
 
 - name: Preseed Diffie-Hellman parameters
-  ansible.builtin.copy:
+  copy:
     src: '{{ dhparam__source_path + "/" }}'
     dest: '{{ dhparam__path + "/params/" + dhparam__set_prefix + item + "/" }}'
     owner: 'root'
@@ -98,7 +98,7 @@
   notify: [ 'Execute DH parameter hooks' ]
 
 - name: Create default symlinks for all sets
-  ansible.builtin.file:
+  file:
     src: '{{ "params/" + dhparam__set_prefix + item + "/"
              + dhparam__prefix + dhparam__default_length + dhparam__suffix }}'
     path: '{{ dhparam__path + "/" + dhparam__set_prefix + item }}'
@@ -108,7 +108,7 @@
   with_sequence: 'start=0 count={{ dhparam__sets }}'
 
 - name: Install DHE generation script
-  ansible.builtin.template:
+  template:
     src: 'usr/local/lib/dhparam-generate-params.j2'
     dest: '{{ dhparam__generate_params }}'
     owner: 'root'
@@ -117,7 +117,7 @@
   when: dhparam__deploy_state in ['present']
 
 - name: Enable periodic DH parameters generation via cron
-  ansible.builtin.cron:
+  cron:
     name: 'Generate new Diffie-Hellman ephemeral parameters'
     job: 'test -x {{ dhparam__generate_params }} && {{ dhparam__generate_params }} schedule'
     cron_file: 'dhparam-generate-params'
@@ -125,13 +125,13 @@
     special_time: '{{ dhparam__generate_cron_period }}'
     state: '{{ "present"
                if (ansible_service_mgr != "systemd" and
-                   dhparam__generate_cron | bool and
+                   dhparam__generate_cron|bool and
                    dhparam__deploy_state in ["present"])
                else "absent" }}'
   when: not ansible_check_mode
 
 - name: Setup systemd timer for periodic DH parameter regeneration
-  ansible.builtin.template:
+  template:
     src: '{{ item }}.j2'
     dest: '/{{ item }}'
     owner: 'root'
@@ -144,20 +144,20 @@
   when: dhparam__deploy_state in ['present'] and ansible_service_mgr == 'systemd'
 
 - name: Enable systemd timer
-  ansible.builtin.systemd:
+  systemd:
     daemon_reload: True
     name: 'dhparam-generate-params.timer'
     enabled: '{{ True
-                 if (dhparam__generate_cron | bool)
+                 if (dhparam__generate_cron|bool)
                  else False }}'
     state: '{{ "started"
-                 if (dhparam__generate_cron | bool)
+                 if (dhparam__generate_cron|bool)
                  else "stopped" }}'
   when: dhparam__deploy_state in ['present'] and ansible_service_mgr == 'systemd' and
         not ansible_check_mode
 
 - name: Make sure the Ansible local facts directory exists
-  ansible.builtin.file:
+  file:
     path: '/etc/ansible/facts.d'
     state: 'directory'
     owner: 'root'
@@ -166,7 +166,7 @@
   when: dhparam__deploy_state in ['present']
 
 - name: Save dhparam local facts
-  ansible.builtin.template:
+  template:
     src: 'etc/ansible/facts.d/dhparam.fact.j2'
     dest: '/etc/ansible/facts.d/dhparam.fact'
     owner: 'root'
@@ -176,4 +176,4 @@
   tags: [ 'meta::facts' ]
 
 - name: Gather facts if they changed
-  ansible.builtin.meta: 'flush_handlers'
+  meta: 'flush_handlers'

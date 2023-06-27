@@ -6,16 +6,16 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Import DebOps global handlers
-  ansible.builtin.import_role:
+  import_role:
     name: 'global_handlers'
 
 - name: Import DebOps secret role
-  ansible.builtin.import_role:
+  import_role:
     name: 'secret'
 
 # System packages [[[
 - name: Ensure specified packages are in there desired state
-  ansible.builtin.package:
+  package:
     name: '{{ q("flattened", foodsoft__base_packages) }}'
     state: '{{ "present" if (foodsoft__deploy_state == "present") else "absent" }}'
   register: foodsoft__register_packages
@@ -25,13 +25,13 @@
 
 # System user and group [[[
 - name: Create Foodsoft system group
-  ansible.builtin.group:
+  group:
     name: '{{ foodsoft__group }}'
     state: '{{ "present" if (foodsoft__deploy_state == "present") else "absent" }}'
     system: True
 
 - name: Create Foodsoft system user
-  ansible.builtin.user:
+  user:
     name: '{{ foodsoft__user }}'
     group: '{{ foodsoft__group }}'
     home: '{{ foodsoft__home_path }}'
@@ -42,18 +42,18 @@
 # ]]]
 
 - name: Clone Foodsoft git repository
-  ansible.builtin.git:
+  git:
     repo: '{{ foodsoft__git_repo }}'
     dest: '{{ foodsoft__git_dest }}'
     version: '{{ foodsoft__git_version }}'
-    update: '{{ foodsoft__git_update | bool }}'
+    update: '{{ foodsoft__git_update|bool }}'
   become: True
   become_user: '{{ foodsoft__user }}'
   register: foodsoft__register_git
   when: (foodsoft__deploy_state == "present")
 
 - name: Update Foodsoft directory permissions
-  ansible.builtin.file:
+  file:
     path: '{{ item }}'
     state: 'directory'
     owner: '{{ foodsoft__user }}'
@@ -64,7 +64,7 @@
     - '{{ foodsoft__git_dest }}'
 
 - name: Install Foodsoft dependencies via bundler
-  community.general.bundler:
+  bundler:
     chdir: '{{ foodsoft__git_dest }}'
     exclude_groups: '{{ foodsoft__bundler_exclude_groups }}'
     extra_args: '--without development --deployment'
@@ -74,11 +74,11 @@
   tags: [ 'role::foodsoft:gems' ]
   # become: True
   # become_user: '{{ foodsoft__user }}'
-  when: foodsoft__bundler_exclude_groups | d()
+  when: foodsoft__bundler_exclude_groups|d()
 
 ## https://github.com/foodcoops/foodsoft/blob/master/doc/SETUP_DEVELOPMENT.md#manual-configuration
 - name: Configure Foodsoft
-  ansible.builtin.template:
+  template:
     src: 'srv/www/foodsoft/app/config/{{ item }}.j2'
     dest: '{{ foodsoft__git_dest }}/config/{{ item }}'
     owner: '{{ foodsoft__user }}'
@@ -91,7 +91,7 @@
 
 ## Workaround because there is not a single command for this: https://github.com/foodcoops/foodsoft/issues/385
 - name: Generate secret token
-  ansible.builtin.command: 'bundle exec rake secret'
+  command: 'bundle exec rake secret'
   args:
     chdir: '{{ foodsoft__git_dest }}'
     creates: '{{ foodsoft__git_dest }}/config/initializers/secret_token.rb'
@@ -102,15 +102,15 @@
 
 - name: Check secret token
   ## Default is 128
-  ansible.builtin.assert:  # noqa no-handler
+  assert:  # noqa no-handler
     that:
-      - 'foodsoft__register_secret_token.stdout | length > 120'
-      - 'foodsoft__register_secret_token.stdout | length < 500'
+      - 'foodsoft__register_secret_token.stdout|length > 120'
+      - 'foodsoft__register_secret_token.stdout|length < 500'
   when: foodsoft__register_secret_token is changed
   tags: [ 'role::foodsoft:gen_token' ]
 
 - name: Configure secret token for Foodsoft
-  ansible.builtin.template:  # noqa no-handler
+  template:  # noqa no-handler
     src: 'srv/www/foodsoft/app/config/initializers/secret_token.rb.j2'
     dest: '{{ foodsoft__git_dest }}/config/initializers/secret_token.rb'
     owner: '{{ foodsoft__user }}'
@@ -120,19 +120,19 @@
   when: foodsoft__register_secret_token is changed
 
 - name: Create database schema and load defaults
-  ansible.builtin.command: 'bundle exec rake db:setup'
+  command: 'bundle exec rake db:setup'
   args:
     chdir: '{{ foodsoft__git_dest }}'
   # become: True
   # become_user: '{{ foodsoft__user }}'
-  when: (not (ansible_local.foodsoft[foodsoft__database + "_initialized"] | bool
-              if (ansible_local | d() and ansible_local.foodsoft | d() and
-                  ansible_local.foodsoft[foodsoft__database + "_initialized"] | d())
+  when: (not (ansible_local.foodsoft[foodsoft__database + "_initialized"]|bool
+              if (ansible_local|d() and ansible_local.foodsoft|d() and
+                  ansible_local.foodsoft[foodsoft__database + "_initialized"]|d())
               else False))
 
 ## Maybe only needed for https://github.com/foodcoop-adam/foodsoft
 # - name: Setup admin user
-  # ansible.builtin.command: 'rake db:seed'
+  # command: 'rake db:seed'
   # args:
     # chdir: '{{ foodsoft__git_dest }}'
   # become: True
@@ -143,7 +143,7 @@
 
 # Ansible local facts [[[
 - name: Make sure that Ansible local facts directory is present
-  ansible.builtin.file:
+  file:
     path: '/etc/ansible/facts.d'
     state: 'directory'
     owner: 'root'
@@ -152,7 +152,7 @@
   when: (foodsoft__deploy_state == "present")
 
 - name: Save Foodsoft local facts
-  ansible.builtin.template:
+  template:
     src: 'etc/ansible/facts.d/foodsoft.fact.j2'
     dest: '/etc/ansible/facts.d/foodsoft.fact'
     owner: 'root'
@@ -163,5 +163,5 @@
   tags: [ 'meta::facts' ]
 
 - name: Gather facts if they were modified
-  ansible.builtin.meta: 'flush_handlers'
+  meta: 'flush_handlers'
 # ]]]

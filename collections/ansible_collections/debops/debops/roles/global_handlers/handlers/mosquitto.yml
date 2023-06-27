@@ -4,11 +4,11 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Restart mosquitto
-  ansible.builtin.service:
+  service:
     name: 'mosquitto'
     state: 'restarted'
 
 - name: Reload mosquitto
-  ansible.builtin.service:
+  service:
     name: 'mosquitto'
     state: 'reloaded'

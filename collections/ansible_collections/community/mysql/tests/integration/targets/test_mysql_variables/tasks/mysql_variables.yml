@@ -23,14 +23,10 @@
     mysql_parameters: &mysql_params
       login_user: '{{ mysql_user }}'
       login_password: '{{ mysql_password }}'
-      login_host: 127.0.0.1
+      login_host: '{{ mysql_host }}'
       login_port: '{{ mysql_primary_port }}'
 
   block:
-
-    - name: alias mysql command to include default options
-      set_fact:
-        mysql_command: "mysql -u{{ mysql_user }} -p{{ mysql_password }} -P{{ mysql_primary_port }} --protocol=tcp"
 
     - set_fact:
         set_name: 'version'
@@ -41,7 +37,11 @@
         variable: '{{ set_name }}'
       register: result
 
-    - include: assert_var_output.yml changed=false output={{ result }} var_name={{ set_name }}
+    - include_tasks: assert_var_output.yml
+      vars:
+        changed: false
+        output: "{{ result }}"
+        var_name: "{{ set_name }}"
 
     # ============================================================
     # Verify mysql_variable successfully updates a variable (issue:4568)
@@ -63,7 +63,12 @@
         value: '{{ set_value }}'
       register: result
 
-    - include: assert_var.yml changed=false output={{ result }} var_name={{ set_name }} var_value={{ set_value }}
+    - include_tasks: assert_var.yml
+      vars:
+        changed: false
+        output: "{{ result }}"
+        var_name: "{{ set_name }}"
+        var_value: "{{ set_value }}"
 
     # ============================================================
     # Verify mysql_variable successfully updates a variable using single quotes
@@ -89,7 +94,12 @@
         that:
         - result.queries == ["SET GLOBAL `{{ set_name }}` = {{ set_value }}"]
 
-    - include: assert_var.yml changed=true output={{ result }} var_name={{ set_name }} var_value='{{ set_value }}'
+    - include_tasks: assert_var.yml
+      vars:
+        changed: true
+        output: "{{ result }}"
+        var_name: "{{ set_name }}"
+        var_value: '{{ set_value }}'
 
     # ============================================================
     # Verify mysql_variable successfully updates a variable using double quotes
@@ -111,7 +121,12 @@
         value: '{{ set_value }}'
       register: result
 
-    - include: assert_var.yml changed=true output={{ result }} var_name={{ set_name }} var_value='{{ set_value }}'
+    - include_tasks: assert_var.yml
+      vars:
+        changed: true
+        output: "{{ result }}"
+        var_name: "{{ set_name }}"
+        var_value: '{{ set_value }}'
 
     # ============================================================
     # Verify mysql_variable successfully updates a variable using no quotes
@@ -133,7 +148,12 @@
         value: '{{ set_value }}'
       register: result
 
-    - include: assert_var.yml changed=true output={{ result }} var_name={{ set_name }} var_value='{{ set_value }}'
+    - include_tasks: assert_var.yml
+      vars:
+        changed: true
+        output: "{{ result }}"
+        var_name: "{{ set_name }}"
+        var_value: '{{ set_value }}'
 
     # ============================================================
     # Verify mysql_variable successfully updates a variable using an expression (e.g. 1024*4)
@@ -146,12 +166,15 @@
       register: result
       ignore_errors: true
 
-    - include: assert_fail_msg.yml output={{ result }}  msg='Incorrect argument type to variable'
+    - include_tasks: assert_fail_msg.yml
+      vars:
+        output: "{{ result }}"
+        msg: 'Incorrect argument type to variable'
 
     # ============================================================
     # Verify mysql_variable fails when setting an incorrect value (out of range)
     #
-    - name: set mysql variable value to a number out of range
+    - name: Set mysql variable value to a number out of range
       mysql_variables:
         <<: *mysql_params
         variable: max_connect_errors
@@ -159,11 +182,22 @@
       register: oor_result
       ignore_errors: true
 
-    - include: assert_var.yml changed=true output={{ oor_result }} var_name=max_connect_errors var_value=1
-      when: connector_name is not search('pymysql')
+    - include_tasks: assert_var.yml
+      vars:
+        changed: true
+        output: "{{ oor_result }}"
+        var_name: max_connect_errors
+        var_value: 1
+      when:
+        - connector_name == 'mysqlclient'
+        - db_engine == 'mysql'  # mysqlclient returns "changed" with MariaDB
 
-    - include: assert_fail_msg.yml output={{ oor_result }}  msg='Truncated incorrect'
-      when: connector_name is search('pymysql')
+    - include_tasks: assert_fail_msg.yml
+      vars:
+        output: "{{ oor_result }}"
+        msg: 'Truncated incorrect'
+      when:
+        - connector_name == 'pymsql'
 
     # ============================================================
     # Verify mysql_variable fails when setting an incorrect value (incorrect type)
@@ -176,7 +210,10 @@
       register: nvv_result
       ignore_errors: true
 
-    - include: assert_fail_msg.yml output={{ nvv_result }}  msg='Incorrect argument type to variable'
+    - include_tasks: assert_fail_msg.yml
+      vars:
+        output: "{{ nvv_result }}"
+        msg: 'Incorrect argument type to variable'
 
     # ============================================================
     # Verify mysql_variable fails when setting an unknown variable
@@ -189,7 +226,10 @@
       register: result
       ignore_errors: true
 
-    - include: assert_fail_msg.yml output={{ result }}  msg='Variable not available'
+    - include_tasks: assert_fail_msg.yml
+      vars:
+        output: "{{ result }}"
+        msg: 'Variable not available'
 
     # ============================================================
     # Verify mysql_variable fails when setting a read-only variable
@@ -202,7 +242,10 @@
       register: result
       ignore_errors: true
 
-    - include: assert_fail_msg.yml output={{ result }}  msg='read only variable'
+    - include_tasks: assert_fail_msg.yml
+      vars:
+        output: "{{ result }}"
+        msg: 'read only variable'
 
     #=============================================================
     # Verify mysql_variable works with the login_user and login_password parameters
@@ -217,7 +260,11 @@
         variable: '{{ set_name }}'
       register: result
 
-    - include: assert_var_output.yml changed=false output={{ result }} var_name={{ set_name }}
+    - include_tasks: assert_var_output.yml
+      vars:
+        changed: false
+        output: "{{ result }}"
+        var_name: "{{ set_name }}"
 
     - name: set mysql variable to temp value using user login and password (expect changed=true)
       mysql_variables:
@@ -233,7 +280,12 @@
         value: '{{set_value}}'
       register: result
 
-    - include: assert_var.yml changed=true output={{result}} var_name={{set_name}} var_value='{{set_value}}'
+    - include_tasks: assert_var.yml
+      vars:
+        changed: true
+        output: "{{result}}"
+        var_name: "{{set_name}}"
+        var_value: '{{set_value}}'
 
     #============================================================
     # Verify mysql_variable fails with an incorrect login_password parameter
@@ -246,26 +298,32 @@
       mysql_variables:
         login_user: '{{ mysql_user }}'
         login_password: 'wrongpassword'
-        login_host: 127.0.0.1
+        login_host: '{{ mysql_host }}'
         login_port: '{{ mysql_primary_port }}'
         variable: '{{ set_name }}'
       register: result
       ignore_errors: true
 
-    - include: assert_fail_msg.yml output={{ result }}  msg='unable to connect to database'
+    - include_tasks: assert_fail_msg.yml
+      vars:
+        output: "{{ result }}"
+        msg: 'unable to connect to database'
 
     - name: update mysql variable value using incorrect login_password (expect failed=true)
       mysql_variables:
         login_user: '{{ mysql_user }}'
         login_password: 'wrongpassword'
-        login_host: 127.0.0.1
+        login_host: '{{ mysql_host }}'
         login_port: '{{ mysql_primary_port }}'
         variable: '{{ set_name }}'
         value: '{{ set_value }}'
       register: result
       ignore_errors: true
 
-    - include: assert_fail_msg.yml output={{ result }}  msg='unable to connect to database'
+    - include_tasks: assert_fail_msg.yml
+      vars:
+        output: "{{ result }}"
+        msg: 'unable to connect to database'
 
     #============================================================
     # Verify mysql_variable fails with an incorrect login_host parameter
@@ -281,7 +339,10 @@
       register: result
       ignore_errors: true
 
-    - include: assert_fail_msg.yml output={{ result }}  msg='unable to connect to database'
+    - include_tasks: assert_fail_msg.yml
+      vars:
+        output: "{{ result }}"
+        msg: 'unable to connect to database'
 
     - block:
 
@@ -300,7 +361,12 @@
             that:
             - result.queries == ["SET PERSIST `{{ set_name }}` = {{ set_value }}"]
 
-        - include: assert_var.yml changed=true output={{ result }} var_name={{ set_name }} var_value='{{ set_value }}'
+        - include_tasks: assert_var.yml
+          vars:
+            changed: true
+            output: "{{ result }}"
+            var_name: "{{ set_name }}"
+            var_value: '{{ set_value }}'
 
         - name: try to update mysql variable value (expect changed=false) in persist mode again
           mysql_variables:
@@ -310,7 +376,12 @@
             mode: persist
           register: result
 
-        - include: assert_var.yml changed=false output={{ result }} var_name={{ set_name }} var_value='{{ set_value }}'
+        - include_tasks: assert_var.yml
+          vars:
+            changed: false
+            output: "{{ result }}"
+            var_name: "{{ set_name }}"
+            var_value: '{{ set_value }}'
 
         - name: set mysql variable to a temp value
           mysql_variables:
@@ -357,11 +428,16 @@
             mode: persist_only
           register: result
 
-        - include: assert_var.yml changed=true output={{ result }} var_name={{ set_name }} var_value='{{ def_val }}'
+        - include_tasks: assert_var.yml
+          vars:
+            changed: true
+            output: "{{ result }}"
+            var_name: "{{ set_name }}"
+            var_value: '{{ def_val }}'
 
       when:
-        - mysql_version is version('8.0', '>=')
-        - install_type == 'mysql'
+        - db_engine == 'mysql'
+        - db_version is version('8.0', '>=')
 
     # Bugfix of https://github.com/ansible/ansible/issues/54239
     # - name: set variable containing dot

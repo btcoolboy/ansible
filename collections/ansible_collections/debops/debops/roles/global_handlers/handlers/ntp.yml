@@ -5,23 +5,23 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Restart openntpd
-  ansible.builtin.service:
+  service:
     name: 'openntpd'
     state: 'restarted'
   when: not ansible_check_mode
 
 - name: Restart ntp
-  ansible.builtin.service:
+  service:
     name: 'ntp'
     state: 'restarted'
   when: ntp__daemon == 'ntpd'
 
 - name: Restart systemd-timesyncd
-  ansible.builtin.service:
+  service:
     name: 'systemd-timesyncd'
     state: 'restarted'
 
 - name: Restart chrony
-  ansible.builtin.service:
+  service:
     name: 'chrony'
     state: 'restarted'

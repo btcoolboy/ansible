@@ -68,24 +68,24 @@
 
 {% endblock %}
 {% block nginx_tpl_block_location_root %}
-                try_files {{ (([ item.try_files ] if item.try_files is string else item.try_files) if item.try_files | d() else ["$uri $uri/ $uri.php"]) | join(' ') }};
+                try_files {{ (([ item.try_files ] if item.try_files is string else item.try_files) if item.try_files|d() else ["$uri $uri/ $uri.php"]) | join(' ') }};
 {% endblock %}
 {% block nginx_tpl_block_custom_status_locations %}
-{% if item.php5_status | d(nginx_php5_status) and (nginx_status or nginx_status_localhost) %}
+{% if item.php5_status|d(nginx_php5_status) and (nginx_status or nginx_status_localhost) %}
         location ~ ^/({{ item.php5_status_name | default(nginx_php5_status_name) }}|{{ item.php5_ping_name | default(nginx_php5_ping_name) }})$ {
                 access_log off;
 {% if nginx_status_localhost %}
-{% for address in nginx_status_localhost | unique %}
+{% for address in nginx_status_localhost | unique | sort %}
                 allow {{ address }};
 {% endfor %}
 {% endif %}
 {% if nginx_status %}
-{% for address in nginx_status | unique %}
+{% for address in nginx_status | unique | sort %}
                 allow {{ address }};
 {% endfor %}
 {% endif %}
 {% if item.php5_status is defined and item.php5_status %}
-{% for address in item.php5_status | unique %}
+{% for address in item.php5_status | unique | sort %}
                 allow {{ address }};
 {% endfor %}
 {% endif %}

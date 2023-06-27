@@ -47,15 +47,19 @@ options:
     type: bool
     default: true
     version_added: '0.2.0'
+
+attributes:
+  check_mode:
+    support: full
+
 seealso:
 - module: community.postgresql.postgresql_ping
+
 author:
 - Andrew Klychkov (@Andersson007)
+
 extends_documentation_fragment:
 - community.postgresql.postgres
-
-notes:
-- Supports C(check_mode).
 '''
 
 EXAMPLES = r'''
@@ -281,6 +285,8 @@ databases:
           - Information about replication subscriptions (available for PostgreSQL 10 and higher)
             U(https://www.postgresql.org/docs/current/logical-replication-subscription.html).
           - Content depends on PostgreSQL server version.
+          - The return values for the superuser and the normal user may differ
+            U(https://www.postgresql.org/docs/current/catalog-pg-subscription.html).
           returned: if configured
           type: dict
           sample:
@@ -652,6 +658,9 @@ class PgClusterInfo(object):
             for s in subset_map:
                 subset_map[s]()
 
+        self.cursor.close()
+        self.db_obj.db_conn.close()
+
         return self.pg_info
 
     def get_pub_info(self):
@@ -682,12 +691,19 @@ class PgClusterInfo(object):
 
     def get_subscr_info(self):
         """Get subscription statistics."""
-        query = ("SELECT s.*, r.rolname AS ownername, d.datname AS dbname "
+        columns_sub_table = ("SELECT column_name "
+                             "FROM information_schema.columns "
+                             "WHERE table_schema = 'pg_catalog' "
+                             "AND table_name = 'pg_subscription'")
+        columns_result = self.__exec_sql(columns_sub_table)
+        columns = ", ".join(["s.%s" % column[0] for column in columns_result])
+
+        query = ("SELECT %s, r.rolname AS ownername, d.datname AS dbname "
                  "FROM pg_catalog.pg_subscription s "
                  "JOIN pg_catalog.pg_database d "
                  "ON s.subdbid = d.oid "
                  "JOIN pg_catalog.pg_roles AS r "
-                 "ON s.subowner = r.oid")
+                 "ON s.subowner = r.oid" % columns)
 
         result = self.__exec_sql(query)
 
@@ -761,14 +777,23 @@ class PgClusterInfo(object):
         ext_dict = {}
         for i in res:
             ext_ver_raw = i[1]
-            ext_ver = i[1].split('.')
 
-            if len(ext_ver) < 2:
-                ext_ver.append(None)
+            if re.search(r'^([0-9]+([\-]*[0-9]+)?\.)*[0-9]+([\-]*[0-9]+)?$', i[1]) is None:
+                ext_ver = [None, None]
+            else:
+                ext_ver = i[1].split('.')
+                if re.search(r'-', ext_ver[0]) is not None:
+                    ext_ver = ext_ver[0].split('-')
+                else:
+                    try:
+                        if re.search(r'-', ext_ver[1]) is not None:
+                            ext_ver[1] = ext_ver[1].split('-')[0]
+                    except IndexError:
+                        ext_ver.append(None)
 
             ext_dict[i[0]] = dict(
                 extversion=dict(
-                    major=int(ext_ver[0]),
+                    major=int(ext_ver[0]) if ext_ver[0] else None,
                     minor=int(ext_ver[1]) if ext_ver[1] else None,
                     raw=ext_ver_raw,
                 ),

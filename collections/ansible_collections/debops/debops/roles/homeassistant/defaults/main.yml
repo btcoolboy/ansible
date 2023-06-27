@@ -23,10 +23,6 @@
 #
 # List of base packages to install.
 homeassistant__base_packages:
-  - 'python3'
-  - 'python3-dev'
-  - 'python3-venv'
-  - 'python3-pip'
   - 'libffi-dev'
   - 'libssl-dev'
   - 'libjpeg-dev'
@@ -51,6 +47,10 @@ homeassistant__packages: []
 # List of Home Assistant Core dependency packages.
 # This refers to Debian system packages and not Python packages.
 homeassistant__dependency_python_packages:
+  - 'python3-dev'
+  - 'python3-venv'
+  - 'python3-pip'
+  - 'python3-virtualenv'
   - 'python3-requests'
   - 'python3-yaml'
   - 'python3-tz'
@@ -61,7 +61,7 @@ homeassistant__dependency_python_packages:
         if (ansible_distribution_release not in ["trusty"])
         else [] }}'
   - '{{ ["python3-async-timeout"]
-        if (ansible_distribution == "Debian" and ansible_distribution_major_version | int >= 9)
+        if (ansible_distribution == "Debian" and ansible_distribution_major_version|int >= 9)
         else [] }}'
   - 'python3-chardet'
                                                                    # ]]]
@@ -84,15 +84,12 @@ homeassistant__optional_python_packages:
 # .. envvar:: homeassistant__combined_packages [[[
 #
 # List of all system packages which will be installed by the role.
-homeassistant__combined_packages: '{{ (homeassistant__base_packages
-                                       + homeassistant__packages
-                                       + (homeassistant__dependency_python_packages
-                                          if (not homeassistant__virtualenv | bool)
-                                          else [])
-                                       + (homeassistant__optional_python_packages
-                                          if (not homeassistant__virtualenv | bool)
-                                          else []))
-                                      | unique | sort }}'
+homeassistant__combined_packages: '{{ (
+      homeassistant__base_packages +
+      homeassistant__packages +
+      (homeassistant__dependency_python_packages if (not homeassistant__virtualenv|bool) else []) +
+      (homeassistant__optional_python_packages if (not homeassistant__virtualenv|bool) else [])
+    ) | unique | sort }}'
 
                                                                    # ]]]
 # .. envvar:: homeassistant__deploy_state [[[
@@ -166,14 +163,14 @@ homeassistant__basic_auth_name: 'homeassistant'
 # .. envvar:: homeassistant__basic_auth_users [[[
 #
 # List of user accounts which will be allowed access to Home Assistant.
-homeassistant__basic_auth_users: '{{ ansible_local.core.admin_users | d([]) }}'
+homeassistant__basic_auth_users: '{{ ansible_local.core.admin_users|d([]) }}'
 
                                                                    # ]]]
 # .. envvar:: homeassistant__webserver_user [[[
 #
 # Name of the webserver user account which will be granted read only access to
 # the www directory outside of the Home Assistant configuration directory.
-homeassistant__webserver_user: '{{ ansible_local.nginx.user | d("www-data") }}'
+homeassistant__webserver_user: '{{ ansible_local.nginx.user|d("www-data") }}'
                                                                    # ]]]
                                                                    # ]]]
 # Directory paths [[[
@@ -295,7 +292,7 @@ homeassistant__git_update: True
 #
 # File path where the Home Assistant console script is located.
 homeassistant__daemon_path: '{{ (homeassistant__home_path + "/prod_venv/bin/hass")
-                                if (homeassistant__virtualenv | bool)
+                                if (homeassistant__virtualenv|bool)
                                 else (homeassistant__home_path + "/.local/bin/hass") }}'
                                                                    # ]]]
                                                                    # ]]]
@@ -335,7 +332,7 @@ homeassistant__nginx__dependent_servers:
     by_role: 'debops-contrib.homeassistant'
     state: '{{ "present" if (homeassistant__deploy_state == "present") else "absent" }}'
     type: 'proxy'
-    ssl_verify_client: '{{ homeassistant__verify_client_certificate | bool }}'
+    ssl_verify_client: '{{ homeassistant__verify_client_certificate|bool }}'
     auth_basic: '{{ homeassistant__basic_auth | bool }}'
     auth_basic_realm: '{{ homeassistant__basic_auth_realm }}'
     auth_basic_name: '{{ homeassistant__basic_auth_name }}'

@@ -98,7 +98,7 @@ $VERBOSE = 1;	# set to true to produce more verbose messages
 # We may send one piece of mail this way, subject to frequency throttling.
 # Use this set of definitions for a piece of email that is delivered as regular email (not a page).
 use vars qw($THROTTLE_MAIL_CMD $THROTTLE_MAIL_TIMEOUT $THROTTLE_MAIL_FROM $THROTTLE_MAIL_RECIPIENT $THROTTLE_MAIL_RECIPIENT_TEST $THROTTLE_MAIL_SUBJECT);
-{% if dhcp_probe__mail_to | d() %}
+{% if dhcp_probe__mail_to|d() %}
 $THROTTLE_MAIL_CMD = "{{ dhcp_probe__lib + '/mail-throttled' }}"; # set to "" to disable
 {% else %}
 $THROTTLE_MAIL_CMD = ""; # set to "" to disable
@@ -112,7 +112,7 @@ $THROTTLE_MAIL_SUBJECT = "{{ dhcp_probe__mail_subject }}";
 # We may also send another piece of email this way, subject to frequency throttling.
 # Use this set of definitions for a piece of email that is delivered to a pager (not as regular email).
 use vars qw($THROTTLE_PAGE_CMD $THROTTLE_PAGE_TIMEOUT $THROTTLE_PAGE_RECIPIENT);
-{% if dhcp_probe__page_to | d() %}
+{% if dhcp_probe__page_to|d() %}
 $THROTTLE_PAGE_CMD = "{{ dhcp_probe__lib + '/mail-throttled' }}"; # set to "" to disable
 {% else %}
 $THROTTLE_PAGE_CMD = ""; # set to "" to disable
@@ -196,7 +196,7 @@ $timestamp =~ s/(\d\d:\d\d:\d\d)/$1.$microseconds/; # glue microsends to end of 
 # to ensure the second response isn't throttled using the same key as the first response.)
 #
 # We can't just use the value of yiaddr itself as the string to incorporate into the key,
-# as that would result in a unqiue key for each distributed IP address.  Instead, we
+# as that would result in a unique key for each distributed IP address.  Instead, we
 # will use the state of yiaddr (set or unset).
 #
 # Note this means that when a rogue DHCP server is distributing IP addresses that fall into "Networks of Concern",

@@ -1,3 +1,4 @@
+---
 name: Roles CI
 on:
   push:
@@ -14,7 +15,7 @@ on:
 jobs:
   molecule:
     name: "Molecule (Python: ${{ matrix.python }}, Ansible: ${{ matrix.ansible }}, MySQL: ${{ matrix.mysql }})"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       PY_COLORS: 1
       ANSIBLE_FORCE_COLOR: 1
@@ -30,15 +31,24 @@ jobs:
         python:
           - 3.6
           - 3.8
+          - 3.9
         exclude:
-          - python: 3.8
-            ansible: stable-2.11
           - python: 3.6
             ansible: stable-2.12
           - python: 3.6
             ansible: stable-2.13
           - python: 3.6
             ansible: devel
+          - python: 3.8
+            ansible: stable-2.11
+          - python: 3.8
+            ansible: stable-2.13
+          - python: 3.8
+            ansible: devel
+          - python: 3.9
+            ansible: stable-2.11
+          - python: 3.9
+            ansible: stable-2.12
 
     steps:
 

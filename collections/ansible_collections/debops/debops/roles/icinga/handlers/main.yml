@@ -4,18 +4,18 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Check icinga2 configuration and restart it on the master node
-  ansible.builtin.command: icinga2 daemon -C
+  command: icinga2 daemon -C
   notify: [ 'Restart icinga2 on the master node' ]
   delegate_to: '{{ icinga__master_delegate_to }}'
 
 - name: Restart icinga2 on the master node
-  ansible.builtin.service:
+  service:
     name: 'icinga2'
     state: 'restarted'
   delegate_to: '{{ icinga__master_delegate_to }}'
 
 - name: Trigger Icinga Director configuration deployment
-  ansible.builtin.uri:
+  uri:
     body_format: 'json'
     headers:
       Accept: 'application/json'
@@ -24,5 +24,5 @@
     user: '{{ icinga__director_deploy_api_user }}'
     password: '{{ icinga__director_deploy_api_password }}'
   run_once: True
-  when: icinga__director_deploy | bool
+  when: icinga__director_deploy|bool
   no_log: '{{ debops__no_log | d(True) }}'

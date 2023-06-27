@@ -1,3 +1,4 @@
+---
 # test code to assert variables in mysql_variables module
 # (c) 2014,  Wayne Rosario <wrosario@ansible.com>
 
@@ -19,16 +20,16 @@
 # ============================================================
 # Assert mysql variable name and value from mysql database
 #
-- name: assert output message changed value
+- name: Assert output message changed value
   assert:
     that:
       - "output.changed | bool == changed | bool"
 
-- name: run mysql command to show variable
+- name: Run mysql command to show variable
   command: "{{ mysql_command }} \"-e show variables like '{{ var_name }}'\""
   register: result
 
-- name: assert output mysql variable name and value
+- name: Assert output mysql variable name and value
   assert:
     that:
       - result is changed

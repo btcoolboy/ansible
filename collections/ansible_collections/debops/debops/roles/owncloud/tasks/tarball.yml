@@ -8,14 +8,14 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Create Nextcloud group
-  ansible.builtin.group:
+  group:
     name: '{{ owncloud__system_group }}'
     state: 'present'
     system: True
   tags: [ 'role::nextcloud:download', 'role::nextcloud:verify' ]
 
 - name: Create Nextcloud user
-  ansible.builtin.user:
+  user:
     name: '{{ owncloud__system_user }}'
     group: '{{ owncloud__system_group }}'
     home: '{{ owncloud__system_home }}'
@@ -26,7 +26,7 @@
   tags: [ 'role::nextcloud:download', 'role::nextcloud:verify' ]
 
 - name: Create source directory
-  ansible.builtin.file:
+  file:
     path: '{{ owncloud__src }}'
     state: 'directory'
     owner: '{{ owncloud__system_user }}'
@@ -34,7 +34,7 @@
     mode: '0755'
 
 - name: Create deployment directory
-  ansible.builtin.file:
+  file:
     path: '{{ owncloud__deploy_path }}'
     state: 'directory'
     owner: '{{ owncloud__app_user }}'
@@ -51,12 +51,11 @@
     # Get latest patch version for release [[[2
 
     - name: Query for the full version string of the current release
-      ansible.builtin.shell: curl -s -m 900 {{ (owncloud__variant_download_url_map[owncloud__variant] + "/") | quote }}
+      shell: curl -s -m 900 {{ (owncloud__variant_download_url_map[owncloud__variant] + "/") | quote }}
              | sed --silent 's/.*href="nextcloud-\({{ owncloud__release | regex_escape() }}[^"]\+\).zip.asc".*/\1/p'
              | sort --version-sort --reverse
       args:
-        warn: False
-        executable: 'sh'
+        executable: 'bash'
       register: owncloud__register_full_version
       changed_when: False
       check_mode: False
@@ -65,7 +64,7 @@
     # Nextcloud application archive download [[[2
 
     - name: Create source directories
-      ansible.builtin.file:
+      file:
         path: '{{ owncloud__src + "/" + owncloud__variant + "/" + owncloud__register_full_version.stdout_lines[0] }}'
         state: 'directory'
         owner: '{{ owncloud__system_user }}'
@@ -74,7 +73,7 @@
       tags: [ 'role::nextcloud:download', 'role::nextcloud:verify' ]
 
     - name: Download application files needed for verification
-      ansible.builtin.get_url:
+      get_url:
         url: '{{ owncloud__variant_download_url_map[owncloud__variant] + "/" +
                  owncloud__variant + "-" + owncloud__register_full_version.stdout_lines[0] + "." + item }}'
         dest: '{{ owncloud__src + "/" + owncloud__variant + "/" + owncloud__register_full_version.stdout_lines[0] }}'
@@ -90,19 +89,19 @@
     # Nextcloud application archive authenticity verification [[[2
 
     - name: Read checksum from file
-      ansible.builtin.shell: cat {{ owncloud__src + "/" + owncloud__variant + "/"
+      shell: cat {{ owncloud__src + "/" + owncloud__variant + "/"
                     + owncloud__register_full_version.stdout_lines[0] + "/"
                     + owncloud__variant + "-" + owncloud__register_full_version.stdout_lines[0]
                     + ".zip.sha512" }} | grep '.zip$'
       args:
-        executable: 'sh'
+        executable: 'bash'
       changed_when: False
       register: owncloud__register_checksum
       when: not ansible_check_mode  # Latest checksum file may not be available
       tags: [ 'role::nextcloud:download', 'role::nextcloud:verify' ]
 
     - name: Download application archive
-      ansible.builtin.get_url:
+      get_url:
         url: '{{ owncloud__variant_download_url_map[owncloud__variant] + "/" +
                  owncloud__variant + "-" + owncloud__register_full_version.stdout_lines[0] + ".zip" }}'
         dest: '{{ owncloud__src + "/" + owncloud__variant + "/" + owncloud__register_full_version.stdout_lines[0] }}'
@@ -116,7 +115,7 @@
     - name: Verify OpenPGP signature
       environment:
         LC_MESSAGES: 'C'
-      ansible.builtin.shell: |
+      shell: |
           set -o nounset -o pipefail -o errexit
           gpg --verify {{ owncloud__src + "/" + owncloud__variant + "/"
                           + owncloud__register_full_version.stdout_lines[0] + "/"
@@ -132,12 +131,12 @@
       changed_when: False
       register: owncloud__register_verify_authenticity
       failed_when: (owncloud__register_verify_authenticity.rc != 0 or
-                    (owncloud__register_verify_authenticity.stdout | replace(" ", ""))
-                    != (owncloud__upstream_key_fingerprint | replace(" ", "")))
+                    (owncloud__register_verify_authenticity.stdout|replace(" ",""))
+                    != (owncloud__upstream_key_fingerprint|replace(" ","")))
       tags: [ 'role::nextcloud:verify' ]
 
 - name: Unpack the application archive
-  ansible.builtin.unarchive:
+  unarchive:
     remote_src: True
     src: '{{ owncloud__src + "/" + owncloud__variant + "/" + owncloud__register_full_version.stdout_lines[0] + "/" +
              owncloud__variant + "-" + owncloud__register_full_version.stdout_lines[0] + ".zip" }}'

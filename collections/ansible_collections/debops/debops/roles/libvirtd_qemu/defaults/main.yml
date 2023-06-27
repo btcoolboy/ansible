@@ -25,7 +25,7 @@
 libvirtd_qemu__kvm_support: '{{ True
                                 if (ansible_virtualization_type == "kvm" and
                                     (ansible_virtualization_role == "host" or
-                                     libvirtd_qemu__register_hw_virt.stdout | d()))
+                                     libvirtd_qemu__register_hw_virt.stdout|d()))
                                 else False }}'
                                                                    # ]]]
                                                                    # ]]]
@@ -44,6 +44,8 @@ libvirtd_qemu__base_packages:
 #
 # Override list of base packages for specific distribution releases.
 libvirtd_qemu__base_packages_map:
+  'wheezy':  [ 'libvirt-bin' ]
+  'precise': [ 'libvirt-bin' ]
   'trusty':  [ 'libvirt-bin' ]
   'xenial':  [ 'libvirt-bin' ]
 
@@ -52,10 +54,11 @@ libvirtd_qemu__base_packages_map:
 #
 # List of QEMU KVM packages to install. They will be installed on all hosts
 # apart from KVM guests, to not create redundant support.
-libvirtd_qemu__kvm_packages: '{{ ["qemu-system-x86", "qemu-utils"]
-                                 + ["qemu-kvm"]
-                                   if ansible_distribution_release in
-                                        ["stretch", "buster", "bionic", "focal"]
+libvirtd_qemu__kvm_packages: '{{ [ "qemu-system-x86", "qemu-utils" ]
+                                 + [ "qemu-kvm" ]
+                                   if ansible_distribution_release in [
+                                        "stretch", "buster", "bionic", "focal"
+                                      ]
                                    else [] }}'
 
                                                                    # ]]]
@@ -73,7 +76,7 @@ libvirtd_qemu__packages: []
 # Specify the type of the environment a given :command:`libvirtd` operates in.
 # Possible choices: ``libvirt``, ``opennebula``.
 libvirtd_qemu__deployment_mode: '{{ ansible_local.libvirtd.deployment_mode
-                                    if (ansible_local.libvirtd.deployment_mode | d())
+                                    if (ansible_local.libvirtd.deployment_mode|d())
                                     else ("opennebula"
                                           if ("debops_service_opennebula_node" in group_names)
                                           else "libvirt") }}'
@@ -85,7 +88,7 @@ libvirtd_qemu__deployment_mode: '{{ ansible_local.libvirtd.deployment_mode
 # Debian default is ``libvirt-qemu``, however OpenNebula requires the use of
 # the ``oneadmin`` management account to ensure correct file access.
 libvirtd_qemu__user: '{{ (ansible_local.opennebula.user
-                          if (ansible_local.opennebula.user | d())
+                          if (ansible_local.opennebula.user|d())
                           else "oneadmin")
                          if (libvirtd_qemu__deployment_mode == "opennebula")
                          else "libvirt-qemu" }}'
@@ -97,7 +100,7 @@ libvirtd_qemu__user: '{{ (ansible_local.opennebula.user
 # default is ``libvirt-qemu``, however OpenNebula requires the use of the
 # ``oneadmin`` management group to ensure correct file access.
 libvirtd_qemu__group: '{{ (ansible_local.opennebula.group
-                           if (ansible_local.opennebula.group | d())
+                           if (ansible_local.opennebula.group|d())
                            else "oneadmin")
                           if (libvirtd_qemu__deployment_mode == "opennebula")
                           else "libvirt-qemu" }}'
@@ -117,12 +120,12 @@ libvirtd_qemu__remote_display_allow: []
 # .. envvar:: libvirtd_qemu__remote_display_ports [[[
 #
 # List of TCP ports which should be opened in the firewall to allow access to
-# the VNC/SPICE services. You can specify specifc ports or port ranges
+# the VNC/SPICE services. You can specify specific ports or port ranges
 # separated by the ``:`` character. Only the hosts specified by the
 # :envvar:`libvirtd_qemu__remote_display_allow` variable will have access
 # through these ports.
-libvirtd_qemu__remote_display_ports: '{{ libvirtd_qemu__remote_display_port_min | string + ":"
-                                         + libvirtd_qemu__remote_display_port_max | string }}'
+libvirtd_qemu__remote_display_ports: '{{ libvirtd_qemu__remote_display_port_min|string + ":"
+                                         + libvirtd_qemu__remote_display_port_max|string }}'
 
                                                                    # ]]]
 # .. envvar:: libvirtd_qemu__remote_display_port_min [[[
@@ -146,7 +149,7 @@ libvirtd_qemu__remote_display_port_max: 65535
 # Specify the IP address on which QEMU processes should listen for SPICE
 # connections.
 libvirtd_qemu__spice_listen: '{{ "0.0.0.0"
-                                 if libvirtd_qemu__remote_display_allow | d()
+                                 if libvirtd_qemu__remote_display_allow|d()
                                  else "127.0.0.1" }}'
 
                                                                    # ]]]
@@ -155,7 +158,7 @@ libvirtd_qemu__spice_listen: '{{ "0.0.0.0"
 # Specify the IP address on which QEMU processes should listen for VNC
 # connections.
 libvirtd_qemu__vnc_listen: '{{ "0.0.0.0"
-                               if libvirtd_qemu__remote_display_allow | d()
+                               if libvirtd_qemu__remote_display_allow|d()
                                else "127.0.0.1" }}'
                                                                    # ]]]
                                                                    # ]]]
@@ -1091,13 +1094,13 @@ libvirtd_qemu__default_configuration:
   - name: 'spice_listen'
     value: '{{ libvirtd_qemu__spice_listen }}'
     state: '{{ "present"
-               if (libvirtd_qemu__remote_display_allow | d())
+               if (libvirtd_qemu__remote_display_allow|d())
                else "ignore" }}'
 
   - name: 'vnc_listen'
     value: '{{ libvirtd_qemu__vnc_listen }}'
     state: '{{ "present"
-               if (libvirtd_qemu__remote_display_allow | d())
+               if (libvirtd_qemu__remote_display_allow|d())
                else "ignore" }}'
 
   - name: 'remote_display_port_min'

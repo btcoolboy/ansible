@@ -78,10 +78,13 @@ options:
     default: true
     version_added: '0.2.0'
 
-notes:
-- I(state=absent) and I(state=present) (the second one if the tablespace doesn't exist) do not
-  support check mode because the corresponding PostgreSQL DROP and CREATE TABLESPACE commands
-  can not be run inside the transaction block.
+attributes:
+  check_mode:
+    support: partial
+    details:
+      - I(state=absent) and I(state=present) (the second one if the tablespace doesn't exist) do not
+        support check mode because the corresponding PostgreSQL DROP and CREATE TABLESPACE commands
+        can not be run inside the transaction block.
 
 seealso:
 - name: PostgreSQL tablespaces
@@ -104,7 +107,6 @@ author:
 
 extends_documentation_fragment:
 - community.postgresql.postgres
-
 '''
 
 EXAMPLES = r'''
@@ -191,7 +193,6 @@ from ansible.module_utils.six import iteritems
 
 from ansible_collections.community.postgresql.plugins.module_utils.database import (
     check_input,
-    pg_quote_identifier,
 )
 from ansible_collections.community.postgresql.plugins.module_utils.postgres import (
     connect_to_db,

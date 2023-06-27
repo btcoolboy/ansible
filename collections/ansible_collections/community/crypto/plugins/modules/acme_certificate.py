@@ -124,10 +124,19 @@ options:
     type: bool
     default: true
   challenge:
-    description: The challenge to be performed.
+    description:
+      - The challenge to be performed.
+      - If set to C(no challenge), no challenge will be used. This is necessary for some private
+        CAs which use External Account Binding and other means of validating certificate assurance.
+        For example, an account could be allowed to issue certificates for C(foo.example.com)
+        without any further validation for a certain period of time.
     type: str
     default: 'http-01'
-    choices: [ 'http-01', 'dns-01', 'tls-alpn-01' ]
+    choices:
+      - 'http-01'
+      - 'dns-01'
+      - 'tls-alpn-01'
+      - 'no challenge'
   csr:
     description:
       - "File containing the CSR for the new certificate."
@@ -315,14 +324,16 @@ EXAMPLES = r'''
 # perform the necessary steps to fulfill the challenge
 # for example:
 #
-# - copy:
+# - name: Copy http-01 challenge for sample.com
+#   ansible.builtin.copy:
 #     dest: /var/www/html/{{ sample_com_challenge['challenge_data']['sample.com']['http-01']['resource'] }}
 #     content: "{{ sample_com_challenge['challenge_data']['sample.com']['http-01']['resource_value'] }}"
 #   when: sample_com_challenge is changed and 'sample.com' in sample_com_challenge['challenge_data']
 #
 # Alternative way:
 #
-# - copy:
+# - name: Copy http-01 challenges
+#   ansible.builtin.copy:
 #     dest: /var/www/{{ item.key }}/{{ item.value['http-01']['resource'] }}
 #     content: "{{ item.value['http-01']['resource_value'] }}"
 #   loop: "{{ sample_com_challenge.challenge_data | dict2items }}"
@@ -354,7 +365,8 @@ EXAMPLES = r'''
 # perform the necessary steps to fulfill the challenge
 # for example:
 #
-# - community.aws.route53:
+# - name: Create DNS record for sample.com dns-01 challenge
+#   community.aws.route53:
 #     zone: sample.com
 #     record: "{{ sample_com_challenge.challenge_data['sample.com']['dns-01'].record }}"
 #     type: TXT
@@ -367,7 +379,8 @@ EXAMPLES = r'''
 #
 # Alternative way:
 #
-# - community.aws.route53:
+# - name: Create DNS records for dns-01 challenges
+#   community.aws.route53:
 #     zone: sample.com
 #     record: "{{ item.key }}"
 #     type: TXT
@@ -548,6 +561,7 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.account impo
 from ansible_collections.community.crypto.plugins.module_utils.acme.challenges import (
     combine_identifier,
     split_identifier,
+    wait_for_validation,
     Authorization,
 )
 
@@ -574,6 +588,9 @@ from ansible_collections.community.crypto.plugins.module_utils.acme.utils import
 )
 
 
+NO_CHALLENGE = 'no challenge'
+
+
 class ACMECertificateClient(object):
     '''
     ACME client class. Uses an ACME account object and a CSR to
@@ -585,6 +602,9 @@ class ACMECertificateClient(object):
         self.module = module
         self.version = module.params['acme_version']
         self.challenge = module.params['challenge']
+        # We use None instead of a magic string for 'no challenge'
+        if self.challenge == NO_CHALLENGE:
+            self.challenge = None
         self.csr = module.params['csr']
         self.csr_content = module.params['csr_content']
         self.dest = module.params.get('dest')
@@ -692,7 +712,7 @@ class ACMECertificateClient(object):
                 continue
             # We drop the type from the key to preserve backwards compatibility
             data[identifier] = authz.get_challenge_data(self.client)
-            if first_step and self.challenge not in data[identifier]:
+            if first_step and self.challenge is not None and self.challenge not in data[identifier]:
                 raise ModuleFailException("Found no challenge of type '{0}' for identifier {1}!".format(
                     self.challenge, type_identifier))
         # Get DNS challenge data
@@ -728,11 +748,22 @@ class ACMECertificateClient(object):
             self.authorizations.update(self.order.authorizations)
 
         # Step 2: validate pending challenges
+        authzs_to_wait_for = []
         for type_identifier, authz in self.authorizations.items():
             if authz.status == 'pending':
-                identifier_type, identifier = split_identifier(type_identifier)
-                authz.call_validate(self.client, self.challenge)
+                if self.challenge is not None:
+                    authz.call_validate(self.client, self.challenge, wait=False)
+                    authzs_to_wait_for.append(authz)
+                # If there is no challenge, we must check whether the authz is valid
+                elif authz.status != 'valid':
+                    authz.raise_error(
+                        'Status is not "valid", even though no challenge should be necessary',
+                        module=self.client.module,
+                    )
                 self.changed = True
+
+        # Step 3: wait for authzs to validate
+        wait_for_validation(authzs_to_wait_for, self.client)
 
     def download_alternate_chains(self, cert):
         alternate_chains = []
@@ -828,7 +859,7 @@ def main():
         account_email=dict(type='str'),
         agreement=dict(type='str'),
         terms_agreed=dict(type='bool', default=False),
-        challenge=dict(type='str', default='http-01', choices=['http-01', 'dns-01', 'tls-alpn-01']),
+        challenge=dict(type='str', default='http-01', choices=['http-01', 'dns-01', 'tls-alpn-01', NO_CHALLENGE]),
         csr=dict(type='path', aliases=['src']),
         csr_content=dict(type='str'),
         data=dict(type='dict'),

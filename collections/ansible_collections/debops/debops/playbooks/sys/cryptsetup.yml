@@ -3,8 +3,6 @@
 # Copyright (C) 2015-2020 DebOps <https://debops.org/>
 # SPDX-License-Identifier: GPL-3.0-only
 
-- name: Manage regular cryptsetup installation
-  import_playbook: 'cryptsetup-plain.yml'
+- import_playbook: cryptsetup-plain.yml
 
-- name: Manage cryptsetup on QbesOS
-  import_playbook: 'cryptsetup-persistent_paths.yml'
+- import_playbook: cryptsetup-persistent_paths.yml

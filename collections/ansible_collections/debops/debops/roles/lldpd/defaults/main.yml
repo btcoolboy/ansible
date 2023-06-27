@@ -57,7 +57,7 @@ lldpd__default_daemon_arguments:
 
   # Enable support for SNMP subagent when the 'debops.snmpd' role is detected
   # on the host
-  - '{{ "-x" if (ansible_local.snmpd.installed | d()) | bool else [] }}'
+  - '{{ "-x" if (ansible_local.snmpd.installed|d())|bool else [] }}'
 
                                                                    # ]]]
 # .. envvar:: lldpd__daemon_arguments [[[
@@ -72,7 +72,7 @@ lldpd__daemon_arguments: []
 # LLDP service configuration [[[
 # ------------------------------
 
-# The lists below define the contents of the :file:`/etc/lldpd.d/` directoory
+# The lists below define the contents of the :file:`/etc/lldpd.d/` directory
 # and configuration files inside. See :ref:`lldpd__ref_configuration` for more
 # details.
 

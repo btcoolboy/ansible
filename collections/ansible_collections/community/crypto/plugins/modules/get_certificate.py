@@ -81,6 +81,25 @@ options:
       type: str
       default: auto
       choices: [ auto, cryptography ]
+    ciphers:
+      description:
+        - SSL/TLS Ciphers to use for the request.
+        - 'When a list is provided, all ciphers are joined in order with C(:).'
+        - See the L(OpenSSL Cipher List Format,https://www.openssl.org/docs/manmaster/man1/openssl-ciphers.html#CIPHER-LIST-FORMAT)
+          for more details.
+        - The available ciphers is dependent on the Python and OpenSSL/LibreSSL versions.
+      type: list
+      elements: str
+      version_added: 2.11.0
+    asn1_base64:
+      description:
+        - Whether to encode the ASN.1 values in the C(extensions) return value with Base64 or not.
+        - The documentation claimed for a long time that the values are Base64 encoded, but they
+          never were. For compatibility this option is set to C(false), but that value will eventually
+          be deprecated and changed to C(true).
+      type: bool
+      default: false
+      version_added: 2.12.0
 
 notes:
     - When using ca_cert on OS X it has been reported that in some conditions the validate will always succeed.
@@ -113,7 +132,12 @@ extensions:
             returned: success
             type: str
             description:
-              - The Base64 encoded ASN.1 content of the extension.
+              - The ASN.1 content of the extension.
+              - If I(asn1_base64=true) this will be Base64 encoded, otherwise the raw
+                binary value will be returned.
+              - Please note that the raw binary value might not survive JSON serialization
+                to the Ansible controller, and also might cause failures when displaying it.
+                See U(https://github.com/ansible/ansible/issues/80258) for more information.
               - B(Note) that depending on the C(cryptography) version used, it is
                 not possible to extract the ASN.1 content of the extension, but only
                 to provide the re-encoded content of the extension in case it was
@@ -171,7 +195,7 @@ EXAMPLES = '''
   register: cert
 
 - name: How many days until cert expires
-  debug:
+  ansible.builtin.debug:
     msg: "cert expires in: {{ expire_days }} days."
   vars:
     expire_days: "{{ (( cert.not_after | to_datetime('%Y%m%d%H%M%SZ')) - (ansible_date_time.iso8601 | to_datetime('%Y-%m-%dT%H:%M:%SZ')) ).days }}"
@@ -247,6 +271,8 @@ def main():
             timeout=dict(type='int', default=10),
             select_crypto_backend=dict(type='str', choices=['auto', 'cryptography'], default='auto'),
             starttls=dict(type='str', choices=['mysql']),
+            ciphers=dict(type='list', elements='str'),
+            asn1_base64=dict(type='bool', default=False),
         ),
     )
 
@@ -258,6 +284,8 @@ def main():
     timeout = module.params.get('timeout')
     server_name = module.params.get('server_name')
     start_tls_server_type = module.params.get('starttls')
+    ciphers = module.params.get('ciphers')
+    asn1_base64 = module.params['asn1_base64']
 
     backend = module.params.get('select_crypto_backend')
     if backend == 'auto':
@@ -294,6 +322,9 @@ def main():
         if proxy_host:
             module.fail_json(msg='To use proxy_host, you must run the get_certificate module with Python 2.7 or newer.',
                              exception=CREATE_DEFAULT_CONTEXT_IMP_ERR)
+        if ciphers is not None:
+            module.fail_json(msg='To use ciphers, you must run the get_certificate module with Python 2.7 or newer.',
+                             exception=CREATE_DEFAULT_CONTEXT_IMP_ERR)
         try:
             # Note: get_server_certificate does not support SNI!
             cert = get_server_certificate((host, port), ca_certs=ca_cert)
@@ -325,6 +356,10 @@ def main():
             if start_tls_server_type is not None:
                 send_starttls_packet(sock, start_tls_server_type)
 
+            if ciphers is not None:
+                ciphers_joined = ":".join(ciphers)
+                ctx.set_ciphers(ciphers_joined)
+
             cert = ctx.wrap_socket(sock, server_hostname=server_name or host).getpeercert(True)
             cert = DER_cert_to_PEM_cert(cert)
         except Exception as e:
@@ -347,11 +382,14 @@ def main():
         result['extensions'] = []
         for dotted_number, entry in cryptography_get_extensions_from_cert(x509).items():
             oid = cryptography.x509.oid.ObjectIdentifier(dotted_number)
-            result['extensions'].append({
+            ext = {
                 'critical': entry['critical'],
-                'asn1_data': base64.b64decode(entry['value']),
+                'asn1_data': entry['value'],
                 'name': cryptography_oid_to_name(oid, short=True),
-            })
+            }
+            if not asn1_base64:
+                ext['asn1_data'] = base64.b64decode(ext['asn1_data'])
+            result['extensions'].append(ext)
 
         result['issuer'] = {}
         for attribute in x509.issuer:

@@ -6,7 +6,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Ensure specified packages are in there desired state
-  ansible.builtin.package:
+  package:
     name: '{{ q("flattened", homeassistant__combined_packages) }}'
   when: (homeassistant__deploy_state == "present")
   register: homeassistant__register_packages
@@ -15,13 +15,13 @@
 
 # System user and group [[[
 - name: Create Home Assistant system group
-  ansible.builtin.group:
+  group:
     name: '{{ homeassistant__group }}'
     state: '{{ "present" if (homeassistant__deploy_state == "present") else "absent" }}'
     system: True
 
 - name: Create Home Assistant system user
-  ansible.builtin.user:
+  user:
     name: '{{ homeassistant__user }}'
     group: '{{ homeassistant__group }}'
     groups: '{{ homeassistant__groups | join(",") | default(omit) }}'
@@ -34,31 +34,31 @@
 # ]]]
 
 - name: Clone Home Assistant git repository
-  ansible.builtin.git:
+  git:
     repo: '{{ homeassistant__git_repo }}'
     dest: '{{ homeassistant__git_dest }}'
     depth: '{{ homeassistant__git_depth }}'
     version: '{{ homeassistant__git_version }}'
-    recursive: '{{ homeassistant__git_recursive | bool }}'
-    update: '{{ homeassistant__git_update | bool }}'
+    recursive: '{{ homeassistant__git_recursive|bool }}'
+    update: '{{ homeassistant__git_update|bool }}'
   become: True
   become_user: '{{ homeassistant__user }}'
   register: homeassistant__register_git
   when: (homeassistant__deploy_state == "present")
 
 - name: Install hass without virtualenv
-  ansible.builtin.pip:  # noqa no-handler
+  pip:  # noqa no-handler
     name: '.'
     chdir: '{{ homeassistant__git_dest }}'
     executable: 'pip3'
     extra_args: '--user --upgrade'
   become: True
   become_user: '{{ homeassistant__user }}'
-  when: not homeassistant__virtualenv | bool and homeassistant__register_git is changed
+  when: not homeassistant__virtualenv|bool and homeassistant__register_git is changed
   notify: [ 'Restart Home Assistant' ]
 
 - name: Install hass in virtualenv
-  ansible.builtin.pip:  # noqa no-handler
+  pip:  # noqa no-handler
     name: '.'
     chdir: '{{ homeassistant__git_dest }}'
     extra_args: '--upgrade'
@@ -66,11 +66,11 @@
     virtualenv_python: 'python3'
   become: True
   become_user: '{{ homeassistant__user }}'
-  when: homeassistant__virtualenv | bool and homeassistant__register_git is changed
+  when: homeassistant__virtualenv|bool and homeassistant__register_git is changed
   notify: [ 'Restart Home Assistant' ]
 
 - name: Ensure Home Assistant config dir exists
-  ansible.builtin.file:
+  file:
     path: '{{ homeassistant__home_path }}/.homeassistant'
     mode: '0750'
     state: 'directory'
@@ -79,7 +79,7 @@
   when: (homeassistant__deploy_state == "present")
 
 - name: Ensure Home Assistant www dir exists
-  ansible.builtin.file:
+  file:
     path: '{{ homeassistant__home_path }}/www'
     owner: '{{ homeassistant__user }}'
     group: '{{ homeassistant__webserver_user }}'
@@ -88,7 +88,7 @@
   when: (homeassistant__deploy_state == "present")
 
 - name: Ensure Home Assistant www in config dir is a symlink
-  ansible.builtin.file:
+  file:
     src: '{{ homeassistant__home_path }}/www'
     dest: '{{ homeassistant__home_path }}/.homeassistant/www'
     state: 'link'
@@ -98,7 +98,7 @@
   when: (homeassistant__deploy_state == "present")
 
 - name: Configure systemd unit file
-  ansible.builtin.template:
+  template:
     src: 'etc/systemd/system/home-assistant.service.j2'
     dest: '/etc/systemd/system/home-assistant.service'
     owner: 'root'
@@ -108,7 +108,7 @@
   when: (homeassistant__deploy_state == "present")
 
 - name: Set Home Assistant state using systemd
-  ansible.builtin.systemd:
+  systemd:
     name: 'home-assistant'
     state: '{{ "started" if (homeassistant__deploy_state == "present") else "stopped" }}'
     enabled: True

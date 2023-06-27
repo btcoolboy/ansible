@@ -1,3 +1,4 @@
+---
 dependencies:
-  - setup_mysql
+  - setup_controller
   - setup_remote_tmp_dir

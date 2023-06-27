@@ -16,7 +16,7 @@
   pre_tasks:
 
     - name: Prepare redis_sentinel environment
-      ansible.builtin.import_role:
+      import_role:
         name: 'redis_sentinel'
         tasks_from: 'main_env'
       tags: [ 'role::redis_sentinel', 'role::ferm' ]

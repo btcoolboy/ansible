@@ -79,8 +79,6 @@ requirements:
    - PyMySQL (Python 2.7 and Python 3.x) or
    - MySQLdb (Python 2.x)
 notes:
-   - "To avoid the C(Please explicitly state intended protocol) error, use the I(login_unix_socket) argument,
-     for example, C(login_unix_socket: /run/mysqld/mysqld.sock)."
    - Requires the PyMySQL (Python 2.7 and Python 3.X) or MySQL-python (Python 2.X) package installed on the remote host.
      The Python package may be installed with apt-get install python-pymysql (Ubuntu; see M(ansible.builtin.apt)) or
      yum install python2-PyMySQL (RHEL/CentOS/Fedora; see M(ansible.builtin.yum)). You can also use dnf install python2-PyMySQL
@@ -107,4 +105,9 @@ notes:
    - "If credentials from the config file (for example, C(/root/.my.cnf)) are not needed to connect to a database server, but
      the file exists and does not contain a C([client]) section, before any other valid directives, it will be read and this
      will cause the connection to fail, to prevent this set it to an empty string, (for example C(config_file: ''))."
+   - "To avoid the C(Please explicitly state intended protocol) error, use the I(login_unix_socket) argument,
+     for example, C(login_unix_socket: /run/mysqld/mysqld.sock)."
+   - Alternatively, to avoid using I(login_unix_socket) argument on each invocation you can specify the socket path
+     using the `socket` option in your MySQL config file (usually C(~/.my.cnf)) on the destination host, for
+     example C(socket=/var/lib/mysql/mysql.sock).
 '''

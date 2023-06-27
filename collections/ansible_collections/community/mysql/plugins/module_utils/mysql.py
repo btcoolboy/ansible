@@ -23,6 +23,7 @@ try:
     _mysql_cursor_param = 'cursor'
 except ImportError:
     try:
+        # mysqlclient is called MySQLdb
         import MySQLdb as mysql_driver
         import MySQLdb.cursors
         _mysql_cursor_param = 'cursorclass'
@@ -33,6 +34,45 @@ mysql_driver_fail_msg = ('A MySQL module is required: for Python 2.7 either PyMy
                          'MySQL-python, or for Python 3.X mysqlclient or PyMySQL. '
                          'Consider setting ansible_python_interpreter to use '
                          'the intended Python version.')
+
+from ansible_collections.community.mysql.plugins.module_utils.database import mysql_quote_identifier
+
+
+def get_connector_name(connector):
+    """ (class) -> str
+    Return the name of the connector (pymysql or mysqlclient (MySQLdb))
+    or 'Unknown' if not pymysql or MySQLdb. When adding a
+    connector here, also modify get_connector_version.
+    """
+    if connector is None or not hasattr(connector, '__name__'):
+        return 'Unknown'
+
+    return connector.__name__
+
+
+def get_connector_version(connector):
+    """ (class) -> str
+    Return the version of pymysql or mysqlclient (MySQLdb).
+    Return 'Unknown' if the connector name is unknown.
+    """
+
+    if connector is None:
+        return 'Unknown'
+
+    connector_name = get_connector_name(connector)
+
+    if connector_name == 'pymysql':
+        # pymysql has two methods:
+        # - __version__ that returns the string: 0.7.11.None
+        # - VERSION that returns the tuple (0, 7, 11, None)
+        v = connector.VERSION[:3]
+        return '.'.join(map(str, v))
+    elif connector_name == 'MySQLdb':
+        # version_info returns the tuple (2, 1, 1, 'final', 0)
+        v = connector.version_info[:3]
+        return '.'.join(map(str, v))
+    else:
+        return 'Unknown'
 
 
 def parse_from_mysql_config_file(cnf):
@@ -82,7 +122,7 @@ def mysql_connect(module, login_user=None, login_password=None, config_file='', 
     if login_user is not None:
         config['user'] = login_user
     if login_password is not None:
-        config['passwd'] = login_password
+        config['password'] = login_password
     if ssl_cert is not None:
         config['ssl']['cert'] = ssl_cert
     if ssl_key is not None:
@@ -90,22 +130,38 @@ def mysql_connect(module, login_user=None, login_password=None, config_file='', 
     if ssl_ca is not None:
         config['ssl']['ca'] = ssl_ca
     if db is not None:
-        config['db'] = db
+        config['database'] = db
     if connect_timeout is not None:
         config['connect_timeout'] = connect_timeout
     if check_hostname is not None:
-        if mysql_driver.__name__ == "pymysql":
+        if get_connector_name(mysql_driver) == 'pymysql':
             version_tuple = (n for n in mysql_driver.__version__.split('.') if n != 'None')
             if reduce(lambda x, y: int(x) * 100 + int(y), version_tuple) >= 711:
                 config['ssl']['check_hostname'] = check_hostname
             else:
                 module.fail_json(msg='To use check_hostname, pymysql >= 0.7.11 is required on the target host')
 
-    if _mysql_cursor_param == 'cursor':
+    if get_connector_name(mysql_driver) == 'pymysql':
         # In case of PyMySQL driver:
+        if mysql_driver.version_info[0] < 1:
+            # for PyMySQL < 1.0.0, use 'db' instead of 'database' and 'passwd' instead of 'password'
+            if 'database' in config:
+                config['db'] = config['database']
+                del config['database']
+            if 'password' in config:
+                config['passwd'] = config['password']
+                del config['password']
         db_connection = mysql_driver.connect(autocommit=autocommit, **config)
     else:
         # In case of MySQLdb driver
+        if mysql_driver.version_info[0] < 2 or (mysql_driver.version_info[0] == 2 and mysql_driver.version_info[1] < 1):
+            # for MySQLdb < 2.1.0, use 'db' instead of 'database' and 'passwd' instead of 'password'
+            if 'database' in config:
+                config['db'] = config['database']
+                del config['database']
+            if 'password' in config:
+                config['passwd'] = config['password']
+                del config['password']
         db_connection = mysql_driver.connect(**config)
         if autocommit:
             db_connection.autocommit(True)
@@ -149,3 +205,13 @@ def get_server_version(cursor):
         version_str = result[0]
 
     return version_str
+
+
+def set_session_vars(module, cursor, session_vars):
+    """Set session vars."""
+    for var, value in session_vars.items():
+        query = "SET SESSION %s = " % mysql_quote_identifier(var, 'vars')
+        try:
+            cursor.execute(query + "%s", (value,))
+        except Exception as e:
+            module.fail_json(msg='Failed to execute %s%s: %s' % (query, value, e))

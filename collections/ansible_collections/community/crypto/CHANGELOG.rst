@@ -5,6 +5,127 @@ Community Crypto Release Notes
 .. contents:: Topics
 
 
+v2.14.0
+=======
+
+Release Summary
+---------------
+
+Feature release.
+
+Minor Changes
+-------------
+
+- acme_certificate - allow to use no challenge by providing ``no challenge`` for the ``challenge`` option. This is needed for ACME servers where validation is done without challenges (https://github.com/ansible-collections/community.crypto/issues/613, https://github.com/ansible-collections/community.crypto/pull/615).
+- acme_certificate - validate and wait for challenges in parallel instead handling them one after another (https://github.com/ansible-collections/community.crypto/pull/617).
+- x509_certificate_info - added support for certificates in DER format when using ``path`` parameter (https://github.com/ansible-collections/community.crypto/issues/603).
+
+v2.13.1
+=======
+
+Release Summary
+---------------
+
+Bugfix release.
+
+Bugfixes
+--------
+
+- execution environment definition - fix installation of ``python3-pyOpenSSL`` package on CentOS and RHEL (https://github.com/ansible-collections/community.crypto/pull/606).
+- execution environment definition - fix source of ``python3-pyOpenSSL`` package for Rocky Linux 9+ (https://github.com/ansible-collections/community.crypto/pull/606).
+
+v2.13.0
+=======
+
+Release Summary
+---------------
+
+Bugfix and maintenance release.
+
+Minor Changes
+-------------
+
+- x509_crl - the ``crl_mode`` option has been added to replace the existing ``mode`` option (https://github.com/ansible-collections/community.crypto/issues/596).
+
+Deprecated Features
+-------------------
+
+- x509_crl - the ``mode`` option is deprecated; use ``crl_mode`` instead. The ``mode`` option will change its meaning in community.crypto 3.0.0, and will refer to the CRL file's mode instead (https://github.com/ansible-collections/community.crypto/issues/596).
+
+Bugfixes
+--------
+
+- openssh_keypair - always generate a new key pair if the private key does not exist. Previously, the module would fail when ``regenerate=fail`` without an existing key, contradicting the documentation (https://github.com/ansible-collections/community.crypto/pull/598).
+- x509_crl - remove problem with ansible-core 2.16 due to ``AnsibleModule`` is now validating the ``mode`` parameter's values (https://github.com/ansible-collections/community.crypto/issues/596).
+
+v2.12.0
+=======
+
+Release Summary
+---------------
+
+Feature release.
+
+Minor Changes
+-------------
+
+- get_certificate - add ``asn1_base64`` option to control whether the ASN.1 included in the ``extensions`` return value is binary data or Base64 encoded (https://github.com/ansible-collections/community.crypto/pull/592).
+
+v2.11.1
+=======
+
+Release Summary
+---------------
+
+Maintenance release with improved documentation.
+
+v2.11.0
+=======
+
+Release Summary
+---------------
+
+Feature and bugfix release.
+
+Minor Changes
+-------------
+
+- get_certificate - adds ``ciphers`` option for custom cipher selection (https://github.com/ansible-collections/community.crypto/pull/571).
+
+Bugfixes
+--------
+
+- action plugin helper - fix handling of deprecations for ansible-core 2.14.2 (https://github.com/ansible-collections/community.crypto/pull/572).
+- execution environment binary dependencies (bindep.txt) - fix ``python3-pyOpenSSL`` dependency resolution on RHEL 9+ / CentOS Stream 9+ platforms (https://github.com/ansible-collections/community.crypto/pull/575).
+- various plugins - remove unnecessary imports (https://github.com/ansible-collections/community.crypto/pull/569).
+
+v2.10.0
+=======
+
+Release Summary
+---------------
+
+Bugfix and feature release.
+
+Bugfixes
+--------
+
+- openssl_csr, openssl_csr_pipe - prevent invalid values for ``crl_distribution_points`` that do not have one of ``full_name``, ``relative_name``, and ``crl_issuer`` (https://github.com/ansible-collections/community.crypto/pull/560).
+- openssl_publickey_info - do not crash with internal error when public key cannot be parsed (https://github.com/ansible-collections/community.crypto/pull/551).
+
+New Plugins
+-----------
+
+Filter
+~~~~~~
+
+- openssl_csr_info - Retrieve information from OpenSSL Certificate Signing Requests (CSR)
+- openssl_privatekey_info - Retrieve information from OpenSSL private keys
+- openssl_publickey_info - Retrieve information from OpenSSL public keys in PEM format
+- split_pem - Split PEM file contents into multiple objects
+- x509_certificate_info - Retrieve information from X.509 certificates in PEM format
+- x509_crl_info - Retrieve information from X.509 CRLs in PEM format
+
 v2.9.0
 ======
 

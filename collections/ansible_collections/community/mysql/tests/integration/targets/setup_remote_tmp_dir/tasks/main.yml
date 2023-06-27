@@ -7,9 +7,13 @@
   setup:
     gather_subset: distribution
   when: ansible_facts == {}
+  tags:
+    - setup_remote_tmp_dir
 
 - include_tasks: "{{ lookup('first_found', files)}}"
   vars:
     files:
       - "{{ ansible_os_family | lower }}.yml"
       - "default.yml"
+  tags:
+    - setup_remote_tmp_dir

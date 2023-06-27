@@ -13,11 +13,18 @@ DOCUMENTATION = r'''
 module: puppet
 short_description: Runs puppet
 description:
-  - Runs I(puppet) agent or apply in a reliable manner.
+  - Runs C(puppet) agent or apply in a reliable manner.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   timeout:
     description:
-      - How long to wait for I(puppet) to finish.
+      - How long to wait for C(puppet) to finish.
     type: str
     default: 30m
   puppetmaster:
@@ -35,8 +42,8 @@ options:
   noop:
     description:
       - Override puppet.conf noop mode.
-      - When C(true), run Puppet agent with C(--noop) switch set.
-      - When C(false), run Puppet agent with C(--no-noop) switch set.
+      - When V(true), run Puppet agent with C(--noop) switch set.
+      - When V(false), run Puppet agent with C(--no-noop) switch set.
       - When unset (default), use default or puppet.conf value if defined.
     type: bool
   facts:
@@ -60,8 +67,8 @@ options:
   logdest:
     description:
     - Where the puppet logs should go, if puppet apply is being used.
-    - C(all) will go to both C(console) and C(syslog).
-    - C(stdout) will be deprecated and replaced by C(console).
+    - V(all) will go to both C(console) and C(syslog).
+    - V(stdout) will be deprecated and replaced by C(console).
     type: str
     choices: [ all, stdout, syslog ]
     default: stdout
@@ -74,6 +81,12 @@ options:
       - A list of puppet tags to be used.
     type: list
     elements: str
+  skip_tags:
+    description:
+      - A list of puppet tags to be excluded.
+    type: list
+    elements: str
+    version_added: 6.6.0
   execute:
     description:
       - Execute a specific piece of Puppet code.
@@ -101,8 +114,6 @@ options:
   show_diff:
     description:
       - Whether to print file changes details
-      - Alias C(show-diff) has been deprecated and will be removed in community.general 7.0.0.
-    aliases: ['show-diff']
     type: bool
     default: false
 requirements:
@@ -136,6 +147,8 @@ EXAMPLES = r'''
     tags:
     - update
     - nginx
+    skip_tags:
+    - service
 
 - name: Run puppet agent in noop mode
   community.general.puppet:
@@ -152,15 +165,9 @@ import json
 import os
 import stat
 
+import ansible_collections.community.general.plugins.module_utils.puppet as puppet_utils
+
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.six.moves import shlex_quote
-
-
-def _get_facter_dir():
-    if os.getuid() == 0:
-        return '/etc/facter/facts.d'
-    else:
-        return os.path.expanduser('~/.facter/facts.d')
 
 
 def _write_structured_data(basedir, basename, data):
@@ -189,14 +196,13 @@ def main():
             noop=dict(type='bool'),
             logdest=dict(type='str', default='stdout', choices=['all', 'stdout', 'syslog']),
             # The following is not related to Ansible's diff; see https://github.com/ansible-collections/community.general/pull/3980#issuecomment-1005666154
-            show_diff=dict(
-                type='bool', default=False, aliases=['show-diff'],
-                deprecated_aliases=[dict(name='show-diff', version='7.0.0', collection_name='community.general')]),
+            show_diff=dict(type='bool', default=False),
             facts=dict(type='dict'),
             facter_basename=dict(type='str', default='ansible'),
             environment=dict(type='str'),
             certname=dict(type='str'),
             tags=dict(type='list', elements='str'),
+            skip_tags=dict(type='list', elements='str'),
             execute=dict(type='str'),
             summarize=dict(type='bool', default=False),
             debug=dict(type='bool', default=False),
@@ -212,16 +218,6 @@ def main():
     )
     p = module.params
 
-    global PUPPET_CMD
-    PUPPET_CMD = module.get_bin_path("puppet", False, ['/opt/puppetlabs/bin'])
-
-    if not PUPPET_CMD:
-        module.fail_json(
-            msg="Could not find puppet. Please ensure it is installed.")
-
-    global TIMEOUT_CMD
-    TIMEOUT_CMD = module.get_bin_path("timeout", False)
-
     if p['manifest']:
         if not os.path.exists(p['manifest']):
             module.fail_json(
@@ -230,90 +226,24 @@ def main():
 
     # Check if puppet is disabled here
     if not p['manifest']:
-        rc, stdout, stderr = module.run_command(
-            PUPPET_CMD + " config print agent_disabled_lockfile")
-        if os.path.exists(stdout.strip()):
-            module.fail_json(
-                msg="Puppet agent is administratively disabled.",
-                disabled=True)
-        elif rc != 0:
-            module.fail_json(
-                msg="Puppet agent state could not be determined.")
+        puppet_utils.ensure_agent_enabled(module)
 
     if module.params['facts'] and not module.check_mode:
         _write_structured_data(
-            _get_facter_dir(),
+            puppet_utils.get_facter_dir(),
             module.params['facter_basename'],
             module.params['facts'])
 
-    if TIMEOUT_CMD:
-        base_cmd = "%(timeout_cmd)s -s 9 %(timeout)s %(puppet_cmd)s" % dict(
-            timeout_cmd=TIMEOUT_CMD,
-            timeout=shlex_quote(p['timeout']),
-            puppet_cmd=PUPPET_CMD)
-    else:
-        base_cmd = PUPPET_CMD
+    runner = puppet_utils.puppet_runner(module)
 
     if not p['manifest'] and not p['execute']:
-        cmd = ("%(base_cmd)s agent --onetime"
-               " --no-daemonize --no-usecacheonfailure --no-splay"
-               " --detailed-exitcodes --verbose --color 0") % dict(base_cmd=base_cmd)
-        if p['puppetmaster']:
-            cmd += " --server %s" % shlex_quote(p['puppetmaster'])
-        if p['show_diff']:
-            cmd += " --show_diff"
-        if p['confdir']:
-            cmd += " --confdir %s" % shlex_quote(p['confdir'])
-        if p['environment']:
-            cmd += " --environment '%s'" % p['environment']
-        if p['tags']:
-            cmd += " --tags '%s'" % ','.join(p['tags'])
-        if p['certname']:
-            cmd += " --certname='%s'" % p['certname']
-        if module.check_mode:
-            cmd += " --noop"
-        elif 'noop' in p:
-            if p['noop']:
-                cmd += " --noop"
-            else:
-                cmd += " --no-noop"
-        if p['use_srv_records'] is not None:
-            if not p['use_srv_records']:
-                cmd += " --no-use_srv_records"
-            else:
-                cmd += " --use_srv_records"
+        args_order = "_agent_fixed puppetmaster show_diff confdir environment tags skip_tags certname noop use_srv_records"
+        with runner(args_order) as ctx:
+            rc, stdout, stderr = ctx.run()
     else:
-        cmd = "%s apply --detailed-exitcodes " % base_cmd
-        if p['logdest'] == 'syslog':
-            cmd += "--logdest syslog "
-        if p['logdest'] == 'all':
-            cmd += " --logdest syslog --logdest console"
-        if p['modulepath']:
-            cmd += "--modulepath='%s'" % p['modulepath']
-        if p['environment']:
-            cmd += "--environment '%s' " % p['environment']
-        if p['certname']:
-            cmd += " --certname='%s'" % p['certname']
-        if p['tags']:
-            cmd += " --tags '%s'" % ','.join(p['tags'])
-        if module.check_mode:
-            cmd += "--noop "
-        elif 'noop' in p:
-            if p['noop']:
-                cmd += " --noop"
-            else:
-                cmd += " --no-noop"
-        if p['execute']:
-            cmd += " --execute '%s'" % p['execute']
-        else:
-            cmd += " %s" % shlex_quote(p['manifest'])
-        if p['summarize']:
-            cmd += " --summarize"
-        if p['debug']:
-            cmd += " --debug"
-        if p['verbose']:
-            cmd += " --verbose"
-    rc, stdout, stderr = module.run_command(cmd)
+        args_order = "_apply_fixed logdest modulepath environment certname tags skip_tags noop _execute summarize debug verbose"
+        with runner(args_order) as ctx:
+            rc, stdout, stderr = ctx.run(_execute=[p['execute'], p['manifest']])
 
     if rc == 0:
         # success
@@ -335,11 +265,11 @@ def main():
     elif rc == 124:
         # timeout
         module.exit_json(
-            rc=rc, msg="%s timed out" % cmd, stdout=stdout, stderr=stderr)
+            rc=rc, msg="%s timed out" % ctx.cmd, stdout=stdout, stderr=stderr)
     else:
         # failure
         module.fail_json(
-            rc=rc, msg="%s failed with return code: %d" % (cmd, rc),
+            rc=rc, msg="%s failed with return code: %d" % (ctx.cmd, rc),
             stdout=stdout, stderr=stderr)
 
 

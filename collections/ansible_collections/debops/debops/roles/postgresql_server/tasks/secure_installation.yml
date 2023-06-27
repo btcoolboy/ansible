@@ -10,42 +10,45 @@
     encrypted: True
     port: '{{ item.port }}'
     state: 'present'
-  loop: '{{ q("flattened", postgresql_server__clusters) }}'
+  with_flattened:
+    - '{{ postgresql_server__clusters }}'
   become: True
   become_user: '{{ item.user | d(postgresql_server__user) }}'
   when:
-    - item.name | d()
+    - item.name|d()
     - item.standby is not defined
   no_log: '{{ debops__no_log | d(True) }}'
 
 - name: Grant connect on postgres to PUBLIC
-  community.general.postgresql_privs:
+  postgresql_privs:
     database: 'postgres'
     port: '{{ item.port }}'
     role: 'PUBLIC'
     type: 'database'
     privs: 'CONNECT'
     state: 'present'
-  loop: '{{ q("flattened", postgresql_server__clusters) }}'
+  with_flattened:
+    - '{{ postgresql_server__clusters }}'
   become: True
   become_user: '{{ item.user | d(postgresql_server__user) }}'
   when:
-    - item.name | d()
+    - item.name|d()
     - item.standby is not defined
   changed_when: False  # Module always reports "changed" for PUBLIC role
 
 - name: Revoke temporary on postgres from PUBLIC
-  community.general.postgresql_privs:
+  postgresql_privs:
     database: 'postgres'
     port: '{{ item.port }}'
     role: 'PUBLIC'
     type: 'database'
     privs: 'TEMPORARY'
     state: 'absent'
-  loop: '{{ q("flattened", postgresql_server__clusters) }}'
+  with_flattened:
+    - '{{ postgresql_server__clusters }}'
   become: True
   become_user: '{{ item.user | d(postgresql_server__user) }}'
   when:
-    - item.name | d()
+    - item.name|d()
     - item.standby is not defined
   changed_when: False  # Module always reports "changed" for PUBLIC role

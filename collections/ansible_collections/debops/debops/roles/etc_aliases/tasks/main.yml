@@ -4,40 +4,40 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Import custom Ansible plugins
-  ansible.builtin.import_role:
+  import_role:
     name: 'ansible_plugins'
 
 - name: Import DebOps global handlers
-  ansible.builtin.import_role:
+  import_role:
     name: 'global_handlers'
 
 - name: Import DebOps secret role
-  ansible.builtin.import_role:
+  import_role:
     name: 'secret'
 
 - name: Check if the dependent recipients file exists
-  ansible.builtin.stat:
+  stat:
     path: '{{ secret + "/etc_aliases/dependent_config/" + inventory_hostname + "/recipients.json" }}'
   register: etc_aliases__register_dependent_recipients_file
   become: False
   delegate_to: 'localhost'
-  when: (ansible_local | d() and ansible_local.etc_aliases | d() and
+  when: (ansible_local|d() and ansible_local.etc_aliases|d() and
          ansible_local.etc_aliases.configured is defined and
-         ansible_local.etc_aliases.configured | bool)
+         ansible_local.etc_aliases.configured|bool)
 
 - name: Load the dependent recipients from Ansible Controller
-  ansible.builtin.slurp:
+  slurp:
     src: '{{ secret + "/etc_aliases/dependent_config/" + inventory_hostname + "/recipients.json" }}'
   register: etc_aliases__register_dependent_recipients
   become: False
   delegate_to: 'localhost'
-  when: (ansible_local | d() and ansible_local.etc_aliases | d() and
+  when: (ansible_local|d() and ansible_local.etc_aliases|d() and
          ansible_local.etc_aliases.configured is defined and
-         ansible_local.etc_aliases.configured | bool and
-         etc_aliases__register_dependent_recipients_file.stat.exists | bool)
+         ansible_local.etc_aliases.configured|bool and
+         etc_aliases__register_dependent_recipients_file.stat.exists|bool)
 
 - name: Make sure that Ansible local facts directory exists
-  ansible.builtin.file:
+  file:
     path: '/etc/ansible/facts.d'
     state: 'directory'
     owner: 'root'
@@ -45,7 +45,7 @@
     mode: '0755'
 
 - name: Save etc_aliases local facts
-  ansible.builtin.template:
+  template:
     src: 'etc/ansible/facts.d/etc_aliases.fact.j2'
     dest: '/etc/ansible/facts.d/etc_aliases.fact'
     owner: 'root'
@@ -55,10 +55,10 @@
   tags: [ 'meta::facts' ]
 
 - name: Update Ansible facts if they were modified
-  ansible.builtin.meta: 'flush_handlers'
+  meta: 'flush_handlers'
 
 - name: Generate the /etc/aliases file
-  ansible.builtin.template:
+  template:
     src: 'etc/aliases.j2'
     dest: '/etc/aliases'
     owner: 'root'
@@ -67,9 +67,10 @@
   notify: [ 'Update /etc/aliases.db database' ]
 
 - name: Save etc_aliases dependent recipients on Ansible Controller
-  ansible.builtin.template:
+  template:
     src: 'secret/etc_aliases/dependent_config/inventory_hostname/recipients.json.j2'
     dest: '{{ secret + "/etc_aliases/dependent_config/" + inventory_hostname + "/recipients.json" }}'
     mode: '0644'
   become: False
   delegate_to: 'localhost'
+  when: etc_aliases__dependent_recipients | length > 0

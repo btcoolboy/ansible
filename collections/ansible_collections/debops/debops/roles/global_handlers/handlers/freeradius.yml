@@ -4,10 +4,10 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Check freeradius configuration and restart
-  ansible.builtin.command: freeradius -C
+  command: freeradius -C
   notify: [ 'Restart freeradius' ]
 
 - name: Restart freeradius
-  ansible.builtin.service:
+  service:
     name: 'freeradius'
     state: 'restarted'

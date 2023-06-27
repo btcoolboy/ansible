@@ -1,5 +1,5 @@
 # MySQL collection for Ansible
-[![Plugins CI](https://github.com/ansible-collections/community.mysql/workflows/Plugins%20CI/badge.svg?event=push)](https://github.com/ansible-collections/community.mysql/actions?query=workflow%3A"Plugins+CI") [![Roles CI](https://github.com/ansible-collections/community.mysql/workflows/Roles%20CI/badge.svg?event=push)](https://github.com/ansible-collections/community.mysql/actions?query=workflow%3A"Roles+CI") [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.mysql)](https://codecov.io/gh/ansible-collections/community.mysql)
+[![Plugins CI](https://github.com/ansible-collections/community.mysql/workflows/Plugins%20CI/badge.svg?event=push)](https://github.com/ansible-collections/community.mysql/actions?query=workflow%3A"Plugins+CI") [![Roles CI](https://github.com/ansible-collections/community.mysql/workflows/Roles%20CI/badge.svg?event=push)](https://github.com/ansible-collections/community.mysql/actions?query=workflow%3A"Roles+CI") [![Codecov](https://img.shields.io/codecov/c/github/ansible-collections/community.mysql)](https://codecov.io/gh/ansible-collections/community.mysql) [![Discuss on Matrix at #mysql:ansible.com](https://img.shields.io/matrix/mysql:ansible.com.svg?server_fqdn=ansible-accounts.ems.host&label=Discuss%20on%20Matrix%20at%20%23mysql:ansible.com&logo=matrix)](https://matrix.to/#/#mysql:ansible.com)
 
 This collection is a part of the Ansible package.
 
@@ -36,7 +36,7 @@ They also should be subscribed to Ansible's [The Bullhorn newsletter](https://do
 
 We announce releases and important changes through Ansible's [The Bullhorn newsletter](https://eepurl.com/gZmiEP). Be sure you are subscribed.
 
-Join us in the `#ansible` (general use questions and support), `#ansible-community` (community and collection development questions), and other [IRC channels](https://docs.ansible.com/ansible/devel/community/communication.html#irc-channels) on [Libera.Chat](https://libera.chat).
+Join us on Matrix in the `#mysql:ansible.com` [room](https://matrix.to/#/#mysql:ansible.com), the `#users:ansible.com` [room](https://matrix.to/#/#users:ansible.com) (general use questions and support), `#ansible-community:ansible.com` [room](https://matrix.to/#/#community:ansible.com) (community and collection development questions), and other Matrix rooms or corresponding bridged Libera.Chat channels. See the [Ansible Communication Guide](https://docs.ansible.com/ansible/devel/community/communication.html) for details.
 
 We take part in the global quarterly [Ansible Contributor Summit](https://github.com/ansible/community/wiki/Contributor-Summit) virtually or in-person. Track [The Bullhorn newsletter](https://eepurl.com/gZmiEP) and join us.
 
@@ -59,27 +59,49 @@ Every voice is important and every idea is valuable. If you have something on yo
   - [mysql_user](https://docs.ansible.com/ansible/latest/collections/community/mysql/mysql_user_module.html)
   - [mysql_variables](https://docs.ansible.com/ansible/latest/collections/community/mysql/mysql_variables_module.html)
 
+
+## Releases Support Timeline
+
+It has been [decided](https://github.com/ansible-collections/community.mysql/discussions/537) to maintain each major release (1.x.y, 2.x.y, ...) for two years after the next major version is released.
+
+Here is the table for the support timeline:
+
+- 1.x.y: released 2020-08-17, EOL
+- 2.x.y: released 2021-04-15, supported until 2023-12-01
+- 3.x.y: released 2021-12-01, current
+- 4.x.y: To be released
+
+
 ## Tested with
 
 ### ansible-core
 
-- 2.11
 - 2.12
 - 2.13
+- 2.14
 - current development version
 
 ### Databases
 
-- mysql 5.7.31
-- mysql 8.0.22
-- mariadb 10.3.34 (only collection version >= 3)
-- mariadb 10.8.3 (only collection version >= 3)
+For MariaDB, only Long Term releases are tested.
+
+- mysql 5.7.40
+- mysql 8.0.31
+- mariadb:10.3.34 (only collection version <= 3.5.1)
+- mariadb:10.4.24 (only collection version >= 3.5.2)
+- mariadb:10.5.18 (only collection version >= 3.5.2)
+- mariadb:10.6.11 (only collection version >= 3.5.2)
+- mariadb:10.11.?? (waiting for release)
+
 
 ### Database connectors
 
-- pymysql 0.7.10
+- pymysql 0.7.11 (Only tested with MySQL 5.7)
 - pymysql 0.9.3
+- pymysql 1.0.2 (only collection version >= 3.6.1)
 - mysqlclient 2.0.1
+- mysqlclient 2.0.3 (only collection version >= 3.5.2)
+- mysqlclient 2.1.1 (only collection version >= 3.5.2)
 
 ## External requirements
 

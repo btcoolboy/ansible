@@ -55,8 +55,8 @@ kodi__base_packages:
   # - 'upower'
   # - 'acpi-support'
 
-  - '{{ ["policykit-1"]
-        if (kodi__polkit_action | d())
+  - '{{ [ "policykit-1" ]
+        if (kodi__polkit_action|d())
         else [] }}'
                                                                    # ]]]
 # .. envvar:: kodi__deploy_state [[[

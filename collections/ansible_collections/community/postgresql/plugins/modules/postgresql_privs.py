@@ -17,9 +17,6 @@ description:
 - This module is basically a wrapper around most of the functionality of
   PostgreSQL's GRANT and REVOKE statements with detection of changes
   (GRANT/REVOKE I(privs) ON I(type) I(objs) TO/FROM I(roles)).
-- B(WARNING) The C(usage_on_types) option has been B(deprecated) and will be removed in
-  community.postgresql 3.0.0, please use the C(type) option with value C(type) to
-  GRANT/REVOKE permissions on types explicitly.
 options:
   database:
     description:
@@ -112,56 +109,14 @@ options:
     type: bool
     aliases:
     - admin_option
-  host:
-    description:
-    - Database host address. If unspecified, connect via Unix socket.
-    type: str
-    default: ''
-    aliases:
-    - login_host
-  port:
-    description:
-    - Database port to connect to.
-    type: int
-    default: 5432
-    aliases:
-    - login_port
-  unix_socket:
-    description:
-    - Path to a Unix domain socket for local connections.
-    type: str
-    default: ''
-    aliases:
-    - login_unix_socket
-  login:
-    description:
-    - The username to authenticate with.
-    type: str
-    default: postgres
-    aliases:
-    - login_user
   password:
     description:
     - The password to authenticate with.
+    - This option has been B(deprecated) and will be removed in community.postgresql 4.0.0,
+      use the I(login_password) option instead.
+    - Mutually exclusive with I(login_password).
     type: str
     default: ''
-    aliases:
-    - login_password
-  ssl_mode:
-    description:
-    - Determines whether or with what priority a secure SSL TCP/IP connection will be negotiated with the server.
-    - See U(https://www.postgresql.org/docs/current/static/libpq-ssl.html) for more information on the modes.
-    - Default of C(prefer) matches libpq default.
-    type: str
-    default: prefer
-    choices: [ allow, disable, prefer, require, verify-ca, verify-full ]
-  ca_cert:
-    description:
-    - Specifies the name of a file containing SSL certificate authority (CA) certificate(s).
-    - If the file exists, the server's certificate will be verified to be signed by one of these authorities.
-    type: str
-    aliases:
-    - ssl_rootcert
   trust_input:
     description:
     - If C(false), check whether values of parameters I(roles), I(target_roles), I(session_role),
@@ -170,21 +125,8 @@ options:
     type: bool
     default: true
     version_added: '0.2.0'
-  usage_on_types:
-    description:
-    - This option has been B(deprecated) and will be removed in community.postgresql 3.0.0,
-      please use the I(type) option with value C(type) to GRANT/REVOKE permissions on types
-      explicitly.
-    - When adding default privileges, the module always implicitly adds ``USAGE ON TYPES``.
-    - To avoid this behavior, set I(usage_on_types) to C(false).
-    - Added to save backwards compatibility.
-    - Used only when adding default privileges, ignored otherwise.
-    type: bool
-    default: true
-    version_added: '1.2.0'
 
 notes:
-- Supports C(check_mode).
 - Parameters that accept comma separated lists (I(privs), I(objs), I(roles))
   have singular alias names (I(priv), I(obj), I(role)).
 - To revoke only C(GRANT OPTION) for a specific object, set I(state) to
@@ -193,7 +135,7 @@ notes:
   access via privileges granted to any role R is a member of including C(PUBLIC).
 - Note that when you use C(PUBLIC) role, the module always reports that the state has been changed.
 - Note that when revoking privileges from a role R, you do so as the user
-  specified via I(login). If R has been granted the same privileges by
+  specified via I(login_user). If R has been granted the same privileges by
   another user also, R can still access database objects via these privileges.
 - When revoking privileges, C(RESTRICT) is assumed (see PostgreSQL docs).
 
@@ -211,9 +153,12 @@ seealso:
   description: Complete reference of the PostgreSQL REVOKE command documentation.
   link: https://www.postgresql.org/docs/current/sql-revoke.html
 
+attributes:
+  check_mode:
+    support: full
+
 extends_documentation_fragment:
 - community.postgresql.postgres
-
 
 author:
 - Bernhard Weitzhofer (@b6d)
@@ -387,7 +332,7 @@ EXAMPLES = r'''
 # Needs PostreSQL 11 or higher and community.postgresql 1.3.0 or higher
 - name: GRANT EXECUTE ON ALL PROCEDURES IN SCHEMA common TO caller
   community.postgresql.postgresql_privs:
-    type: prucedure
+    type: procedure
     state: present
     privs: EXECUTE
     roles: caller
@@ -468,7 +413,7 @@ from ansible_collections.community.postgresql.plugins.module_utils.database impo
     pg_quote_identifier,
     check_input,
 )
-from ansible_collections.community.postgresql.plugins.module_utils.postgres import postgres_common_argument_spec
+from ansible_collections.community.postgresql.plugins.module_utils.postgres import postgres_common_argument_spec, get_conn_params
 from ansible.module_utils._text import to_native
 
 VALID_PRIVS = frozenset(('SELECT', 'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE',
@@ -521,32 +466,14 @@ class Connection(object):
     def __init__(self, params, module):
         self.database = params.database
         self.module = module
-        # To use defaults values, keyword arguments must be absent, so
-        # check which values are empty and don't include in the **kw
-        # dictionary
-        params_map = {
-            "host": "host",
-            "login": "user",
-            "password": "password",
-            "port": "port",
-            "database": "database",
-            "ssl_mode": "sslmode",
-            "ca_cert": "sslrootcert"
-        }
 
-        kw = dict((params_map[k], getattr(params, k)) for k in params_map
-                  if getattr(params, k) != '' and getattr(params, k) is not None)
-
-        # If a unix_socket is specified, incorporate it here.
-        is_localhost = "host" not in kw or kw["host"] == "" or kw["host"] == "localhost"
-        if is_localhost and params.unix_socket != "":
-            kw["host"] = params.unix_socket
+        conn_params = get_conn_params(module, params.__dict__, warn_db_default=False)
 
         sslrootcert = params.ca_cert
         if psycopg2.__version__ < '2.4.3' and sslrootcert is not None:
             raise ValueError('psycopg2 must be at least 2.4.3 in order to user the ca_cert parameter')
 
-        self.connection = psycopg2.connect(**kw)
+        self.connection = psycopg2.connect(**conn_params)
         self.cursor = self.connection.cursor()
         self.pg_version = self.connection.server_version
 
@@ -761,9 +688,8 @@ class Connection(object):
 
     # Manipulating privileges
 
-    # WARNING: usage_on_types has been deprecated and will be removed in community.postgresql 3.0.0, please use an obj_type of 'type' instead.
     def manipulate_privs(self, obj_type, privs, objs, orig_objs, roles, target_roles,
-                         state, grant_option, schema_qualifier=None, fail_on_role=True, usage_on_types=True):
+                         state, grant_option, schema_qualifier=None, fail_on_role=True):
         """Manipulate database object privileges.
 
         :param obj_type: Type of database object to grant/revoke
@@ -817,6 +743,7 @@ class Connection(object):
         if not objs:
             return False
 
+        quoted_schema_qualifier = '"%s"' % schema_qualifier.replace('"', '""') if schema_qualifier else None
         # obj_ids: quoted db object identifiers (sometimes schema-qualified)
         if obj_type in ('function', 'procedure'):
             obj_ids = []
@@ -825,9 +752,9 @@ class Connection(object):
                     f, args = obj.split('(', 1)
                 except Exception:
                     raise Error('Illegal function / procedure signature: "%s".' % obj)
-                obj_ids.append('"%s"."%s"(%s' % (schema_qualifier, f, args))
+                obj_ids.append('%s."%s"(%s' % (quoted_schema_qualifier, f, args))
         elif obj_type in ['table', 'sequence', 'type']:
-            obj_ids = ['"%s"."%s"' % (schema_qualifier, o) for o in objs]
+            obj_ids = ['%s."%s"' % (quoted_schema_qualifier, o) for o in objs]
         else:
             obj_ids = ['"%s"' % o for o in objs]
 
@@ -846,7 +773,7 @@ class Connection(object):
             # and privs was escaped when it was parsed
             # Note: Underscores are replaced with spaces to support multi-word obj_type
             if orig_objs is not None:
-                set_what = '%s ON %s %s' % (','.join(privs), orig_objs, schema_qualifier)
+                set_what = '%s ON %s %s' % (','.join(privs), orig_objs, quoted_schema_qualifier)
             else:
                 set_what = '%s ON %s %s' % (','.join(privs), obj_type.replace('_', ' '), ','.join(obj_ids))
 
@@ -875,9 +802,6 @@ class Connection(object):
         if target_roles:
             as_who = ','.join('"%s"' % r for r in target_roles)
 
-        if schema_qualifier:
-            schema_qualifier = '"%s"' % schema_qualifier
-
         status_before = get_status(objs)
 
         query = QueryBuilder(state) \
@@ -885,10 +809,9 @@ class Connection(object):
             .with_grant_option(grant_option) \
             .for_whom(for_whom) \
             .as_who(as_who) \
-            .for_schema(schema_qualifier) \
+            .for_schema(quoted_schema_qualifier) \
             .set_what(set_what) \
             .for_objs(objs) \
-            .usage_on_types(usage_on_types) \
             .build()
 
         executed_queries.append(query)
@@ -920,7 +843,6 @@ class QueryBuilder(object):
         self._state = state
         self._schema = None
         self._objs = None
-        self._usage_on_types = None
         self.query = []
 
     def for_objs(self, objs):
@@ -937,10 +859,6 @@ class QueryBuilder(object):
 
     def for_whom(self, who):
         self._for_whom = who
-        return self
-
-    def usage_on_types(self, usage_on_types):
-        self._usage_on_types = usage_on_types
         return self
 
     def as_who(self, target_roles):
@@ -1008,16 +926,6 @@ class QueryBuilder(object):
                                                                                  self._for_whom))
             self.add_grant_option()
 
-        if self._usage_on_types:
-
-            if self._as_who:
-                self.query.append(
-                    'ALTER DEFAULT PRIVILEGES FOR ROLE {0}{1} GRANT USAGE ON TYPES TO {2}'.format(self._as_who,
-                                                                                                  self._schema,
-                                                                                                  self._for_whom))
-            else:
-                self.query.append(
-                    'ALTER DEFAULT PRIVILEGES{0} GRANT USAGE ON TYPES TO {1}'.format(self._schema, self._for_whom))
         self.add_grant_option()
 
     def build_present(self):
@@ -1072,13 +980,13 @@ def main():
         target_roles=dict(required=False),
         grant_option=dict(required=False, type='bool',
                           aliases=['admin_option']),
-        host=dict(default='', aliases=['login_host']),
-        unix_socket=dict(default='', aliases=['login_unix_socket']),
-        login=dict(default='postgres', aliases=['login_user']),
-        password=dict(default='', aliases=['login_password'], no_log=True),
+        # WARNING: password is deprecated and will  be removed in community.postgresql 4.0.0,
+        # login_password should be used instead
+        password=dict(default='', no_log=True,
+                      removed_in_version='4.0.0',
+                      removed_from_collection='community.postgreql'),
         fail_on_role=dict(type='bool', default=True),
         trust_input=dict(type='bool', default=True),
-        usage_on_types=dict(type='bool', default=True, removed_in_version='3.0.0', removed_from_collection='community.postgresql'),
     )
 
     module = AnsibleModule(
@@ -1087,10 +995,19 @@ def main():
     )
 
     fail_on_role = module.params['fail_on_role']
-    usage_on_types = module.params['usage_on_types']
 
     # Create type object as namespace for module params
     p = type('Params', (), module.params)
+
+    # WARNING: password is deprecated and will  be removed in community.postgresql 4.0.0,
+    # login_password should be used instead
+    # https://github.com/ansible-collections/community.postgresql/issues/406
+    if p.password:
+        if p.login_password:
+            module.fail_json(msg='Use the "password" or "login_password" option but not both '
+                                 'to pass a password to log in with.')
+        p.login_password = p.password
+
     # param "schema": default, allowed depends on param "type"
     if p.type in ['table', 'sequence', 'function', 'procedure', 'type', 'default_privs']:
         if p.objs == 'schemas' or p.schema == 'not-specified':
@@ -1100,6 +1017,13 @@ def main():
     elif p.schema:
         module.fail_json(msg='Argument "schema" is not allowed '
                              'for type "%s".' % p.type)
+
+    # param "objs": ALL_IN_SCHEMA can be used only
+    # when param "type" is table, sequence, function or procedure
+    if p.objs == 'ALL_IN_SCHEMA' and p.type not in ('table', 'sequence', 'function', 'procedure'):
+        module.fail_json(msg='Argument "objs": ALL_IN_SCHEMA can be used only for '
+                             'type: table, sequence, function or procedure, '
+                             '%s was passed.' % p.type)
 
     # param "objs": default, required depends on param "type"
     if p.type == 'database':
@@ -1230,7 +1154,6 @@ def main():
             grant_option=p.grant_option,
             schema_qualifier=p.schema,
             fail_on_role=fail_on_role,
-            usage_on_types=usage_on_types,
         )
 
     except Error as e:
@@ -1245,6 +1168,10 @@ def main():
         conn.rollback()
     else:
         conn.commit()
+
+    conn.cursor.close()
+    conn.connection.close()
+
     module.exit_json(changed=changed, queries=executed_queries)
 
 

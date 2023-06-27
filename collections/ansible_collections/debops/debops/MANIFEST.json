@@ -11,6 +11,8 @@
   "tags": [
    "debian",
    "ubuntu",
+   "linux",
+   "infrastructure",
    "debops",
    "sysadmin",
    "cluster",
@@ -23,7 +25,9 @@
   "license_file": null,
   "dependencies": {
    "ansible.posix": "*",
+   "ansible.utils": "*",
    "community.crypto": "*",
+   "community.docker": "*",
    "community.general": "*",
    "community.libvirt": "*",
    "community.mysql": "*",
@@ -39,7 +43,7 @@
   "name": "FILES.json",
   "ftype": "file",
   "chksum_type": "sha256",
-  "chksum_sha256": "12853a856697c2ea9f3cbf5e1df9b8c7849db95154ca54716ad90c4033a823db",
+  "chksum_sha256": "934ccaac5f9e9011834ac3bf84661b132cd8253743490828b4b6200a8a3dd229",
   "format": 1
  },
  "format": 1

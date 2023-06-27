@@ -22,25 +22,55 @@ def patch_redhat_subscription(mocker):
     """
     Function used for mocking some parts of redhat_subscription module
     """
-    mocker.patch('ansible_collections.community.general.plugins.modules.redhat_subscription.RegistrationBase.REDHAT_REPO')
+    mocker.patch('ansible_collections.community.general.plugins.modules.redhat_subscription.Rhsm.REDHAT_REPO')
     mocker.patch('ansible_collections.community.general.plugins.modules.redhat_subscription.isfile', return_value=False)
     mocker.patch('ansible_collections.community.general.plugins.modules.redhat_subscription.unlink', return_value=True)
     mocker.patch('ansible_collections.community.general.plugins.modules.redhat_subscription.AnsibleModule.get_bin_path',
                  return_value='/testbin/subscription-manager')
+    mocker.patch('ansible_collections.community.general.plugins.modules.redhat_subscription.Rhsm._can_connect_to_dbus',
+                 return_value=False)
+    mocker.patch('ansible_collections.community.general.plugins.modules.redhat_subscription.getuid',
+                 return_value=0)
 
 
 @pytest.mark.parametrize('patch_ansible_module', [{}], indirect=['patch_ansible_module'])
 @pytest.mark.usefixtures('patch_ansible_module')
-def test_without_required_parameters(capfd, patch_redhat_subscription):
+def test_without_required_parameters_unregistered(mocker, capfd, patch_redhat_subscription):
     """
     Failure must occurs when all parameters are missing
     """
+    mock_run_command = mocker.patch.object(
+        basic.AnsibleModule,
+        'run_command',
+        return_value=(1, 'This system is not yet registered.', ''))
+
     with pytest.raises(SystemExit):
         redhat_subscription.main()
     out, err = capfd.readouterr()
     results = json.loads(out)
     assert results['failed']
     assert 'state is present but any of the following are missing' in results['msg']
+
+
+@pytest.mark.parametrize('patch_ansible_module', [{}], indirect=['patch_ansible_module'])
+@pytest.mark.usefixtures('patch_ansible_module')
+def test_without_required_parameters_registered(mocker, capfd, patch_redhat_subscription):
+    """
+    System already registered, no parameters required (state=present is the
+    default)
+    """
+    mock_run_command = mocker.patch.object(
+        basic.AnsibleModule,
+        'run_command',
+        return_value=(0, 'system identity: b26df632-25ed-4452-8f89-0308bfd167cb', ''))
+
+    with pytest.raises(SystemExit):
+        redhat_subscription.main()
+    out, err = capfd.readouterr()
+    results = json.loads(out)
+    assert 'changed' in results
+    if 'msg' in results:
+        assert results['msg'] == 'System already registered.'
 
 
 TEST_CASES = [
@@ -62,6 +92,24 @@ TEST_CASES = [
                     # Was return code checked?
                     {'check_rc': False},
                     # Mock of returned code, stdout and stderr
+                    (0, 'system identity: b26df632-25ed-4452-8f89-0308bfd167cb', '')
+                )
+            ],
+            'changed': False,
+            'msg': 'System already registered.'
+        }
+    ],
+    # Already registered system without credentials specified
+    [
+        {
+            'state': 'present',
+        },
+        {
+            'id': 'test_already_registered_system',
+            'run_command.calls': [
+                (
+                    ['/testbin/subscription-manager', 'identity'],
+                    {'check_rc': False},
                     (0, 'system identity: b26df632-25ed-4452-8f89-0308bfd167cb', '')
                 )
             ],
@@ -94,6 +142,37 @@ TEST_CASES = [
                     ['/testbin/subscription-manager', 'register',
                         '--username', 'admin',
                         '--password', 'admin'],
+                    {'check_rc': True, 'expand_user_and_vars': False},
+                    (0, '', '')
+                )
+            ],
+            'changed': True,
+            'msg': "System successfully registered to 'satellite.company.com'."
+        }
+    ],
+    # Test simple registration using token
+    [
+        {
+            'state': 'present',
+            'server_hostname': 'satellite.company.com',
+            'token': 'fake_token',
+        },
+        {
+            'id': 'test_registeration_token',
+            'run_command.calls': [
+                (
+                    ['/testbin/subscription-manager', 'identity'],
+                    {'check_rc': False},
+                    (1, '', '')
+                ),
+                (
+                    ['/testbin/subscription-manager', 'config', '--server.hostname=satellite.company.com'],
+                    {'check_rc': True},
+                    (0, '', '')
+                ),
+                (
+                    ['/testbin/subscription-manager', 'register',
+                        '--token', 'fake_token'],
                     {'check_rc': True, 'expand_user_and_vars': False},
                     (0, '', '')
                 )
@@ -308,6 +387,7 @@ TEST_CASES = [
             'org_id': 'admin',
             'force_register': 'true',
             'server_proxy_hostname': 'proxy.company.com',
+            'server_proxy_scheme': 'https',
             'server_proxy_port': '12345',
             'server_proxy_user': 'proxy_user',
             'server_proxy_password': 'secret_proxy_password'
@@ -327,6 +407,7 @@ TEST_CASES = [
                         '--server.proxy_hostname=proxy.company.com',
                         '--server.proxy_password=secret_proxy_password',
                         '--server.proxy_port=12345',
+                        '--server.proxy_scheme=https',
                         '--server.proxy_user=proxy_user'
                     ],
                     {'check_rc': True},
@@ -707,9 +788,6 @@ Entitlement Type:    Physical
     [
         {
             'state': 'present',
-            'username': 'admin',
-            'password': 'admin',
-            'org_id': 'admin',
             'pool_ids': [{'ff8080816b8e967f016b8e99632804a6': 2}, {'ff8080816b8e967f016b8e99747107e9': 4}]
         },
         {

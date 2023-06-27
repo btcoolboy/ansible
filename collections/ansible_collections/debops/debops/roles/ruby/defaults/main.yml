@@ -31,8 +31,8 @@ ruby__base_packages: [ 'ruby', 'libruby', 'rubygems-integration',
 # List of development packages to install, which are required to compile native
 # Ruby extensions. They will be installed if any Ruby gems are requested using
 # the default lists.
-ruby__dev_packages: '{{ ["ruby-dev", "build-essential"]
-	                if (ruby__dev_support | bool or
+ruby__dev_packages: '{{ ["ruby-dev","build-essential"]
+	                if (ruby__dev_support|bool or
 	                    ruby__gems or ruby__group_gems or
 	                    ruby__host_gems or ruby__dependent_gems or
 	                    ruby__user_gems or ruby__group_user_gems or
@@ -150,6 +150,20 @@ ruby__host_user_gems: []
 #
 # List of gems configured by other Ansible role via role dependency variables.
 ruby__dependent_user_gems: []
+                                                                   # ]]]
+                                                                   # ]]]
+# Configuration of other roles [[[
+# --------------------------------
+
+# .. envvar:: ruby__apt_preferences__dependent_list [[[
+#
+# Configuration for the :ref:`debops.apt_preferences` role.
+ruby__apt_preferences__dependent_list:
+
+  - package: 'bundler ruby-bundler'
+    backports: [ 'jessie' ]
+    reason: 'Closer feature parity with upstream'
+    role: 'debops.ruby'
                                                                    # ]]]
                                                                    # ]]]
                                                                    # ]]]

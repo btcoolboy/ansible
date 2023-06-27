@@ -4,19 +4,19 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Import custom Ansible plugins
-  ansible.builtin.import_role:
+  import_role:
     name: 'ansible_plugins'
 
 - name: Import DebOps global handlers
-  ansible.builtin.import_role:
+  import_role:
     name: 'global_handlers'
 
 - name: Import DebOps secret role
-  ansible.builtin.import_role:
+  import_role:
     name: 'secret'
 
 - name: Install required APT packages
-  ansible.builtin.package:
+  package:
     name: '{{ q("flattened", mailman__base_packages
                              + mailman__packages) }}'
     state: 'present'
@@ -24,7 +24,7 @@
   until: mailman__register_packages is succeeded
 
 - name: Create systemd configuration directories
-  ansible.builtin.file:
+  file:
     path: '{{ "/etc/systemd/system/" + item }}'
     state: 'directory'
     mode: '0755'
@@ -32,7 +32,7 @@
   when: ansible_service_mgr == 'systemd'
 
 - name: Configure systemd services
-  ansible.builtin.template:
+  template:
     src: '{{ "etc/systemd/system/" + item + "/dependencies.conf.j2" }}'
     dest: '{{ "/etc/systemd/system/" + item + "/dependencies.conf" }}'
     mode: '0644'
@@ -41,13 +41,13 @@
   when: ansible_service_mgr == 'systemd'
 
 - name: Make sure that Ansible local facts directory exists
-  ansible.builtin.file:
+  file:
     path: '/etc/ansible/facts.d'
     state: 'directory'
     mode: '0755'
 
 - name: Save Mailman local facts
-  ansible.builtin.template:
+  template:
     src: 'etc/ansible/facts.d/mailman.fact.j2'
     dest: '/etc/ansible/facts.d/mailman.fact'
     mode: '0755'
@@ -55,10 +55,10 @@
   tags: [ 'meta::facts' ]
 
 - name: Update Ansible facts if they were modified
-  ansible.builtin.meta: 'flush_handlers'
+  meta: 'flush_handlers'
 
 - name: Generate Mailman Core configuration
-  ansible.builtin.template:
+  template:
     src: 'etc/mailman3/{{ item }}.j2'
     dest: '/etc/mailman3/{{ item }}'
     group: '{{ mailman__group }}'
@@ -67,7 +67,7 @@
   notify: [ 'Restart mailman3' ]
 
 - name: Generate Mailman Web configuration
-  ansible.builtin.template:
+  template:
     src: 'etc/mailman3/mailman-web.py.j2'
     dest: '/etc/mailman3/mailman-web.py'
     group: 'www-data'
@@ -75,34 +75,34 @@
   notify: [ 'Restart mailman3-web' ]
 
 - name: Create required template directories
-  ansible.builtin.file:
+  file:
     path: '{{ "/var/lib/mailman3/templates/" + (item.name | dirname) }}'
     state: 'directory'
     owner: '{{ mailman__user }}'
     group: '{{ mailman__group }}'
     mode: '0755'
   loop: '{{ mailman__combined_templates | debops.debops.parse_kv_items }}'
-  when: item.state | d('present') != 'absent'
+  when: item.state|d('present') != 'absent'
 
 - name: Remove custom Mailman templates if requested
-  ansible.builtin.file:
+  file:
     path: '{{ "/var/lib/mailman3/templates/" + item.name }}'
     state: 'absent'
   loop: '{{ mailman__combined_templates | debops.debops.parse_kv_items }}'
-  when: item.state | d('present') == 'absent'
+  when: item.state|d('present') == 'absent'
 
 - name: Generate custom Mailman templates
-  ansible.builtin.copy:
+  copy:
     content: '{{ item.content | d("") }}'
     dest: '{{ "/var/lib/mailman3/templates/" + item.name }}'
     owner: '{{ mailman__user }}'
     group: '{{ mailman__group }}'
     mode: '0644'
   loop: '{{ mailman__combined_templates | debops.debops.parse_kv_items }}'
-  when: item.state | d('present') != 'absent'
+  when: item.state|d('present') != 'absent'
 
 - name: Ensure Postfix lookup tables exist
-  ansible.builtin.command: 'mailman aliases'
+  command: 'mailman aliases'
   args:
     creates: '/var/lib/mailman3/data/postfix_domains'
   register: mailman__register_aliases
@@ -110,8 +110,8 @@
   become_user: '{{ mailman__user }}'
 
 - name: Create Django superuser account
-  community.general.django_manage:  # noqa no-handler
+  django_manage:  # noqa no-handler
     command: 'createsuperuser --noinput --username={{ mailman__superuser_name }} --email={{ mailman__superuser_email }}'
     app_path: '/usr/share/mailman3-web'
   when: mailman__register_aliases is changed and
-        not mailman__ldap_enabled | bool
+        not mailman__ldap_enabled|bool

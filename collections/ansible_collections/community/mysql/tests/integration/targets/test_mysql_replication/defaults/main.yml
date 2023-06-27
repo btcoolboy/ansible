@@ -1,6 +1,6 @@
 mysql_user: root
 mysql_password: msandbox
-mysql_host: 127.0.0.1
+mysql_host: '{{ gateway_addr }}'
 mysql_primary_port: 3307
 mysql_replica1_port: 3308
 mysql_replica2_port: 3309

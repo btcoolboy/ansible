@@ -4,24 +4,24 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Import DebOps global handlers
-  ansible.builtin.import_role:
+  import_role:
     name: 'global_handlers'
 
 - name: Install required APT packages
-  ansible.builtin.package:
+  package:
     name: '{{ q("flattened", (wpcli__base_packages + wpcli__packages)) }}'
     state: 'present'
   register: wpcli__register_packages
   until: wpcli__register_packages is succeeded
 
 - name: Create wp-cli source directory
-  ansible.builtin.file:
+  file:
     path: '{{ wpcli__src }}'
     state: 'directory'
     mode: '0755'
 
 - name: Download wp-cli release files
-  ansible.builtin.get_url:
+  get_url:
     url: '{{ item.url }}'
     dest: '{{ item.dest }}'
     checksum: '{{ item.checksum }}'
@@ -32,7 +32,7 @@
   when: item.version == wpcli__version
 
 - name: Verify and install wp-cli binary
-  ansible.builtin.shell: set -o nounset -o pipefail -o errexit
+  shell: set -o nounset -o pipefail -o errexit
          && gpg --batch --decrypt --output {{ wpcli__src + "/wp-cli-" + wpcli__version + ".phar" }} \
                                            {{ wpcli__src + "/wp-cli-" + wpcli__version + ".phar.gpg" }}
          && ( install --mode 755 --owner root --group root \
@@ -45,28 +45,28 @@
   when: wpcli__register_release_files is changed
 
 - name: Install additional wp-cli scripts
-  ansible.builtin.copy:
+  copy:
     src: 'usr/local/bin/'
     dest: '/usr/local/bin/'
     mode: '0755'
 
 - name: Manage wp-config.php security via cron
-  ansible.builtin.cron:
+  cron:
     name: 'Secure wp-config.php files on the server'
     user: 'root'
     cron_file: 'wpcli-secure-wpconfig'
     job: '{{ wpcli__secure_wpconfig_command }}'
     special_time: '{{ wpcli__secure_wpconfig_interval }}'
-    state: '{{ "present" if wpcli__secure_wpconfig_enabled | bool else "absent" }}'
+    state: '{{ "present" if wpcli__secure_wpconfig_enabled|bool else "absent" }}'
 
 - name: Make sure Ansible fact directory exists
-  ansible.builtin.file:
+  file:
     path: '/etc/ansible/facts.d'
     state: 'directory'
     mode: '0755'
 
 - name: Save wpcli local facts
-  ansible.builtin.template:
+  template:
     src: 'etc/ansible/facts.d/wpcli.fact.j2'
     dest: '/etc/ansible/facts.d/wpcli.fact'
     mode: '0755'
@@ -74,4 +74,4 @@
   tags: [ 'meta::facts' ]
 
 - name: Reload facts if they were modified
-  ansible.builtin.meta: 'flush_handlers'
+  meta: 'flush_handlers'

@@ -16,7 +16,7 @@
   pre_tasks:
 
     - name: Prepare apache environment
-      ansible.builtin.import_role:
+      import_role:
         name: 'apache'
         tasks_from: 'main_env'
       tags: [ 'role::apache', 'role::apache:env' ]

@@ -42,7 +42,7 @@ options:
     description:
     - Includes names of empty databases to returned dictionary.
     type: bool
-    default: no
+    default: false
 
 notes:
 - Calculating the size of a database might be slow, depending on the number and size of tables in it.
@@ -58,6 +58,7 @@ seealso:
 author:
 - Andrew Klychkov (@Andersson007)
 - Sebastian Gumprich (@rndmh3ro)
+- Laurent Indermühle (@laurent-indermuehle)
 
 extends_documentation_fragment:
 - community.mysql.mysql
@@ -96,14 +97,14 @@ EXAMPLES = r'''
     filter: "!settings,!users"
 
 - name: Collect info about databases and version using ~/.my.cnf as a credential file
-  become: yes
+  become: true
   community.mysql.mysql_info:
     filter:
     - databases
     - version
 
 - name: Collect info about databases and version using ~alice/.my.cnf as a credential file
-  become: yes
+  become: true
   community.mysql.mysql_info:
     config_file: /home/alice/.my.cnf
     filter:
@@ -111,13 +112,13 @@ EXAMPLES = r'''
     - version
 
 - name: Collect info about databases including empty and excluding their sizes
-  become: yes
+  become: true
   community.mysql.mysql_info:
     config_file: /home/alice/.my.cnf
     filter:
     - databases
     exclude_fields: db_size
-    return_empty_dbs: yes
+    return_empty_dbs: true
 '''
 
 RETURN = r'''
@@ -206,6 +207,21 @@ slave_hosts:
   type: dict
   sample:
   - { "2": { "Host": "", "Master_id": 1, "Port": 3306 } }
+connector_name:
+  description: Name of the python connector used by the module. When the connector is not identified, returns C(Unknown).
+  returned: always
+  type: str
+  sample:
+  - "pymysql"
+  - "MySQLdb"
+  version_added: '3.6.0'
+connector_version:
+  description: Version of the python connector used by the module. When the connector is not identified, returns C(Unknown).
+  returned: always
+  type: str
+  sample:
+  - "1.0.2"
+  version_added: '3.6.0'
 '''
 
 from decimal import Decimal
@@ -216,6 +232,8 @@ from ansible_collections.community.mysql.plugins.module_utils.mysql import (
     mysql_common_argument_spec,
     mysql_driver,
     mysql_driver_fail_msg,
+    get_connector_name,
+    get_connector_version,
 )
 from ansible.module_utils.six import iteritems
 from ansible.module_utils._text import to_native
@@ -558,21 +576,29 @@ def main():
     if mysql_driver is None:
         module.fail_json(msg=mysql_driver_fail_msg)
 
+    connector_name = get_connector_name(mysql_driver)
+    connector_version = get_connector_version(mysql_driver)
+
     try:
         cursor, db_conn = mysql_connect(module, login_user, login_password,
                                         config_file, ssl_cert, ssl_key, ssl_ca, db,
                                         check_hostname=check_hostname,
                                         connect_timeout=connect_timeout, cursor_class='DictCursor')
     except Exception as e:
-        module.fail_json(msg="unable to connect to database, check login_user and login_password are correct or %s has the credentials. "
-                             "Exception message: %s" % (config_file, to_native(e)))
+        msg = ('unable to connect to database using %s %s, check login_user '
+               'and login_password are correct or %s has the credentials. '
+               'Exception message: %s' % (connector_name, connector_version, config_file, to_native(e)))
+        module.fail_json(msg)
 
     ###############################
     # Create object and do main job
 
     mysql = MySQL_Info(module, cursor)
 
-    module.exit_json(changed=False, **mysql.get_info(filter_, exclude_fields, return_empty_dbs))
+    module.exit_json(changed=False,
+                     connector_name=connector_name,
+                     connector_version=connector_version,
+                     **mysql.get_info(filter_, exclude_fields, return_empty_dbs))
 
 
 if __name__ == '__main__':

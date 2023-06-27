@@ -22,12 +22,15 @@ options:
     description:
     - SQL query to run. Multiple queries can be passed using YAML list syntax.
     - Must be a string or YAML list containing strings.
+    - If you use I(named_args) or I(positional_args) any C(%) will be interpreted
+      as a formatting character. All literal C(%) characters in the query should be
+      escaped as C(%%).
     - Note that if you use the C(IF EXISTS/IF NOT EXISTS) clauses in your query
-      and C(mysqlclient) connector, the module will report that
-      the state has been changed even if it has not. If it is important in your
-      workflow, use the C(PyMySQL) connector instead.
+      and C(mysqlclient) or C(PyMySQL 0.10.0+) connectors, the module will report
+      that the state has been changed even if it has not. If it is important in your
+      workflow, use the C(PyMySQL 0.9.3) connector instead.
     type: raw
-    required: yes
+    required: true
   positional_args:
     description:
     - List of values to be passed as positional arguments to the query.
@@ -46,7 +49,7 @@ options:
     description:
     - Where passed queries run in a single transaction (C(yes)) or commit them one-by-one (C(no)).
     type: bool
-    default: no
+    default: false
 seealso:
 - module: community.mysql.mysql_db
 author:
@@ -87,7 +90,7 @@ EXAMPLES = r'''
     query:
     - INSERT INTO articles (id, story) VALUES (2, 'my_long_story')
     - INSERT INTO prices (id, price) VALUES (123, '100.00')
-    single_transaction: yes
+    single_transaction: true
 '''
 
 RETURN = r'''
@@ -219,7 +222,8 @@ def main():
                     # When something is run with IF NOT EXISTS
                     # and there's "already exists" MySQL warning,
                     # set the flag as True.
-                    # PyMySQL throws the warning, mysqlclinet does NOT.
+                    # PyMySQL < 0.10.0 throws the warning, mysqlclient
+                    # and PyMySQL 0.10.0+ does NOT.
                     already_exists = True
 
         except Exception as e:

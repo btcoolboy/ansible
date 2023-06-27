@@ -5,6 +5,109 @@ Community PostgreSQL Collection Release Notes
 .. contents:: Topics
 
 
+v3.0.0
+======
+
+Release Summary
+---------------
+
+This is a major release of the ``community.postgresql`` collection.
+This changelog contains all changes to the modules in this collection that
+have been added after the release of ``community.postgresql`` 2.4.2.
+
+Major Changes
+-------------
+
+- postgresql_pg_hba - remove the deprecated ``order`` argument. The sortorder ``sdu`` is hardcoded (https://github.com/ansible-collections/community.postgresql/pull/496).
+- postgresql_privs - remove the deprecated ``usage_on_types`` argument. Use the ``type`` option of the ``type`` argument to explicitly manipulate privileges on PG types (https://github.com/ansible-collections/community.postgresql/issues/208).
+- postgresql_query - remove the deprecated ``path_to_script`` and ``as_single_query`` arguments. Use the ``postgresql_script`` module to run queries from scripts (https://github.com/ansible-collections/community.postgresql/issues/189).
+- postgresql_user - move the deprecated ``privs`` argument removal to community.postgresql 4.0.0 (https://github.com/ansible-collections/community.postgresql/issues/493).
+- postgresql_user - remove the deprecated ``groups`` argument. Use the ``postgresql_membership`` module instead (https://github.com/ansible-collections/community.postgresql/issues/300).
+
+v2.4.2
+======
+
+Release Summary
+---------------
+
+This is a bugfix release of the ``community.postgresql`` collection.
+This changelog contains all changes to the modules in this collection that
+have been added after release 2.4.1.
+
+Bugfixes
+--------
+
+- postgresql_db - when the task is completed successfully, close the database connection (https://github.com/ansible-collections/community.postgresql/issues/465).
+- postgresql_info - when the task is completed successfully, close the database connection (https://github.com/ansible-collections/community.postgresql/issues/465).
+- postgresql_ping - when the task is completed successfully, close the database connection (https://github.com/ansible-collections/community.postgresql/issues/465).
+- postgresql_privs - when the task is completed successfully, close the database connection (https://github.com/ansible-collections/community.postgresql/issues/465).
+
+v2.4.1
+======
+
+Release Summary
+---------------
+
+This is the bugfix release of the ``community.postgresql`` collection.
+This changelog contains all changes to the modules in this collection that
+have been added after release 2.4.0.
+
+Bugfixes
+--------
+
+- postgresql_privs - fix a breaking change related to handling the ``password`` argument (https://github.com/ansible-collections/community.postgresql/pull/463).
+
+v2.4.0
+======
+
+Release Summary
+---------------
+
+This is the minor release of the ``community.postgresql`` collection.
+This changelog contains all changes to the modules in this collection that
+have been added after the release of ``community.postgresql`` 2.3.2.
+
+Major Changes
+-------------
+
+- postgresql_privs - the ``password`` argument is deprecated and will be removed in community.postgresql 4.0.0, use the ``login_password`` argument instead (https://github.com/ansible-collections/community.postgresql/issues/406).
+
+Minor Changes
+-------------
+
+- Add support for module_defaults with action_group ``all`` (https://github.com/ansible-collections/community.postgresql/pull/430).
+- postgresql - added new parameters ``ssl_cert`` and ``ssl_key`` for ssl connection (https://github.com/ansible-collections/community.postgresql/issues/424).
+- postgresql - when receiving the connection parameters, the ``PGPORT`` and ``PGUSER`` environment variables are checked. The order of assigning values ``environment variables`` -> ``default values`` -> ``set values`` (https://github.com/ansible-collections/community.postgresql/issues/311).
+- postgresql_query - a list of queries can be passed as the ``query`` argument's value, the results will be stored in the ``query_all_results`` return value (is not deprecated anymore, as well as ``query_list``) (https://github.com/ansible-collections/community.postgresql/issues/312).
+
+Bugfixes
+--------
+
+- postgresql_info - add support for non numeric extenstion version (https://github.com/ansible-collections/community.postgresql/issues/428).
+- postgresql_info - when getting information about subscriptions, check the list of available columns in the pg_subscription table (https://github.com/ansible-collections/community.postgresql/issues/429).
+- postgresql_privs - fix connect_params being ignored (https://github.com/ansible-collections/community.postgresql/issues/450).
+- postgresql_query - could crash under certain conditions because of a missing import to `psycopg2.extras` (https://github.com/ansible-collections/community.postgresql/issues/283).
+- postgresql_set - avoid throwing ValueError for IP addresses and other values that may look like a number, but which are not (https://github.com/ansible-collections/community.postgresql/pull/422).
+- postgresql_set - avoid wrong values for single-value parameters containing commas (https://github.com/ansible-collections/community.postgresql/pull/400).
+- postgresql_user - properly close DB connections to prevent possible connection limit exhaustion (https://github.com/ansible-collections/community.postgresql/issues/431).
+
+v2.3.2
+======
+
+Release Summary
+---------------
+
+This is the bugfix release of the ``community.postgresql`` collection.
+This changelog contains all changes to the modules in this collection that
+have been added after release 2.3.1.
+
+Bugfixes
+--------
+
+- postgresql_pg_hba - fix ``changed`` return value for when ``overwrite`` is enabled (https://github.com/ansible-collections/community.postgresql/pull/378).
+- postgresql_privs - fix quoting of the ``schema`` parameter in SQL statements (https://github.com/ansible-collections/community.postgresql/pull/382).
+- postgresql_privs - raise an error when the ``objs: ALL_IN_SCHEMA`` is used with a value of ``type`` that is not ``table``, ``sequence``, ``function`` or ``procedure`` (https://github.com/ansible-collections/community.postgresql/issues/379).
+
 v2.3.1
 ======
 

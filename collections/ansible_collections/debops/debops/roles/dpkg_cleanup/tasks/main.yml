@@ -4,50 +4,50 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Ensure that the cleanup script directory exists
-  ansible.builtin.file:
+  file:
     path: '{{ dpkg_cleanup__scripts_path }}'
     state: 'directory'
     mode: '0755'
-  when: dpkg_cleanup__enabled | bool
+  when: dpkg_cleanup__enabled|bool
 
 - name: Remove cleanup scripts if requested
-  ansible.builtin.file:
+  file:
     path: '{{ dpkg_cleanup__scripts_path + "/" + item.name }}'
     state: 'absent'
   loop: '{{ q("flattened", dpkg_cleanup__dependent_packages) }}'
   loop_control:
     label: '{{ {"package": item.name} }}'
-  when: dpkg_cleanup__enabled | bool and item.name | d() and
-        item.state | d('present') == 'absent'
+  when: dpkg_cleanup__enabled|bool and item.name|d() and
+        item.state|d('present') == 'absent'
 
 - name: Remove cleanup hooks if requested
-  ansible.builtin.file:
+  file:
     path: '{{ dpkg_cleanup__hooks_path + "/dpkg-cleanup-" + item.name }}'
     state: 'absent'
   loop: '{{ q("flattened", dpkg_cleanup__dependent_packages) }}'
   loop_control:
     label: '{{ {"package": item.name} }}'
-  when: dpkg_cleanup__enabled | bool and item.name | d() and
-        item.state | d('present') == 'absent'
+  when: dpkg_cleanup__enabled|bool and item.name|d() and
+        item.state|d('present') == 'absent'
 
 - name: Generate cleanup scripts
-  ansible.builtin.template:
+  template:
     src: 'usr/local/lib/dpkg-cleanup/package.j2'
     dest: '{{ dpkg_cleanup__scripts_path + "/" + item.name }}'
     mode: '0755'
   loop: '{{ q("flattened", dpkg_cleanup__dependent_packages) }}'
   loop_control:
     label: '{{ {"package": item.name} }}'
-  when: dpkg_cleanup__enabled | bool and item.name | d() and
-        item.state | d('present') != 'absent'
+  when: dpkg_cleanup__enabled|bool and item.name|d() and
+        item.state|d('present') != 'absent'
 
 - name: Generate cleanup hooks
-  ansible.builtin.template:
+  template:
     src: 'etc/dpkg/dpkg.cfg.d/dpkg-cleanup-package.j2'
     dest: '{{ dpkg_cleanup__hooks_path + "/dpkg-cleanup-" + item.name }}'
     mode: '0644'
   loop: '{{ q("flattened", dpkg_cleanup__dependent_packages) }}'
   loop_control:
     label: '{{ {"package": item.name} }}'
-  when: dpkg_cleanup__enabled | bool and item.name | d() and
-        item.state | d('present') != 'absent'
+  when: dpkg_cleanup__enabled|bool and item.name|d() and
+        item.state|d('present') != 'absent'

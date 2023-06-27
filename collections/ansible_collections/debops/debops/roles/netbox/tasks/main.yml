@@ -5,11 +5,11 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Import DebOps secret role
-  ansible.builtin.import_role:
+  import_role:
     name: 'secret'
 
 - name: Install required packages
-  ansible.builtin.package:
+  package:
     name: '{{ q("flattened", (netbox__base_packages
                               + netbox__packages)) }}'
     state: 'present'
@@ -17,13 +17,13 @@
   until: netbox__register_packages is succeeded
 
 - name: Create NetBox system group
-  ansible.builtin.group:
+  group:
     name: '{{ netbox__group }}'
     state: 'present'
     system: True
 
 - name: Create NetBox system user
-  ansible.builtin.user:
+  user:
     name: '{{ netbox__user }}'
     group: '{{ netbox__group }}'
     home: '{{ netbox__home }}'
@@ -35,7 +35,7 @@
     ssh_key_bits: '{{ netbox__napalm_ssh_generate_bits }}'
 
 - name: Create additional directories used by NetBox
-  ansible.builtin.file:
+  file:
     path: '{{ item }}'
     state: 'directory'
     owner: '{{ netbox__user }}'
@@ -50,7 +50,7 @@
     - '{{ netbox__config_scripts_root }}'
 
 - name: Clone NetBox source code
-  ansible.builtin.git:
+  git:
     repo: '{{ netbox__git_repo }}'
     dest: '{{ netbox__git_dest }}'
     version: '{{ netbox__git_version }}'
@@ -63,25 +63,25 @@
   until: netbox__register_source is succeeded
 
 - name: Check if NetBox is installed
-  ansible.builtin.stat:
+  stat:
     path: '{{ netbox__git_checkout }}'
   register: netbox__register_installed
 
 - name: Check current virtualenv version
-  ansible.builtin.stat:
+  stat:
     path: '{{ netbox__virtualenv + "/bin/python" }}'
   register: netbox__register_virtualenv_version
 
 - name: Remove old python2 based virtualenv
-  ansible.builtin.file:
+  file:
     path: '{{ netbox__virtualenv }}'
     state: 'absent'
   register: netbox__register_virtalenv_deleted
-  when: (netbox__virtualenv_version == '3' and
-         netbox__register_virtualenv_version.stat.lnk_target | d() == 'python2')
+  when: ( netbox__virtualenv_version == '3' and
+          netbox__register_virtualenv_version.stat.lnk_target|d() == 'python2' )
 
 - name: Create NetBox checkout directory
-  ansible.builtin.file:
+  file:
     path: '{{ netbox__git_checkout }}'
     state: 'directory'
     owner: '{{ netbox__user }}'
@@ -89,7 +89,7 @@
     mode: '0755'
 
 - name: Prepare NetBox git worktree
-  ansible.builtin.copy:
+  copy:
     content: 'gitdir: {{ netbox__git_dest }}'
     dest: '{{ netbox__git_checkout + "/.git" }}'
     owner: '{{ netbox__user }}'
@@ -99,10 +99,9 @@
 - name: Get commit hash of target checkout
   environment:
     GIT_WORK_TREE: '{{ netbox__git_checkout }}'
-  ansible.builtin.command: git rev-parse {{ netbox__git_version }}
+  command: git rev-parse {{ netbox__git_version }}
   args:
     chdir: '{{ netbox__git_dest }}'
-    warn: False
   become: True
   become_user: '{{ netbox__user }}'
   register: netbox__register_target_branch
@@ -111,23 +110,22 @@
 - name: Checkout NetBox
   environment:  # noqa no-handler
     GIT_WORK_TREE: '{{ netbox__git_checkout }}'
-  ansible.builtin.command: git checkout -f {{ netbox__git_version }}
+  command: git checkout -f {{ netbox__git_version }}
   args:
     chdir: '{{ netbox__git_dest }}'
-    warn: False
   become: True
   become_user: '{{ netbox__user }}'
   register: netbox__register_checkout
   until: netbox__register_checkout is succeeded
   notify: [ 'Restart gunicorn for netbox', 'Restart netbox internal appserver', 'Restart netbox Request Queue Worker' ]
   when: (netbox__register_source.before is undefined or
-         (netbox__register_source.before | d() and netbox__register_target_branch.stdout | d() and
+         (netbox__register_source.before|d() and netbox__register_target_branch.stdout|d() and
           netbox__register_source.before != netbox__register_target_branch.stdout) or
-          not netbox__register_installed.stat.exists | bool or
-          netbox__register_virtalenv_deleted.changed | bool)
+          not netbox__register_installed.stat.exists|bool or
+          netbox__register_virtalenv_deleted.changed|bool)
 
 - name: Create Python virtualenv for NetBox
-  ansible.builtin.pip:
+  pip:
     name: [ 'pip', 'setuptools' ]
     virtualenv: '{{ netbox__virtualenv }}'
     virtualenv_python: '{{ "python" + netbox__virtualenv_version }}'
@@ -142,7 +140,7 @@
                  netbox__register_virtualenv.stdout is search('New python executable in'))
 
 - name: Clean up stale Python bytecode
-  ansible.builtin.command: "find . -name '*.pyc' -delete"  # noqa no-handler
+  command: "find . -name '*.pyc' -delete"  # noqa no-handler
   args:
     chdir: '{{ netbox__git_checkout + "/netbox" }}'
   become: True
@@ -150,7 +148,7 @@
   when: netbox__register_checkout is changed
 
 - name: Install NetBox requirements in virtualenv
-  ansible.builtin.pip:  # noqa no-handler
+  pip:  # noqa no-handler
     virtualenv: '{{ netbox__virtualenv }}'
     requirements: '{{ netbox__git_checkout + "/requirements.txt" }}'
     extra_args: '--upgrade'
@@ -162,18 +160,18 @@
   when: netbox__register_checkout is changed
 
 - name: Install additional Python modules in virtualenv
-  ansible.builtin.pip:  # noqa no-handler
+  pip:  # noqa no-handler
     name:       '{{ item.name | d(item) }}'
     version:    '{{ item.version | d(omit) }}'
     virtualenv: '{{ netbox__virtualenv }}'
   become: True
   become_user: '{{ netbox__user }}'
-  loop: '{{ q("flattened", netbox__virtualenv_pip_packages) }}'
+  with_flattened: '{{ netbox__virtualenv_pip_packages }}'
   when: netbox__register_checkout is changed and
-        item.state | d('present') not in ['absent', 'ignore']
+        item.state|d('present') not in [ 'absent', 'ignore' ]
 
 - name: Generate NetBox configuration
-  ansible.builtin.template:
+  template:
     src: 'usr/local/lib/netbox/configuration.py.j2'
     dest: '{{ netbox__git_checkout + "/netbox/netbox/configuration.py" }}'
     owner: '{{ netbox__user }}'
@@ -191,7 +189,7 @@
     group: '{{ netbox__group }}'
     mode: '0640'
   notify: [ 'Restart gunicorn for netbox', 'Restart netbox internal appserver', 'Restart netbox Request Queue Worker' ]
-  when: netbox__ldap_enabled | bool
+  when: netbox__ldap_enabled|bool
   tags: [ 'role::netbox:config' ]
   no_log: '{{ debops__no_log | d(True) }}'
 
@@ -199,7 +197,7 @@
   ## Commands from upgrade.sh. We cannot directly run this script as of 2.10
   ## because it also deals with virtualenv with different directory paths than
   ## this role.
-  ansible.builtin.shell:  # noqa no-handler
+  shell:  # noqa no-handler
     cmd: |
       set -o nounset -o pipefail -o errexit
       ./manage.py migrate
@@ -219,20 +217,20 @@
   register: netbox__register_migration
 
 - name: Create Django superuser account
-  community.general.django_manage:
+  environment:
+    DJANGO_SUPERUSER_PASSWORD: '{{ netbox__superuser_password }}'
+  django_manage:
     command: 'createsuperuser --noinput --username={{ netbox__superuser_name }} --email={{ netbox__superuser_email }}'
     app_path: '{{ netbox__git_checkout + "/netbox" }}'
     virtualenv: '{{ netbox__virtualenv }}'
-  environment:
-    DJANGO_SUPERUSER_PASSWORD: '{{ netbox__superuser_password }}'
   become: True
   become_user: '{{ netbox__user }}'
-  when: (not netbox__register_installed.stat.exists | bool and
+  when: (not netbox__register_installed.stat.exists|bool and
          not netbox__register_migration.stdout is search('No migrations to apply.'))
   no_log: '{{ debops__no_log | d(True) }}'
 
 - name: Generate systemd service unit
-  ansible.builtin.template:
+  template:
     src: 'etc/systemd/system/netbox.service.j2'
     dest: '/etc/systemd/system/netbox.service'
     owner: 'root'
@@ -242,10 +240,10 @@
     - 'Reload systemd daemon (netbox)'
     - 'Restart gunicorn for netbox'
     - 'Restart netbox internal appserver'
-  when: netbox__app_internal_appserver | bool
+  when: netbox__app_internal_appserver|bool
 
 - name: Generate NetBox RQ systemd service unit
-  ansible.builtin.template:
+  template:
     src: 'etc/systemd/system/netbox-rq.service.j2'
     dest: '/etc/systemd/system/netbox-rq.service'
     owner: 'root'
@@ -254,10 +252,10 @@
   notify:
     - 'Reload systemd daemon (netbox)'
     - 'Restart netbox Request Queue Worker'
-  when: netbox__app_internal_appserver | bool
+  when: netbox__app_internal_appserver|bool
 
 - name: Generate NetBox netbox-manage script
-  ansible.builtin.template:
+  template:
     src: 'usr/local/bin/netbox-manage.j2'
     dest: '{{ netbox__bin + "/netbox-manage" }}'
     owner: 'root'
@@ -265,7 +263,7 @@
     mode: '0755'
 
 - name: Make sure that Ansible local facts directory exists
-  ansible.builtin.file:
+  file:
     path: '/etc/ansible/facts.d'
     state: 'directory'
     owner: 'root'
@@ -273,7 +271,7 @@
     mode: '0755'
 
 - name: Save NetBox local facts
-  ansible.builtin.template:
+  template:
     src: 'etc/ansible/facts.d/netbox.fact.j2'
     dest: '/etc/ansible/facts.d/netbox.fact'
     owner: 'root'

@@ -19,11 +19,16 @@ description:
   notifications. Rackspace monitoring module flow | rax_mon_entity ->
   rax_mon_check -> rax_mon_notification -> rax_mon_notification_plan ->
   *rax_mon_alarm*
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   state:
     type: str
     description:
-    - Ensure that the alarm with this C(label) exists or does not exist.
+    - Ensure that the alarm with this O(label) exists or does not exist.
     choices: [ "present", "absent" ]
     required: false
     default: present
@@ -71,7 +76,8 @@ options:
       keys and values between 1 and 255 characters long.
 author: Ash Wilson (@smashwilson)
 extends_documentation_fragment:
-- community.general.rackspace.openstack
+  - community.general.rackspace.openstack
+  - community.general.attributes
 
 '''
 

@@ -1,3 +1,4 @@
+---
 ####################################################################
 # WARNING: These are designed specifically for Ansible tests       #
 # and should not be used as examples of how to write Ansible roles #
@@ -20,10 +21,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
-
-- name: alias mysql command to include default options
-  set_fact:
-    mysql_command: "mysql -u{{ mysql_user }} -p{{ mysql_password }} -P{{ mysql_primary_port }} --protocol=tcp"
 
 - name: Check state present/absent
   include_tasks: state_present_absent.yml

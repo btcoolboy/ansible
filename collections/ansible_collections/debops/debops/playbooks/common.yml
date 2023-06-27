@@ -14,7 +14,7 @@
   tasks:
 
     - name: Check for Ansible version without known vulnerabilities
-      ansible.builtin.assert:
+      assert:
         that:
           - 'ansible_version.full is version_compare("2.1.5.0", ">=")'
           - '((ansible_version.minor == 2) and
@@ -47,9 +47,7 @@
       tags: [ 'role::apt', 'skip::apt' ]
 
 
-- name: Apply core configuration
-  import_playbook: 'service/core.yml'
-
+- import_playbook: service/core.yml
 
 - name: Common configuration for all hosts
   collections: [ 'debops.debops', 'debops.roles01',
@@ -65,19 +63,19 @@
   pre_tasks:
 
     - name: Prepare nullmailer environment
-      ansible.builtin.import_role:
+      import_role:
         name: 'nullmailer'
         tasks_from: 'main_env'
       tags: [ 'role::nullmailer', 'role::ferm', 'role::tcpwrappers' ]
 
     - name: Prepare pki environment
-      ansible.builtin.import_role:
+      import_role:
         name: 'pki'
         tasks_from: 'main_env'
       tags: [ 'role::pki', 'role::pki:secret', 'role::secret' ]
 
     - name: Prepare sshd environment
-      ansible.builtin.import_role:
+      import_role:
         name: 'sshd'
         tasks_from: 'main_env'
       tags: [ 'role::sshd', 'role::ldap' ]
@@ -117,8 +115,10 @@
       tags: [ 'role::apt_preferences', 'skip::apt_preferences' ]
       apt_preferences__dependent_list:
         - '{{ etckeeper__apt_preferences__dependent_list }}'
+        - '{{ sshd__apt_preferences__dependent_list }}'
         - '{{ apt_install__apt_preferences__dependent_list }}'
         - '{{ yadm__apt_preferences__dependent_list }}'
+        - '{{ rsyslog__apt_preferences__dependent_list }}'
 
     - role: tzdata
       tags: [ 'role::tzdata', 'skip::tzdata' ]
@@ -200,6 +200,8 @@
 
     - role: etc_services
       tags: [ 'role::etc_services', 'skip::etc_services' ]
+      etc_services__dependent_list:
+        - '{{ rsyslog__etc_services__dependent_list }}'
 
     - role: logrotate
       tags: [ 'role::logrotate', 'skip::logrotate' ]

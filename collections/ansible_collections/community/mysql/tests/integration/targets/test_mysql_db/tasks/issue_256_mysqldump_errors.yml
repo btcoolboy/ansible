@@ -7,7 +7,7 @@
     community.mysql.mysql_db: &mysql_defaults
       login_user: '{{ mysql_user }}'
       login_password: '{{ mysql_password }}'
-      login_host: 127.0.0.1
+      login_host: '{{ mysql_host }}'
       login_port: '{{ mysql_primary_port }}'
     community.mysql.mysql_query: *mysql_defaults
 
@@ -73,6 +73,7 @@
         name: all
         target: /tmp/full-dump-without-t1.sql
         pipefail: true  # This should do nothing
+
       register: full_dump_without_t1
       ignore_errors: true
 

@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Restart tinyproxy
-  ansible.builtin.service:
+  service:
     name: 'tinyproxy'
     state: 'restarted'
     enabled: yes

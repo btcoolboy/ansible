@@ -53,12 +53,12 @@ options:
     description:
     - Execute the dump in a single transaction.
     type: bool
-    default: no
+    default: false
   quick:
     description:
     - Option used for dumping large tables.
     type: bool
-    default: yes
+    default: true
   ignore_tables:
     description:
     - A list of table names that will be ignored in the dump
@@ -70,14 +70,14 @@ options:
     description:
     - Dump binary columns using hexadecimal notation.
     type: bool
-    default: no
+    default: false
     version_added: '0.1.0'
   force:
     description:
     - Continue dump or import even if we get an SQL error.
     - Used only when I(state) is C(dump) or C(import).
     type: bool
-    default: no
+    default: false
     version_added: '0.1.0'
   master_data:
     description:
@@ -96,7 +96,7 @@ options:
     description:
       - Skip locking tables for read. Used when I(state=dump), ignored otherwise.
     type: bool
-    default: no
+    default: false
     version_added: '0.1.0'
   dump_extra_args:
     description:
@@ -110,7 +110,7 @@ options:
       - If C(yes), the module will internally execute commands via a shell.
       - Used when I(state=import), ignored otherwise.
     type: bool
-    default: no
+    default: false
     version_added: '0.1.0'
   unsafe_login_password:
     description:
@@ -121,7 +121,7 @@ options:
       - Used only when I(state) is C(import) or C(dump) and
         I(login_password) is passed, ignored otherwise.
     type: bool
-    default: no
+    default: false
     version_added: '0.1.0'
   restrict_config_file:
     description:
@@ -132,14 +132,14 @@ options:
         under the hood that read named option file in addition to usual option files.
       - If this behavior is undesirable, use C(yes) to read only named option file.
     type: bool
-    default: no
+    default: false
     version_added: '0.1.0'
   check_implicit_admin:
     description:
       - Check if mysql allows login as root/nopassword before trying supplied credentials.
       - If success, passed I(login_user)/I(login_password) will be ignored.
     type: bool
-    default: no
+    default: false
     version_added: '0.1.0'
   config_overrides_defaults:
     description:
@@ -148,7 +148,7 @@ options:
       - Used when I(stat) is C(present) or C(absent), ignored otherwise.
       - It needs Python 3.5+ as the default interpreter on a target host.
     type: bool
-    default: no
+    default: false
     version_added: '0.1.0'
   chdir:
     description:
@@ -163,7 +163,7 @@ options:
     - The default is C(no) to prevent issues on systems without bash as a default interpreter.
     - The default will change to C(yes) in community.mysql 4.0.0.
     type: bool
-    default: no
+    default: false
     version_added: '3.4.0'
 
 seealso:
@@ -230,7 +230,7 @@ EXAMPLES = r'''
     name: my_db
     state: import
     target: /tmp/dump.sql.bz2
-    force: yes
+    force: true
 
 - name: Dump multiple databases
   community.mysql.mysql_db:
@@ -302,7 +302,7 @@ EXAMPLES = r'''
 
 - name: Try to create database as root/nopassword first. If not allowed, pass the credentials
   community.mysql.mysql_db:
-    check_implicit_admin: yes
+    check_implicit_admin: true
     login_user: bob
     login_password: 123456
     name: bobdata

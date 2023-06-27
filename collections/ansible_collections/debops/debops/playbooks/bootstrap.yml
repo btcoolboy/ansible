@@ -6,7 +6,7 @@
 # This playbook can be used to bootstrap freshly installed minimal Debian
 # system for Ansible management. The expected state the host:
 #   - host is already configured in Ansible inventory/hosts file;
-#   - local user has prepared SSH keypair in RSA format;
+#   - local user has prepared SSH key pair in RSA format;
 #   - host has OpenSSH server installed;
 #
 # Modifications that will be made on the host:
@@ -43,7 +43,7 @@
   tasks:
 
     - name: Initialize Ansible support via raw tasks
-      ansible.builtin.import_role:
+      import_role:
         name: 'python'
         tasks_from: 'main_raw'
       tags: [ 'role::python_raw', 'skip::python_raw', 'role::python' ]
@@ -68,8 +68,7 @@
       tags: [ 'role::apt', 'skip::apt' ]
 
 
-- name: Apply core configuration
-  import_playbook: 'service/core.yml'
+- import_playbook: 'service/core.yml'
 
 
 - name: Bootstrap host for Ansible management

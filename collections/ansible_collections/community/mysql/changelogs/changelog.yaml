@@ -4,7 +4,7 @@ releases:
     changes:
       breaking_changes:
       - mysql_replication - remove ``Is_Slave`` and ``Is_Master`` return values (were
-        replaced with ``Is_Primary`` and ``Is_Replica`` (https://github.com/ansible-collections    /community.mysql/issues/145).
+        replaced with ``Is_Primary`` and ``Is_Replica`` (https://github.com/ansible-collections/community.mysql/issues/145).
       - mysql_replication - remove the mode options values containing ``master``/``slave``
         and the master_use_gtid option ``slave_pos`` (were replaced with corresponding
         ``primary``/``replica`` values) (https://github.com/ansible-collections/community.mysql/issues/145).
@@ -261,3 +261,88 @@ releases:
     - 3.5.1.yml
     - 438-fix-privilege-changing-everytime.yml
     release_date: '2022-09-09'
+  3.6.0:
+    changes:
+      bugfixes:
+      - mysql_user - when revoke privs consists only of ``GRANT``, a 2nd revoke query
+        is executed with empty privs to revoke that ended in an SQL exception (https://github.com/ansible-collections/community.mysql/pull/503).
+      - mysql_variables - add uppercase character pattern to regex to allow GLOBAL
+        variables containing uppercase characters. This recognizes variable names
+        used in Galera, for example, ``wsrep_OSU_method``, which breaks the normal
+        pattern of all lowercase characters (https://github.com/ansible-collections/community.mysql/pull/501).
+      minor_changes:
+      - mysql_info - add ``connector_name`` and ``connector_version`` to returned
+        values (https://github.com/ansible-collections/community.mysql/pull/497).
+      - mysql_role - enable auto_commit to avoid MySQL metadata table lock (https://github.com/ansible-collections/community.mysql/issues/479).
+      - mysql_user - add plugin_auth_string as optional parameter to use a specific
+        pam service if pam/auth_pam plugin is used (https://github.com/ansible-collections/community.mysql/pull/445).
+      - mysql_user - add the ``session_vars`` argument to set session variables at
+        the beginning of module execution (https://github.com/ansible-collections/community.mysql/issues/478).
+      - mysql_user - display a more informative invalid privilege exception. Changes
+        the exception handling of the granting permission logic to show the query
+        executed , params and the exception message granting privileges fails` (https://github.com/ansible-collections/community.mysql/issues/465).
+      - mysql_user - enable auto_commit to avoid MySQL metadata table lock (https://github.com/ansible-collections/community.mysql/issues/479).
+      - setup_mysql - update MySQL tarball URL (https://github.com/ansible-collections/community.mysql/pull/491).
+      release_summary: 'This is the minor release of the ``community.mysql`` collection.
+
+        This changelog contains all changes to the modules and plugins in this collection
+
+        that have been made after the previous release.'
+    fragments:
+    - 0_mysql_user_session_vars.yml
+    - 3.6.0.yml
+    - 445_add_service_name_to_plugin_pam_auth_pam_usage.yml
+    - 465-display_more_informative_invalid_priv_exceptiion.yml
+    - 479_enable_auto_commit.yml
+    - 479_enable_auto_commit_part2.yml
+    - 491_fix_download_url.yaml
+    - 497_mysql_info_returns_connector_name_and_version.yml
+    - 503-fix-revoke-grant-only.yml
+    - mysql_variables_allow_uppercase_identifiers.yml
+    release_date: '2023-02-08'
+  3.7.0:
+    changes:
+      minor_changes:
+      - mysql module utils - change deprecated connection parameters ``passwd`` and
+        ``db`` to ``password`` and ``database`` (https://github.com/ansible-collections/community.mysql/pull/177).
+      - mysql_user - add ``MAX_STATEMENT_TIME`` support for mariadb to the ``resource_limits``
+        argument (https://github.com/ansible-collections/community.mysql/issues/211).
+      release_summary: 'This is the minor release of the ``community.mysql`` collection.
+
+        This changelog contains all changes to the modules and plugins in this collection
+
+        that have been made after the previous release.'
+    fragments:
+    - 177-change_deprecated_connection_parameters.yml
+    - 3.7.0.yml
+    - 523-add-max_statement_time_resource-limit.yml
+    release_date: '2023-05-05'
+  3.7.1:
+    changes:
+      bugfixes:
+      - mysql module utils - use the connection arguments ``db`` instead of ``database``
+        and ``passwd`` instead of ``password`` when running with older mysql drivers
+        (MySQLdb < 2.1.0 or PyMySQL < 1.0.0) (https://github.com/ansible-collections/community.mysql/pull/551).
+      release_summary: 'This is a patch release of the community.mysql collection.
+
+        This changelog contains all changes to the modules and plugins in this collection
+
+        that have been made after the previous release.'
+    fragments:
+    - 3.7.1.yml
+    - 551-fix_connection_arguments_driver_compatability.yaml
+    release_date: '2023-05-22'
+  3.7.2:
+    changes:
+      bugfixes:
+      - mysql module utils - use the connection arguments ``db`` instead of ``database``
+        and ``passwd`` instead of ``password`` when running with MySQLdb < 2.0.0 (https://github.com/ansible-collections/community.mysql/pull/553).
+      release_summary: 'This is a patch release of the community.mysql collection.
+
+        This changelog contains all changes to the modules and plugins in this collection
+
+        that have been made after the previous release.'
+    fragments:
+    - 3.7.2.yml
+    - 553_fix_connection_arguemnts_for_old_mysqldb_driver.yaml
+    release_date: '2023-05-25'

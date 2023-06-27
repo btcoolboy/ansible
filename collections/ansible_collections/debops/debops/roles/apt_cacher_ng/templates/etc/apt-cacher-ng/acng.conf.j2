@@ -59,7 +59,7 @@ Port:{{ apt_cacher_ng__port }}
 # Default: listens on all interfaces and protocols
 #
 # BindAddress: localhost 192.168.7.254 publicNameOnMainInterface
-{{ ("BindAddress: " + apt_cacher_ng__bind_address | join(" ")) if apt_cacher_ng__bind_address else "" }}
+{{ ("BindAddress: " + apt_cacher_ng__bind_address|join(" ")) if apt_cacher_ng__bind_address else "" }}
 
 # The specification of another HTTP proxy which shall be used for downloads.
 # It can include user name and password but see the manual for limitations.
@@ -114,7 +114,7 @@ ReportPage: acng-report.html
 # activity type, time and transfer sizes are logged.
 #
 # VerboseLog: 1
-VerboseLog: {{ "1" if apt_cacher_ng__verbose_log | bool else "0" }}
+VerboseLog: {{ "1" if apt_cacher_ng__verbose_log|bool else "0" }}
 
 # Don't detach from the starting console.
 #
@@ -129,14 +129,14 @@ VerboseLog: {{ "1" if apt_cacher_ng__verbose_log | bool else "0" }}
 # respond with 503 error where it's not possible.
 #
 # Offlinemode: 0
-Offlinemode: {{ "1" if apt_cacher_ng__offline_mode | bool else "0" }}
+Offlinemode: {{ "1" if apt_cacher_ng__offline_mode|bool else "0" }}
 
 # Forbid downloads from locations that are directly specified in the user
 # request, i.e. all downloads must be processed by the preconfigured remapping
 # backends (see above).
 #
 # ForceManaged: 0
-ForceManaged: {{ "1" if apt_cacher_ng__force_managed | bool else "0" }}
+ForceManaged: {{ "1" if apt_cacher_ng__force_managed|bool else "0" }}
 
 # Days before considering an unreferenced file expired (to be deleted).
 # WARNING: if the value is set too low and particular index files are not
@@ -144,7 +144,7 @@ ForceManaged: {{ "1" if apt_cacher_ng__force_managed | bool else "0" }}
 # still useful package files.
 #
 # ExThreshold: 4
-{{ ("ExTreshold: " + apt_cacher_ng__expiration_threshold | string) if (apt_cacher_ng__expiration_threshold != "default") else "" }}
+{{ ("ExTreshold: " + apt_cacher_ng__expiration_threshold|string) if (apt_cacher_ng__expiration_threshold != "default") else "" }}
 
 # If the expiration is run daily, it sometimes does not make much sense to do
 # it because the expected changes (i.e. removal of expired files) don't justify
@@ -169,7 +169,7 @@ ForceManaged: {{ "1" if apt_cacher_ng__force_managed | bool else "0" }}
 # consequences like a sudden and complete cache data loss.
 #
 # ExAbortOnProblems: 1
-{{ ("ExAbortOnProblems: " + apt_cacher_ng__expiration_abort_on_problems | string) if (apt_cacher_ng__expiration_abort_on_problems != "default") else "" }}
+{{ ("ExAbortOnProblems: " + apt_cacher_ng__expiration_abort_on_problems|string) if (apt_cacher_ng__expiration_abort_on_problems != "default") else "" }}
 
 # Number of failed nightly expiration runs which are considered acceptable and
 # do not trigger an error notification to the admin (e.g. via daily cron job)
@@ -196,7 +196,7 @@ ForceManaged: {{ "1" if apt_cacher_ng__force_managed | bool else "0" }}
 # less than zero.
 #
 # DnsCacheSeconds: 1800
-{{ ("DnsCacheSeconds: " + apt_cacher_ng__dns_cache_seconds | string) if (apt_cacher_ng__dns_cache_seconds != "default") else "" }}
+{{ ("DnsCacheSeconds: " + apt_cacher_ng__dns_cache_seconds|string) if (apt_cacher_ng__dns_cache_seconds != "default") else "" }}
 
 ###############################################################################
 #
@@ -231,7 +231,7 @@ ForceManaged: {{ "1" if apt_cacher_ng__force_managed | bool else "0" }}
 # - «PFilePattern» for static data that doesn't change silently on the server.
 # - «VFilePattern» for volatile data that may change like every hour. Files
 #   that match both PFilePattern and VfilePattern will be treated as volatile.
-# - Static data with file names that match VFilePattern may be overriden being
+# - Static data with file names that match VFilePattern may be overridden being
 #   treated as volatile by making it match the special static data pattern,
 #   «SPfilePattern».
 # - «SVfilePattern» or the "special volatile data" pattern is for the
@@ -258,7 +258,7 @@ ForceManaged: {{ "1" if apt_cacher_ng__force_managed | bool else "0" }}
 #
 ###############################################################################
 
-# A bitmask type value declaring the loging verbosity and behavior of the error
+# A bitmask type value declaring the logging verbosity and behavior of the error
 # log writing. Non-zero value triggers at least faster log file flushing.
 #
 # Some higher bits only working with a special debug build of apt-cacher-ng,
@@ -269,7 +269,7 @@ ForceManaged: {{ "1" if apt_cacher_ng__force_managed | bool else "0" }}
 # Default: 0
 #
 # Debug:3
-{{ ("Debug: " + apt_cacher_ng__debug | string) if (apt_cacher_ng__debug != "") else "" }}
+{{ ("Debug: " + apt_cacher_ng__debug|string) if (apt_cacher_ng__debug != "") else "" }}
 
 # Usually, general purpose proxies like Squid expose the IP address of the
 # client user to the remote server using the X-Forwarded-For HTTP header. This
@@ -281,7 +281,7 @@ ForceManaged: {{ "1" if apt_cacher_ng__force_managed | bool else "0" }}
 # the client in the X-Forwarded-For header.
 #
 # LogSubmittedOrigin: 0
-LogSubmittedOrigin: {{ "1" if apt_cacher_ng__log_submitted_origin | bool else "0" }}
+LogSubmittedOrigin: {{ "1" if apt_cacher_ng__log_submitted_origin|bool else "0" }}
 
 # The version string reported to the peer, to be displayed as HTTP client (and
 # version) in the logs of the mirror.
@@ -312,11 +312,11 @@ RecompBz2: {{ "1" if apt_cacher_ng__recompress_bz2 else "0" }}
 # Network timeout for outgoing connections, in seconds.
 #
 # NetworkTimeout: 40
-{{ ("NetworkTimeout: " + apt_cacher_ng__network_timeout | string) if (apt_cacher_ng__network_timeout != "") else "" }}
+{{ ("NetworkTimeout: " + apt_cacher_ng__network_timeout|string) if (apt_cacher_ng__network_timeout != "") else "" }}
 
 # Fast fallback timeout, in seconds. This is the time to wait before
 # alternative target addresses for a client connection are tried, which can be
-# usefull for quick fallback to IPv4 in case of whacky IPv6 configuration.
+# useful for quick fallback to IPv4 in case of whacky IPv6 configuration.
 #
 # FastTimeout = 4
 
@@ -382,7 +382,7 @@ LocalDirs: acng-doc /usr/share/doc/apt-cacher-ng
 # PrecacheFor: debrep/dists/unstable/*/source/Sources* debrep/dists/unstable/*/binary-amd64/Packages*
 
 # Arbitrary set of data to append to request headers sent over the wire. Should
-# be a well formated HTTP headers part including newlines (DOS style) which
+# be a well formatted HTTP headers part including newlines (DOS style) which
 # can be entered as escape sequences (\r\n).
 #
 # RequestAppendix: X-Tracking-Choice: do-not-track\r\n
@@ -397,7 +397,7 @@ LocalDirs: acng-doc /usr/share/doc/apt-cacher-ng
 # BindAddress value.
 #
 # ConnectProto: v6 v4
-{% if apt_cacher_ng__connect_protocol | length >= 1 %}
+{% if apt_cacher_ng__connect_protocol|length >= 1 %}
 ConnectProto: {{ apt_cacher_ng__connect_protocol | join(" ") }}
 {% endif %}
 
@@ -461,7 +461,7 @@ ConnectProto: {{ apt_cacher_ng__connect_protocol | join(" ") }}
 # Allow data pass-through mode for certain hosts when requested by the client
 # using a CONNECT request. This is particularly useful to allow access to SSL
 # sites (https proxying). The string is a regular expression which should cover
-# the server name with port and must be correctly formated and terminated.
+# the server name with port and must be correctly formatted and terminated.
 # Examples:
 # PassThroughPattern: private-ppa\.launchpad\.net:443$
 # PassThroughPattern: .* # this would allow CONNECT to everything
@@ -524,11 +524,11 @@ ConnectProto: {{ apt_cacher_ng__connect_protocol | join(" ") }}
 #
 # OptProxyCheckCommand: ...
 #
-# Check intervall, in seconds.
+# Check interval, in seconds.
 #
 # OptProxyCheckInterval: 99
 #
-# Conection timeout in seconds, default: negative, means disabled.
+# Connection timeout in seconds, default: negative, means disabled.
 #
 # OptProxyTimeout: -1
 
@@ -536,7 +536,7 @@ ConnectProto: {{ apt_cacher_ng__connect_protocol | join(" ") }}
 # overall download speed limit. Unit: KiB/s, Default: unlimited.
 #
 # MaxDlSpeed: 500
-{{ ("MaxDlSpeed: " + apt_cacher_ng__max_download_speed_kib | string) if (apt_cacher_ng__max_download_speed_kib != "") else "" }}
+{{ ("MaxDlSpeed: " + apt_cacher_ng__max_download_speed_kib|string) if (apt_cacher_ng__max_download_speed_kib != "") else "" }}
 
 # In special corner cases, download clients attempt to download random chunks
 # of a files headers, i.e. the first kilobytes. The "don't get client stuck"
@@ -566,7 +566,7 @@ ConnectProto: {{ apt_cacher_ng__connect_protocol | join(" ") }}
 
 # Only set this value for debugging purposes. It disables SSL security checks
 # like strict host verification. 0 means no, any other value can have
-# differrent meaning in the future.
+# different meaning in the future.
 #
 # NoSSLChecks: 0
 

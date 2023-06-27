@@ -1,13 +1,10 @@
 ---
-- name: alias mysql command to include default options
-  set_fact:
-    mysql_command: "mysql -u{{ mysql_user }} -p{{ mysql_password }} --protocol=tcp"
 
 - vars:
     mysql_parameters: &mysql_params
       login_user: '{{ mysql_user }}'
       login_password: '{{ mysql_password }}'
-      login_host: 127.0.0.1
+      login_host: '{{ mysql_host }}'
       login_port: '{{ mysql_primary_port }}'
   block:
 
@@ -29,6 +26,7 @@
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_1 }}'
+        host: '{{ gateway_addr }}'
         state: absent
       ignore_errors: yes
 
@@ -38,6 +36,7 @@
       mysql_user:
         <<: *mysql_params
         name: "{{ user_name_1 }}"
+        host: '{{ gateway_addr }}'
         password: "{{ user_password_1 }}"
         priv: '*.*:ALL,GRANT'
         force_context: yes
@@ -47,7 +46,7 @@
         mode: getprimary
         login_user: '{{ user_name_1 }}'
         login_password: '{{ user_password_1 }}'
-        login_host: 127.0.0.1
+        login_host: '{{ mysql_host }}'
         login_port: '{{ mysql_replica1_port }}'
       register: result
       ignore_errors: yes
@@ -60,6 +59,7 @@
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_1 }}'
+        host: '{{ gateway_addr }}'
         state: absent
         force_context: yes
 
@@ -68,7 +68,7 @@
         mode: getprimary
         login_user: '{{ user_name_1 }}'
         login_password: '{{ user_password_1 }}'
-        login_host: 127.0.0.1
+        login_host: '{{ mysql_host }}'
         login_port: '{{ mysql_replica1_port }}'
       register: result
       ignore_errors: yes
@@ -92,12 +92,12 @@
           - result.queries == ["STOP SLAVE"] or result.queries == ["STOP REPLICA"]
 
     - name: Create replication filter MySQL
-      shell: "echo \"CHANGE REPLICATION FILTER REPLICATE_IGNORE_DB = (mysql);\" | {{ mysql_command }} -P{{ mysql_replica1_port }}"
-      when: install_type == 'mysql'
+      shell: "echo \"CHANGE REPLICATION FILTER REPLICATE_IGNORE_DB = (mysql);\" | {{ mysql_command_wo_port }} -P{{ mysql_replica1_port }}"
+      when: db_engine == 'mysql'
 
     - name: Create replication filter MariaDB
-      shell: "echo \"SET GLOBAL replicate_ignore_db = 'mysql';\" | {{ mysql_command }} -P{{ mysql_replica1_port }}"
-      when: install_type == 'mariadb'
+      shell: "echo \"SET GLOBAL replicate_ignore_db = 'mysql';\" | {{ mysql_command_wo_port }} -P{{ mysql_replica1_port }}"
+      when: db_engine == 'mariadb'
 
     - name: Start replica
       mysql_replication:
@@ -117,6 +117,7 @@
       mysql_user:
         <<: *mysql_params
         name: "{{ user_name_1 }}"
+        host: "{{ gateway_addr }}"
         password: "{{ user_password_1 }}"
         priv: '*.*:ALL,GRANT'
         force_context: yes
@@ -126,7 +127,7 @@
         mode: getprimary
         login_user: '{{ user_name_1 }}'
         login_password: '{{ user_password_1 }}'
-        login_host: 127.0.0.1
+        login_host: '{{ mysql_host }}'
         login_port: '{{ mysql_replica1_port }}'
       register: result
       ignore_errors: yes
@@ -139,6 +140,7 @@
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_1 }}'
+        host: "{{ gateway_addr }}"
         state: absent
         force_context: yes
 
@@ -157,9 +159,9 @@
           - result.queries == ["STOP SLAVE"] or result.queries == ["STOP REPLICA"]
 
     - name: Remove replication filter MySQL
-      shell: "echo \"CHANGE REPLICATION FILTER REPLICATE_IGNORE_DB = ();\" | {{ mysql_command }} -P{{ mysql_replica1_port }}"
-      when: install_type == 'mysql'
+      shell: "echo \"CHANGE REPLICATION FILTER REPLICATE_IGNORE_DB = ();\" | {{ mysql_command_wo_port }} -P{{ mysql_replica1_port }}"
+      when: db_engine == 'mysql'
 
     - name: Remove replication filter MariaDB
-      shell: "echo \"SET GLOBAL replicate_ignore_db = '';\" | {{ mysql_command }} -P{{ mysql_replica1_port }}"
-      when: install_type == 'mariadb'
+      shell: "echo \"SET GLOBAL replicate_ignore_db = '';\" | {{ mysql_command_wo_port }} -P{{ mysql_replica1_port }}"
+      when: db_engine == 'mariadb'

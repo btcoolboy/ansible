@@ -44,7 +44,8 @@ EXAMPLES = r'''
     privatekey_path: /etc/ssl/private/ansible.com.pem
     common_name: www.ansible.com
   register: result
-- debug:
+- name: Print CSR
+  ansible.builtin.debug:
     var: result.csr
 
 - name: Generate an OpenSSL Certificate Signing Request with an inline CSR
@@ -167,9 +168,10 @@ def main():
         supports_check_mode=True,
     )
 
-    backend = module.params['select_crypto_backend']
-    backend, module_backend = select_backend(module, backend)
     try:
+        backend = module.params['select_crypto_backend']
+        backend, module_backend = select_backend(module, backend)
+
         csr = CertificateSigningRequestModule(module, module_backend)
         csr.generate(module)
         result = csr.dump()

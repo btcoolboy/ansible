@@ -15,6 +15,9 @@ module: iptables_state
 short_description: Save iptables state into a file or restore it from a file
 version_added: '1.1.0'
 author: quidame (@quidame)
+extends_documentation_fragment:
+  - community.general.attributes
+  - community.general.attributes.flow
 description:
   - C(iptables) is used to set up, maintain, and inspect the tables of IP
     packet filter rules in the Linux kernel.
@@ -31,17 +34,25 @@ description:
 notes:
   - The rollback feature is not a module option and depends on task's
     attributes. To enable it, the module must be played asynchronously, i.e.
-    by setting task attributes I(poll) to C(0), and I(async) to a value less
-    or equal to C(ANSIBLE_TIMEOUT). If I(async) is greater, the rollback will
+    by setting task attributes C(poll) to V(0), and C(async) to a value less
+    or equal to C(ANSIBLE_TIMEOUT). If C(async) is greater, the rollback will
     still happen if it shall happen, but you will experience a connection
     timeout instead of more relevant info returned by the module after its
     failure.
-  - This module supports I(check_mode).
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
+  action:
+    support: full
+  async:
+    support: full
 options:
   counters:
     description:
       - Save or restore the values of all packet and byte counters.
-      - When C(true), the module is not idempotent.
+      - When V(true), the module is not idempotent.
     type: bool
     default: false
   ip_version:
@@ -54,14 +65,14 @@ options:
     description:
       - Specify the path to the C(modprobe) program internally used by iptables
         related commands to load kernel modules.
-      - By default, C(/proc/sys/kernel/modprobe) is inspected to determine the
+      - By default, V(/proc/sys/kernel/modprobe) is inspected to determine the
         executable's path.
     type: path
   noflush:
     description:
-      - For I(state=restored), ignored otherwise.
-      - If C(false), restoring iptables rules from a file flushes (deletes)
-        all previous contents of the respective table(s). If C(true), the
+      - For O(state=restored), ignored otherwise.
+      - If V(false), restoring iptables rules from a file flushes (deletes)
+        all previous contents of the respective table(s). If V(true), the
         previous rules are left untouched (but policies are updated anyway,
         for all built-in chains).
     type: bool
@@ -81,10 +92,10 @@ options:
     required: true
   table:
     description:
-      - When I(state=restored), restore only the named table even if the input
+      - When O(state=restored), restore only the named table even if the input
         file contains other tables. Fail if the named table is not declared in
         the file.
-      - When I(state=saved), restrict output to the specified table. If not
+      - When O(state=saved), restrict output to the specified table. If not
         specified, output includes all active tables.
     type: str
     choices: [ filter, nat, mangle, raw, security ]
@@ -260,10 +271,7 @@ def read_state(b_path):
     '''
     with open(b_path, 'r') as f:
         text = f.read()
-    lines = text.splitlines()
-    while '' in lines:
-        lines.remove('')
-    return lines
+    return [t for t in text.splitlines() if t != '']
 
 
 def write_state(b_path, lines, changed):
@@ -273,8 +281,7 @@ def write_state(b_path, lines, changed):
     # Populate a temporary file
     tmpfd, tmpfile = tempfile.mkstemp()
     with os.fdopen(tmpfd, 'w') as f:
-        for line in lines:
-            f.write('%s\n' % line)
+        f.write("{0}\n".format("\n".join(lines)))
 
     # Prepare to copy temporary file to the final destination
     if not os.path.exists(b_path):
@@ -335,9 +342,7 @@ def filter_and_format_state(string):
     string = re.sub(r'((^|\n)# (Generated|Completed)[^\n]*) on [^\n]*', r'\1', string)
     if not module.params['counters']:
         string = re.sub(r'\[[0-9]+:[0-9]+\]', r'[0:0]', string)
-    lines = string.splitlines()
-    while '' in lines:
-        lines.remove('')
+    lines = [line for line in string.splitlines() if line != '']
     return lines
 
 
@@ -354,10 +359,7 @@ def per_table_state(command, state):
             dummy, out, dummy = module.run_command(COMMAND, check_rc=True)
             out = re.sub(r'(^|\n)(# Generated|# Completed|[*]%s|COMMIT)[^\n]*' % t, r'', out)
             out = re.sub(r' *\[[0-9]+:[0-9]+\] *', r'', out)
-            table = out.splitlines()
-            while '' in table:
-                table.remove('')
-            tables[t] = table
+            tables[t] = [tt for tt in out.splitlines() if tt != '']
     return tables
 
 
@@ -548,8 +550,7 @@ def main():
     if module.check_mode:
         tmpfd, tmpfile = tempfile.mkstemp()
         with os.fdopen(tmpfd, 'w') as f:
-            for line in initial_state:
-                f.write('%s\n' % line)
+            f.write("{0}\n".format("\n".join(initial_state)))
 
         if filecmp.cmp(tmpfile, b_path):
             restored_state = initial_state

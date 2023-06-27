@@ -1,3 +1,4 @@
+---
 name: Plugins CI
 on:
   push:
@@ -14,149 +15,318 @@ on:
     - cron: '0 6 * * *'
 
 
-env:
-  mysql_version_file: "./ansible_collections/community/mysql/tests/integration/targets/setup_mysql/defaults/main.yml"
-  connector_version_file: "./ansible_collections/community/mysql/tests/integration/targets/setup_mysql/vars/main.yml"
-
 jobs:
   sanity:
-    name: "Sanity (Python: ${{ matrix.python }}, Ansible: ${{ matrix.ansible }})"
-    runs-on: ubuntu-latest
+    name: "Sanity (Ansible: ${{ matrix.ansible }})"
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         ansible:
-          - stable-2.11
           - stable-2.12
           - stable-2.13
+          - stable-2.14
           - devel
-        python:
-          - 3.8
-          - 3.9
-        exclude:
-          - python: 3.8
-            ansible: stable-2.13
-          - python: 3.8
-            ansible: devel
-          - python: 3.9
-            ansible: stable-2.11
-          - python: 3.9
-            ansible: stable-2.12
     steps:
-
-      - name: Check out code
-        uses: actions/checkout@v2
+      - name: Perform sanity testing
+        uses: ansible-community/ansible-test-gh-action@release/v1
         with:
-          path: ansible_collections/community/mysql
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python }}
-
-      - name: Install ansible-base (${{ matrix.ansible }})
-        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
-
-      - name: Run sanity tests
-        run: ansible-test sanity --docker -v --color
-        working-directory: ./ansible_collections/community/mysql
+          ansible-core-version: ${{ matrix.ansible }}
+          testing-type: sanity
+          pull-request-change-detection: true
 
   integration:
-    name: "Integration (Python: ${{ matrix.python }}, Ansible: ${{ matrix.ansible }}, MySQL: ${{ matrix.db_engine_version }}, Connector: ${{ matrix.connector }})"
-    runs-on: ubuntu-latest
+    name: "Integration (Python: ${{ matrix.python }}, Ansible: ${{ matrix.ansible }}, DB: ${{ matrix.db_engine_name }} ${{ matrix.db_engine_version }}, connector: ${{ matrix.connector_name }} ${{ matrix.connector_version }})"
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
-        db_engine_version:
-          - mysql_5.7.31
-          - mysql_8.0.22
-          - mariadb_10.3.34
-          # When adding later versions below,
-          # also change the "Set MariaDB URL sub dir" task
-          - mariadb_10.8.3
         ansible:
-          - stable-2.11
           - stable-2.12
           - stable-2.13
+          - stable-2.14
           - devel
+        db_engine_name:
+          - mysql
+          - mariadb
+        db_engine_version:
+          - 5.7.40
+          - 8.0.31
+          - 10.4.27
+          - 10.5.18
+          - 10.6.11
         python:
-          - 3.6
-          - 3.8
-          - 3.9
-        connector:
-          - pymysql==0.7.10
-          - pymysql==0.9.3
-          - mysqlclient==2.0.1
+          - '3.8'
+          - '3.9'
+          - '3.10'
+        connector_name:
+          - pymysql
+          - mysqlclient
+        connector_version:
+          - 0.7.11
+          - 0.9.3
+          - 1.0.2
+          - 2.0.1
+          - 2.0.3
+          - 2.1.1
         exclude:
-          - db_engine_version: mysql_8.0.22
-            connector: pymysql==0.7.10
-          - db_engine_version: mariadb_10.8.3
-            connector: pymysql==0.7.10
-          - python: 3.6
-            ansible: stable-2.12
-          - python: 3.6
+          - db_engine_name: mysql
+            db_engine_version: 10.4.27
+
+          - db_engine_name: mysql
+            db_engine_version: 10.5.18
+
+          - db_engine_name: mysql
+            db_engine_version: 10.6.11
+
+          - db_engine_name: mariadb
+            db_engine_version: 5.7.40
+
+          - db_engine_name: mariadb
+            db_engine_version: 8.0.31
+
+          - connector_name: pymysql
+            connector_version: 2.0.1
+
+          - connector_name: pymysql
+            connector_version: 2.0.3
+
+          - connector_name: pymysql
+            connector_version: 2.1.1
+
+          - connector_name: mysqlclient
+            connector_version: 0.7.11
+
+          - connector_name: mysqlclient
+            connector_version: 0.9.3
+
+          - connector_name: mysqlclient
+            connector_version: 1.0.2
+
+          - db_engine_name: mariadb
+            connector_version: 0.7.11
+
+          - db_engine_version: 5.7.40
+            python: '3.9'
+
+          - db_engine_version: 5.7.40
+            python: '3.10'
+
+          - db_engine_version: 5.7.40
             ansible: stable-2.13
-          - python: 3.6
+
+          - db_engine_version: 5.7.40
+            ansible: stable-2.14
+
+          - db_engine_version: 5.7.40
             ansible: devel
-          - python: 3.8
-            ansible: stable-2.11
-          - python: 3.8
+
+          - db_engine_version: 8.0.31
+            python: '3.8'
+
+          - db_engine_version: 8.0.31
+            python: '3.8'
+
+          - db_engine_version: 10.4.27
+            python: '3.10'
+
+          - db_engine_version: 10.4.27
+            ansible: devel
+
+          - db_engine_version: 10.6.11
+            python: '3.8'
+
+          - db_engine_version: 10.6.11
+            python: '3.9'
+
+          - python: '3.8'
+            connector_version: 1.0.2
+
+          - python: '3.8'
+            connector_version: 2.0.3
+
+          - python: '3.8'
+            connector_version: 2.1.1
+
+          - python: '3.9'
+            connector_version: 0.7.11
+
+          - python: '3.9'
+            connector_version: 1.0.2
+
+          - python: '3.9'
+            connector_version: 2.0.1
+
+          - python: '3.9'
+            connector_version: 2.1.1
+
+          - python: '3.10'
+            connector_version: 0.7.11
+
+          - python: '3.10'
+            connector_version: 0.9.3
+
+          - python: '3.10'
+            connector_version: 2.0.1
+
+          - python: '3.10'
+            connector_version: 2.0.3
+
+          - python: '3.8'
             ansible: stable-2.13
-          - python: 3.8
+
+          - python: '3.8'
+            ansible: stable-2.14
+
+          - python: '3.8'
             ansible: devel
-          - python: 3.9
-            ansible: stable-2.11
-          - python: 3.9
+
+          - python: '3.9'
             ansible: stable-2.12
+
+          - python: '3.9'
+            ansible: devel
+
+          - python: '3.10'
+            ansible: stable-2.12
+
+    services:
+      db_primary:
+        image: docker.io/library/${{ matrix.db_engine_name }}:${{ matrix.db_engine_version }}
+        env:
+          MARIADB_ROOT_PASSWORD: msandbox
+          MYSQL_ROOT_PASSWORD: msandbox
+        ports:
+          - 3307:3306
+        # We write our own health-cmd because the mariadb container does not
+        # provide a healthcheck
+        options: >-
+          --health-cmd "mysqladmin ping -P 3306 -pmsandbox |grep alive || exit 1"
+          --health-start-period 10s
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 6
+
+      db_replica1:
+        image: docker.io/library/${{ matrix.db_engine_name }}:${{ matrix.db_engine_version }}
+        env:
+          MARIADB_ROOT_PASSWORD: msandbox
+          MYSQL_ROOT_PASSWORD: msandbox
+        ports:
+          - 3308:3306
+        options: >-
+          --health-cmd "mysqladmin ping -P 3306 -pmsandbox |grep alive || exit 1"
+          --health-start-period 10s
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 6
+
+      db_replica2:
+        image: docker.io/library/${{ matrix.db_engine_name }}:${{ matrix.db_engine_version }}
+        env:
+          MARIADB_ROOT_PASSWORD: msandbox
+          MYSQL_ROOT_PASSWORD: msandbox
+        ports:
+          - 3309:3306
+        options: >-
+          --health-cmd "mysqladmin ping -P 3306 -pmsandbox |grep alive || exit 1"
+          --health-start-period 10s
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 6
 
     steps:
 
-      - name: Check out code
-        uses: actions/checkout@v2
-        with:
-          path: ansible_collections/community/mysql
+      # No need to check for service health. GitHub Action took care of it.
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python }}
-
-      - name: Install ansible-base (${{ matrix.ansible }})
-        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
-
-      - name: Set MySQL version (${{ matrix.db_engine_version }})
+      - name: Restart MySQL server with settings for replication
         run: |
-          export DB_VERSION=$(echo "${{ matrix.db_engine_version }}" | awk -F_ '{print $2}')
-          sed -i "s/^mysql_version:.*/mysql_version: $DB_VERSION/g" ${{ env.mysql_version_file }}
-        if: ${{ startsWith(matrix.db_engine_version, 'mysql') }}
+          docker exec ${{ job.services.db_primary.id }} bash -c 'echo -e [mysqld]\\nserver-id=1\\nlog-bin=/var/lib/mysql/primary-bin > /etc/mysql/conf.d/replication.cnf'
+          docker exec ${{ job.services.db_replica1.id }} bash -c 'echo -e [mysqld]\\nserver-id=2\\nlog-bin=/var/lib/mysql/replica1-bin > /etc/mysql/conf.d/replication.cnf'
+          docker exec ${{ job.services.db_replica2.id }} bash -c 'echo -e [mysqld]\\nserver-id=3\\nlog-bin=/var/lib/mysql/replica2-bin > /etc/mysql/conf.d/replication.cnf'
+          docker restart -t 30 ${{ job.services.db_primary.id }}
+          docker restart -t 30 ${{ job.services.db_replica1.id }}
+          docker restart -t 30 ${{ job.services.db_replica2.id }}
 
-      - name: Set MariaDB version (${{ matrix.db_engine_version }})
-        run: |
-          export DB_VERSION=$(echo "${{ matrix.db_engine_version }}" | awk -F_ '{print $2}')
-          sed -i -e "s/^mariadb_version:.*/mariadb_version: $DB_VERSION/g" -e 's/^mariadb_install: false/mariadb_install: true/g' ${{ env.mysql_version_file }}
-        if: ${{ startsWith(matrix.db_engine_version, 'mariadb') }}
+      - name: Wait for the primary to be healthy
+        run: >
+          while ! /usr/bin/docker inspect
+          --format="{{if .Config.Healthcheck}}{{print .State.Health.Status}}{{end}}"
+          ${{ job.services.db_primary.id }}
+          | grep healthy && [[ "$SECONDS" -lt 120 ]]; do sleep 1; done
 
-      - name: Set MariaDB URL sub dir
-        run: |
-          sed -i -e "s/^mariadb_url_subdir:.*/mariadb_url_subdir: linux-systemd/g" ${{ env.connector_version_file }}
-        if: matrix.db_engine_version == 'mariadb_10.8.3'
+      - name: Compute docker_image - Set python_version_flat
+        run: >
+          echo "python_version_flat=$(echo ${{ matrix.python }}
+          | tr -d '.')" >> $GITHUB_ENV
 
-      - name: Set Connector version (${{ matrix.connector }})
-        run: "sed -i 's/^python_packages:.*/python_packages: [${{ matrix.connector }}]/' ${{ env.connector_version_file }}"
+      - name: Compute docker_image - Set connector_version_flat
+        run: >
+          echo "connector_version_flat=$(echo ${{ matrix.connector_version }}
+          |tr -d .)" >> $GITHUB_ENV
 
-      - name: Run integration tests
-        run: ansible-test integration --docker -v --color --retry-on-error --continue-on-error --python ${{ matrix.python }} --diff --coverage
-        working-directory: ./ansible_collections/community/mysql
+      - name: Compute docker_image - Set db_engine_version_flat
+        run: >
+          echo "db_engine_version_flat=$(echo ${{ matrix.db_engine_version }}
+          | awk -F '.' '{print $1 $2}')" >> $GITHUB_ENV
 
-      - name: Generate coverage report.
-        run: ansible-test coverage xml -v --requirements --group-by command --group-by version
-        working-directory: ./ansible_collections/community/mysql
+      - name: Compute docker_image - Set db_client
+        run: >
+          if [[ ${{ env.db_engine_version_flat }} == 57 ]]; then
+            echo "db_client=my57" >> $GITHUB_ENV;
+          else
+            echo "db_client=$(echo ${{ matrix.db_engine_name }})" >> $GITHUB_ENV;
+          fi
 
-      - uses: codecov/codecov-action@v1
+      - name: Set docker_image
+        run: >
+          docker_image_multiline=("
+          ghcr.io/ansible-collections/community.mysql\
+          /test-container-${{ env.db_client }}\
+          -py${{ env.python_version_flat }}\
+          -${{ matrix.connector_name }}${{ env.connector_version_flat }}\
+          :latest")
+
+          echo "docker_image=$(printf '%s' $docker_image_multiline)"
+          >> $GITHUB_ENV
+
+      - name: >-
+          Perform integration testing against
+          Ansible version ${{ matrix.ansible }}
+          under Python ${{ matrix.python }}
+        uses: ansible-community/ansible-test-gh-action@release/v1
         with:
-          fail_ci_if_error: false
+          ansible-core-version: ${{ matrix.ansible }}
+          pre-test-cmd: >-
+            echo Setting db_engine_name to "${{ matrix.db_engine_name }}"...;
+            echo -n "${{ matrix.db_engine_name }}"
+            > tests/integration/db_engine_name;
+
+            echo Setting db_engine_version to \
+            "${{ matrix.db_engine_version }}"...;
+            echo -n "${{ matrix.db_engine_version }}"
+            > tests/integration/db_engine_version;
+
+            echo Setting Connector name to "${{ matrix.connector_name }}"...;
+            echo -n "${{ matrix.connector_name }}"
+            > tests/integration/connector_name;
+
+            echo Setting Connector name to "${{ matrix.connector_version }}"...;
+            echo -n "${{ matrix.connector_version }}"
+            > tests/integration/connector_version;
+
+            echo Setting Python version to "${{ matrix.python }}"...;
+            echo -n "${{ matrix.python }}"
+            > tests/integration/python;
+
+            echo Setting Ansible version to "${{ matrix.ansible }}"...;
+            echo -n "${{ matrix.ansible }}"
+            > tests/integration/ansible
+          docker-image: ${{ env.docker_image }}
+          target-python-version: ${{ matrix.python }}
+          testing-type: integration
 
   units:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: Units (Ⓐ${{ matrix.ansible }})
     strategy:
       # As soon as the first unit test fails,
@@ -164,48 +334,30 @@ jobs:
       fail-fast: true
       matrix:
         ansible:
-          - stable-2.11
           - stable-2.12
           - stable-2.13
+          - stable-2.14
           - devel
         python:
           - 3.8
           - 3.9
         exclude:
-          - python: 3.8
+          - python: '3.8'
             ansible: stable-2.13
-          - python: 3.8
+          - python: '3.8'
+            ansible: stable-2.14
+          - python: '3.8'
             ansible: devel
-          - python: 3.9
-            ansible: stable-2.11
-          - python: 3.9
+          - python: '3.9'
             ansible: stable-2.12
 
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
+      - name: >-
+          Perform unit testing against
+          Ansible version ${{ matrix.ansible }}
+        uses: ansible-community/ansible-test-gh-action@release/v1
         with:
-          path: ./ansible_collections/community/mysql
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python }}
-
-      - name: Install ansible-base (${{matrix.ansible}})
-        run: pip install https://github.com/ansible/ansible/archive/${{ matrix.ansible }}.tar.gz --disable-pip-version-check
-
-      # Run the unit tests
-      - name: Run unit test
-        run: ansible-test units -v --color --docker --coverage
-        working-directory: ./ansible_collections/community/mysql
-
-      # ansible-test support producing code coverage date
-      - name: Generate coverage report
-        run: ansible-test coverage xml -v --requirements --group-by command --group-by version
-        working-directory: ./ansible_collections/community/mysql
-
-      # See the reports at https://codecov.io/gh/GITHUBORG/REPONAME
-      - uses: codecov/codecov-action@v1
-        with:
-          fail_ci_if_error: false
+          ansible-core-version: ${{ matrix.ansible }}
+          target-python-version: ${{ matrix.python }}
+          testing-type: units
+          pull-request-change-detection: true

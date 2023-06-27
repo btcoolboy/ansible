@@ -14,18 +14,12 @@ module: postgresql_query
 short_description: Run PostgreSQL queries
 description:
 - Runs arbitrary PostgreSQL queries.
-- B(WARNING) The C(path_to_script) and C(as_single_query) options as well as
-  the C(query_list) and C(query_all_results) return values have been B(deprecated) and
-  will be removed in community.postgresql 3.0.0, please use the
-  M(community.postgresql.postgresql_script) module to execute statements from scripts.
-- Does not run against backup files. Use M(community.postgresql.postgresql_db) with I(state=restore)
-  to run queries on files made by pg_dump/pg_dumpall utilities.
 options:
   query:
     description:
-    - SQL query to run. Variables can be escaped with psycopg2 syntax
+    - SQL query string or list of queries to run. Variables can be escaped with psycopg2 syntax
       U(http://initd.org/psycopg/docs/usage.html).
-    type: str
+    type: raw
   positional_args:
     description:
     - List of values to be passed as positional arguments to the query.
@@ -39,19 +33,6 @@ options:
       When the value is a list, it will be converted to PostgreSQL array.
     - Mutually exclusive with I(positional_args).
     type: dict
-  path_to_script:
-    description:
-    - This option has been B(deprecated) and will be removed in community.postgresql 3.0.0,
-      please use the M(community.postgresql.postgresql_script) module to execute
-      statements from scripts.
-    - Path to a SQL script on the target machine.
-    - If the script contains several queries, they must be semicolon-separated.
-    - To run scripts containing objects with semicolons
-      (for example, function and procedure definitions), use I(as_single_query=true).
-    - To upload dumps or to execute other complex scripts, the preferable way
-      is to use the M(community.postgresql.postgresql_db) module with I(state=restore).
-    - Mutually exclusive with I(query).
-    type: path
   session_role:
     description:
     - Switch to session_role after connecting. The specified session_role must
@@ -91,39 +72,24 @@ options:
     type: list
     elements: str
     version_added: '1.0.0'
-  as_single_query:
-    description:
-    - This option has been B(deprecated) and will be removed in community.postgresql 3.0.0,
-      please use the M(community.postgresql.postgresql_script) module to execute
-      statements from scripts.
-    - If C(true), when reading from the I(path_to_script) file,
-      executes its whole content in a single query (not splitting it up
-      into separate queries by semicolons). It brings the following changes in
-      the module's behavior.
-    - When C(true), the C(query_all_results) return value
-      contains only the result of the last statement.
-    - Whether the state is reported as changed or not
-      is determined by the last statement of the file.
-    - Used only when I(path_to_script) is specified, otherwise ignored.
-    - If set to C(false), the script can contain only semicolon-separated queries.
-      (see the I(path_to_script) option documentation).
-    type: bool
-    default: true
-    version_added: '1.1.0'
 seealso:
 - module: community.postgresql.postgresql_script
 - module: community.postgresql.postgresql_db
 - name: PostgreSQL Schema reference
   description: Complete reference of the PostgreSQL schema documentation.
   link: https://www.postgresql.org/docs/current/ddl-schemas.html
+
+attributes:
+  check_mode:
+    support: full
+
 author:
 - Felix Archambault (@archf)
 - Andrew Klychkov (@Andersson007)
 - Will Rouesnel (@wrouesnel)
+
 extends_documentation_fragment:
 - community.postgresql.postgres
-notes:
-- Supports C(check_mode).
 '''
 
 EXAMPLES = r'''
@@ -131,6 +97,14 @@ EXAMPLES = r'''
   community.postgresql.postgresql_query:
     db: acme
     query: SELECT version()
+
+# The result of each query will be stored in query_all_results return value
+- name: Run several queries against acme db
+  community.postgresql.postgresql_query:
+    db: acme
+    query:
+    - SELECT version()
+    - SELECT id FROM accounts
 
 - name: Select query to db acme with positional arguments and non-default credentials
   community.postgresql.postgresql_query:
@@ -165,20 +139,6 @@ EXAMPLES = r'''
     login_password: "test1234"
     db: 'test'
     query: 'insert into test (test) values (now())'
-
-
-# WARNING: The path_to_script and as_single_query options have been deprecated
-# and will be removed in community.postgresql 3.0.0, please
-# use the community.postgresql.postgresql_script module instead.
-# If your script contains semicolons as parts of separate objects
-# like functions, procedures, and so on, use "as_single_query: true"
-- name: Run queries from SQL script using UTF-8 client encoding for session
-  community.postgresql.postgresql_query:
-    db: test_db
-    path_to_script: /var/lib/pgsql/test.sql
-    positional_args:
-    - 1
-    encoding: UTF-8
 
 - name: Example of using autocommit parameter
   community.postgresql.postgresql_query:
@@ -268,20 +228,14 @@ query_result:
     sample: [{"Column": "Value1"},{"Column": "Value2"}]
 query_list:
     description:
-    - This return value has been B(deprecated) and will be removed in
-      community.postgresql 3.0.0.
     - List of executed queries.
-      Useful when reading several queries from a file.
     returned: always
     type: list
     elements: str
     sample: ['SELECT * FROM foo', 'SELECT * FROM bar']
 query_all_results:
     description:
-    - This return value has been B(deprecated) and will be removed in
-      community.postgresql 3.0.0.
     - List containing results of all queries executed (one sublist for every query).
-      Useful when reading several queries from a file.
     returned: always
     type: list
     elements: list
@@ -340,17 +294,15 @@ def insane_query(string):
 def main():
     argument_spec = postgres_common_argument_spec()
     argument_spec.update(
-        query=dict(type='str'),
+        query=dict(type='raw'),
         db=dict(type='str', aliases=['login_db']),
         positional_args=dict(type='list', elements='raw'),
         named_args=dict(type='dict'),
         session_role=dict(type='str'),
-        path_to_script=dict(type='path'),
         autocommit=dict(type='bool', default=False),
         encoding=dict(type='str'),
         trust_input=dict(type='bool', default=True),
         search_path=dict(type='list', elements='str'),
-        as_single_query=dict(type='bool', default=True),
     )
 
     module = AnsibleModule(
@@ -362,13 +314,14 @@ def main():
     query = module.params["query"]
     positional_args = module.params["positional_args"]
     named_args = module.params["named_args"]
-    path_to_script = module.params["path_to_script"]
     autocommit = module.params["autocommit"]
     encoding = module.params["encoding"]
     session_role = module.params["session_role"]
     trust_input = module.params["trust_input"]
     search_path = module.params["search_path"]
-    as_single_query = module.params["as_single_query"]
+
+    if query and not isinstance(query, (str, list)):
+        module.fail_json(msg="query argument must be of type string or list")
 
     if not trust_input:
         # Check input for potentially dangerous elements:
@@ -377,41 +330,12 @@ def main():
     if autocommit and module.check_mode:
         module.fail_json(msg="Using autocommit is mutually exclusive with check_mode")
 
-    if path_to_script and query:
-        module.fail_json(msg="path_to_script is mutually exclusive with query")
-
     query_list = []
-    if path_to_script:
-        depr_msg = ("The 'path_to_script' option is deprecated. Please use the "
-                    "'community.postgresql.postgresql_script' module to execute "
-                    "statements from scripts")
-        module.deprecate(msg=depr_msg, version="3.0.0", collection_name="community.postgresql")
 
-        try:
-            with open(path_to_script, 'rb') as f:
-                query = to_native(f.read())
-
-                if not as_single_query:
-                    depr_msg = ("The 'as_single_query' option is deprecated. Please use the "
-                                "'community.postgresql.postgresql_script' module to execute "
-                                "statements from scripts")
-                    module.deprecate(msg=depr_msg, version="3.0.0", collection_name="community.postgresql")
-
-                    if ';' in query:
-                        for q in query.split(';'):
-                            if insane_query(q):
-                                continue
-                            else:
-                                query_list.append(q)
-                    else:
-                        query_list.append(query)
-                else:
-                    query_list.append(query)
-
-        except Exception as e:
-            module.fail_json(msg="Cannot read file '%s' : %s" % (path_to_script, to_native(e)))
-    else:
+    if isinstance(query, str):
         query_list.append(query)
+    else:  # if it's a list
+        query_list = query
 
     # Ensure psycopg2 libraries are available before connecting to DB:
     ensure_required_libs(module)

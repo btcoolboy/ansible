@@ -4,8 +4,6 @@
 # Copyright (C) 2014-2019 DebOps <https://debops.org/>
 # SPDX-License-Identifier: GPL-3.0-only
 
-- name: Manage regular dnsmasq installation
-  import_playbook: 'dnsmasq-plain.yml'
+- import_playbook: dnsmasq-plain.yml
 
-- name: Manage dnsmasq installation on QbesOS
-  import_playbook: 'dnsmasq-persistent_paths.yml'
+- import_playbook: dnsmasq-persistent_paths.yml

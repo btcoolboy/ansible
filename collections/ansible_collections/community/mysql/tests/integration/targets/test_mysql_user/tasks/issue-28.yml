@@ -9,80 +9,87 @@
     mysql_parameters: &mysql_params
       login_user: '{{ mysql_user }}'
       login_password: '{{ mysql_password }}'
-      login_host: 127.0.0.1
+      login_host: '{{ mysql_host }}'
       login_port: '{{ mysql_primary_port }}'
   when: tls_enabled
   block:
 
     # ============================================================
-    - name: get server certificate
+    - name: Issue-28 | Setup | Get server certificate
       copy:
-        content: "{{ lookup('pipe', \"openssl s_client -starttls mysql -connect localhost:3307 -showcerts 2>/dev/null </dev/null |  sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p'\") }}"
+        content: "{{ lookup('pipe', \"openssl s_client -starttls mysql -connect {{ mysql_host }}:3307 -showcerts 2>/dev/null </dev/null |  sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p'\") }}"
         dest: /tmp/cert.pem
       delegate_to: localhost
 
-    - name: Drop mysql user if exists
+    - name: Issue-28 | Setup | Drop mysql user if exists
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_1 }}'
+        host_all: true
         state: absent
-      ignore_errors: yes
+      ignore_errors: true
 
-    - name: create user with ssl requirement
+    - name: Issue-28 | Create user with ssl requirement
       mysql_user:
         <<: *mysql_params
         name: "{{ user_name_1 }}"
+        host: '{{ gateway_addr }}'
         password: "{{ user_password_1 }}"
         priv: '*.*:ALL,GRANT'
         tls_requires:
           SSL:
 
-    - name: attempt connection with newly created user (expect failure)
+    - name: Issue-28 | Attempt connection with newly created user (expect failure)
       mysql_user:
         name: "{{ user_name_2 }}"
         password: "{{ user_password_2 }}"
-        host: 127.0.0.1
+        host: '{{ gateway_addr }}'
         login_user: '{{ user_name_1 }}'
         login_password: '{{ user_password_1 }}'
-        login_host: 127.0.0.1
+        login_host: '{{ mysql_host }}'
         login_port: '{{ mysql_primary_port }}'
         ca_cert: /tmp/cert.pem
       register: result
-      ignore_errors: yes
+      ignore_errors: true
 
-    - assert:
+    - name: Issue-28 | Assert connection failed
+      assert:
         that:
           - result is failed
-      when: connector_name is search('pymysql')
+      when:
+        - connector_name == 'pymysql'
 
-    - assert:
+    - name: Issue-28 | Assert connection succeeded
+      assert:
         that:
           - result is succeeded
-      when: connector_name is not search('pymysql')
+      when:
+        - connector_name != 'pymysql'
 
-    - name: attempt connection with newly created user ignoring hostname
+    - name: Issue-28 | Attempt connection with newly created user ignoring hostname
       mysql_user:
         name: "{{ user_name_2 }}"
         password: "{{ user_password_2 }}"
-        host: 127.0.0.1
+        host: '{{ gateway_addr }}'
         login_user: '{{ user_name_1 }}'
         login_password: '{{ user_password_1 }}'
-        login_host: 127.0.0.1
+        login_host: '{{ mysql_host }}'
         login_port: '{{ mysql_primary_port }}'
         ca_cert: /tmp/cert.pem
-        check_hostname: no
+        check_hostname: false
       register: result
-      ignore_errors: yes
+      ignore_errors: true
 
-    - assert:
+    - name: Issue-28 | Assert connection succeeded
+      assert:
         that:
           - result is succeeded or 'pymysql >= 0.7.11 is required' in result.msg
 
-    - name: Drop mysql user
+    - name: Issue-28 | Drop mysql user
       mysql_user:
         <<: *mysql_params
         name: '{{ item }}'
-        host: 127.0.0.1
+        host: '{{ gateway_addr }}'
         state: absent
       with_items:
         - "{{ user_name_1 }}"

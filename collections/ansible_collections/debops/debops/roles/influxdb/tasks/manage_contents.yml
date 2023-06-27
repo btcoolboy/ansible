@@ -6,7 +6,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Drop databases if requested
-  community.general.influxdb_database:
+  influxdb_database:
     database_name: '{{ item.database | d(item.name) }}'
     state: 'absent'
     hostname: '{{ influxdb__server }}'
@@ -15,14 +15,13 @@
     password: '{{ influxdb__root_password }}'
     proxies: '{{ item.proxies | d(influxdb__proxies | d(omit)) }}'
     validate_certs: '{{ item.validate_certs | d(influxdb__validate_certs | d(True)) }}'
-  loop: '{{ q("flattened", influxdb__databases + influxdb__dependent_databases | d([])) }}'
+  with_flattened: '{{ influxdb__databases + influxdb__dependent_databases|d([]) }}'
   delegate_to: '{{ influxdb__delegate_to }}'
-  when: ((item.database | d(False) or item.name | d(False)) and
+  when: ((item.database|d(False) or item.name|d(False)) and
          (item.state is defined and item.state == 'absent'))
-  no_log: '{{ debops__no_log | d(True) }}'
 
 - name: Create databases
-  community.general.influxdb_database:
+  influxdb_database:
     database_name: '{{ item.database | d(item.name) }}'
     state: 'present'
     hostname: '{{ influxdb__server }}'
@@ -31,14 +30,14 @@
     password: '{{ influxdb__root_password }}'
     proxies: '{{ item.proxies | d(influxdb__proxies | d(omit)) }}'
     validate_certs: '{{ item.validate_certs | d(influxdb__validate_certs | d(True)) }}'
-  loop: '{{ q("flattened", influxdb__databases + influxdb__dependent_databases | d([])) }}'
+  with_flattened: '{{ influxdb__databases + influxdb__dependent_databases|d([]) }}'
   delegate_to: '{{ influxdb__delegate_to }}'
-  when: ((item.database | d(False) or item.name | d(False)) and
+  when: ((item.database|d(False) or item.name|d(False)) and
          (item.state is undefined or item.state != 'absent'))
   no_log: '{{ debops__no_log | d(True) }}'
 
 - name: Create retention policies
-  community.general.influxdb_retention_policy:
+  influxdb_retention_policy:
     policy_name: '{{ item.policy | d(item.name) }}'
     database_name: '{{ item.database }}'
     duration: '{{ item.duration }}'
@@ -50,13 +49,12 @@
     password: '{{ influxdb__root_password }}'
     proxies: '{{ item.proxies | d(influxdb__proxies | d(omit)) }}'
     validate_certs: '{{ item.validate_certs | d(influxdb__validate_certs | d(True)) }}'
-  loop: '{{ q("flattened", influxdb__retention_policies + influxdb__dependent_retention_policies | d([])) }}'
+  with_flattened: '{{ influxdb__retention_policies + influxdb__dependent_retention_policies|d([]) }}'
   delegate_to: '{{ influxdb__delegate_to }}'
-  when: item.policy | d(False) or item.name | d(False)
-  no_log: '{{ debops__no_log | d(True) }}'
+  when: item.policy|d(False) or item.name|d(False)
 
 - name: Drop user accounts if requested
-  community.general.influxdb_user:
+  influxdb_user:
     user_name: '{{ item.user | d(item.name) }}'
     state: 'absent'
     hostname: '{{ influxdb__server }}'
@@ -65,14 +63,14 @@
     password: '{{ influxdb__root_password }}'
     proxies: '{{ item.proxies | d(influxdb__proxies | d(omit)) }}'
     validate_certs: '{{ item.validate_certs | d(influxdb__validate_certs | d(True)) }}'
-  loop: '{{ q("flattened", influxdb__users + influxdb__dependent_users) }}'
+  with_flattened: '{{ influxdb__users + influxdb__dependent_users }}'
   delegate_to: '{{ influxdb__delegate_to }}'
-  when: ((item.user | d(False) or item.name | d(False)) and
+  when: ((item.user|d(False) or item.name|d(False)) and
          (item.state is defined and item.state == "absent"))
   no_log: '{{ debops__no_log | d(True) }}'
 
 - name: Create user accounts
-  community.general.influxdb_user:
+  influxdb_user:
     user_name: '{{ item.user | d(item.name) }}'
     user_password: '{{ item.password | d(lookup("password",
                        secret + "/influxdb/" + influxdb__server +
@@ -87,8 +85,8 @@
     password: '{{ influxdb__root_password }}'
     proxies: '{{ item.proxies | d(influxdb__proxies | d(omit)) }}'
     validate_certs: '{{ item.validate_certs | d(influxdb__validate_certs | d(True)) }}'
-  loop: '{{ q("flattened", influxdb__users + influxdb__dependent_users) }}'
+  with_flattened: '{{ influxdb__users + influxdb__dependent_users }}'
   delegate_to: '{{ influxdb__delegate_to }}'
-  when: ((item.user | d(False) or item.name | d(False)) and
+  when: ((item.user|d(False) or item.name|d(False)) and
          (item.state is undefined or item.state != "absent"))
   no_log: '{{ debops__no_log | d(True) }}'

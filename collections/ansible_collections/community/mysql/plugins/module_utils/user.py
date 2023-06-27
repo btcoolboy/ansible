@@ -170,7 +170,11 @@ def user_add(cursor, user, host, host_all, password, encrypted,
     elif plugin and plugin_hash_string:
         query_with_args = "CREATE USER %s@%s IDENTIFIED WITH %s AS %s", (user, host, plugin, plugin_hash_string)
     elif plugin and plugin_auth_string:
-        query_with_args = "CREATE USER %s@%s IDENTIFIED WITH %s BY %s", (user, host, plugin, plugin_auth_string)
+        # Mysql and MariaDB differ in naming pam plugin and Syntax to set it
+        if plugin == 'pam':  # Used by MariaDB which requires the USING keyword, not BY
+            query_with_args = "CREATE USER %s@%s IDENTIFIED WITH %s USING %s", (user, host, plugin, plugin_auth_string)
+        else:
+            query_with_args = "CREATE USER %s@%s IDENTIFIED WITH %s BY %s", (user, host, plugin, plugin_auth_string)
     elif plugin:
         query_with_args = "CREATE USER %s@%s IDENTIFIED WITH %s", (user, host, plugin)
     else:
@@ -305,7 +309,11 @@ def user_mod(cursor, user, host, host_all, password, encrypted,
                 if plugin_hash_string:
                     query_with_args = "ALTER USER %s@%s IDENTIFIED WITH %s AS %s", (user, host, plugin, plugin_hash_string)
                 elif plugin_auth_string:
-                    query_with_args = "ALTER USER %s@%s IDENTIFIED WITH %s BY %s", (user, host, plugin, plugin_auth_string)
+                    # Mysql and MariaDB differ in naming pam plugin and syntax to set it
+                    if plugin == 'pam':
+                        query_with_args = "ALTER USER %s@%s IDENTIFIED WITH %s USING %s", (user, host, plugin, plugin_auth_string)
+                    else:
+                        query_with_args = "ALTER USER %s@%s IDENTIFIED WITH %s BY %s", (user, host, plugin, plugin_auth_string)
                 else:
                     query_with_args = "ALTER USER %s@%s IDENTIFIED WITH %s", (user, host, plugin)
 
@@ -684,17 +692,19 @@ def privileges_revoke(cursor, user, host, db_table, priv, grant_option, maria_ro
         query = ' '.join(query)
         cursor.execute(query, (user, host))
     priv_string = ",".join([p for p in priv if p not in ('GRANT', )])
-    query = ["REVOKE %s ON %s" % (priv_string, db_table)]
 
-    if not maria_role:
-        query.append("FROM %s@%s")
-        params = (user, host)
-    else:
-        query.append("FROM %s")
-        params = (user,)
+    if priv_string != "":
+        query = ["REVOKE %s ON %s" % (priv_string, db_table)]
 
-    query = ' '.join(query)
-    cursor.execute(query, params)
+        if not maria_role:
+            query.append("FROM %s@%s")
+            params = (user, host)
+        else:
+            query.append("FROM %s")
+            params = (user,)
+
+        query = ' '.join(query)
+        cursor.execute(query, params)
     cursor.execute("FLUSH PRIVILEGES")
 
 
@@ -725,7 +735,8 @@ def privileges_grant(cursor, user, host, db_table, priv, tls_requires, maria_rol
     try:
         cursor.execute(query, params)
     except (mysql_driver.ProgrammingError, mysql_driver.OperationalError, mysql_driver.InternalError) as e:
-        raise InvalidPrivsError("Error granting privileges, invalid priv string: %s" % priv_string)
+        raise InvalidPrivsError("Error granting privileges, invalid priv string: %s , params: %s, query: %s ,"
+                                " exception: %s." % (priv_string, str(params), query, str(e)))
 
 
 def convert_priv_dict_to_str(priv):
@@ -740,33 +751,6 @@ def convert_priv_dict_to_str(priv):
     priv_list = ['%s:%s' % (key, val) for key, val in iteritems(priv)]
 
     return '/'.join(priv_list)
-
-
-# Alter user is supported since MySQL 5.6 and MariaDB 10.2.0
-def server_supports_alter_user(cursor):
-    """Check if the server supports ALTER USER statement or doesn't.
-
-    Args:
-        cursor (cursor): DB driver cursor object.
-
-    Returns: True if supports, False otherwise.
-    """
-    cursor.execute("SELECT VERSION()")
-    version_str = cursor.fetchone()[0]
-    version = version_str.split('.')
-
-    if 'mariadb' in version_str.lower():
-        # MariaDB 10.2 and later
-        if int(version[0]) * 1000 + int(version[1]) >= 10002:
-            return True
-        else:
-            return False
-    else:
-        # MySQL 5.6 and later
-        if int(version[0]) * 1000 + int(version[1]) >= 5006:
-            return True
-        else:
-            return False
 
 
 def get_resource_limits(cursor, user, host):
@@ -797,6 +781,15 @@ def get_resource_limits(cursor, user, host):
         'MAX_CONNECTIONS_PER_HOUR': res[2],
         'MAX_USER_CONNECTIONS': res[3],
     }
+
+    cursor.execute("SELECT VERSION()")
+    if 'mariadb' in cursor.fetchone()[0].lower():
+        query = ('SELECT max_statement_time AS MAX_STATEMENT_TIME '
+                 'FROM mysql.user WHERE User = %s AND Host = %s')
+        cursor.execute(query, (user, host))
+        res_max_statement_time = cursor.fetchone()
+        current_limits['MAX_STATEMENT_TIME'] = res_max_statement_time[0]
+
     return current_limits
 
 
@@ -849,9 +842,14 @@ def limit_resources(module, cursor, user, host, resource_limits, check_mode):
 
     Returns: True, if changed, False otherwise.
     """
-    if not server_supports_alter_user(cursor):
+    if not impl.server_supports_alter_user(cursor):
         module.fail_json(msg="The server version does not match the requirements "
                              "for resource_limits parameter. See module's documentation.")
+
+    cursor.execute("SELECT VERSION()")
+    if 'mariadb' not in cursor.fetchone()[0].lower():
+        if 'MAX_STATEMENT_TIME' in resource_limits:
+            module.fail_json(msg="MAX_STATEMENT_TIME resource limit is only supported by MariaDB.")
 
     current_limits = get_resource_limits(cursor, user, host)
 

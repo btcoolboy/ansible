@@ -6,17 +6,17 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Import custom Ansible plugins
-  ansible.builtin.import_role:
+  import_role:
     name: 'ansible_plugins'
 
 - name: Import DebOps global handlers
-  ansible.builtin.import_role:
+  import_role:
     name: 'global_handlers'
 
 # APT package installation [[[1
 
 - name: Install required packages
-  ansible.builtin.package:
+  package:
     name: '{{ q("flattened", (hashicorp__base_packages
                               + hashicorp__packages
                               + hashicorp__dependent_packages)) }}'
@@ -29,7 +29,7 @@
 # User, group management [[[1
 
 - name: Create HashiCorp group
-  ansible.builtin.group:
+  group:
     name: '{{ hashicorp__group }}'
     state: 'present'
     system: True
@@ -37,7 +37,7 @@
   tags: [ 'role::hashicorp:download', 'role::hashicorp:verify' ]
 
 - name: Create HashiCorp user
-  ansible.builtin.user:
+  user:
     name: '{{ hashicorp__user }}'
     group: '{{ hashicorp__group }}'
     home: '{{ hashicorp__home }}'
@@ -52,7 +52,7 @@
 # Filesystem directory management [[[1
 
 - name: Create source directories
-  ansible.builtin.file:
+  file:
     path: '{{ hashicorp__src + "/" + item + "/" + hashicorp__combined_version_map[item] }}'
     state: 'directory'
     owner: '{{ hashicorp__user }}'
@@ -63,7 +63,7 @@
   tags: [ 'role::hashicorp:download', 'role::hashicorp:verify' ]
 
 - name: Create library directories
-  ansible.builtin.file:
+  file:
     path: '{{ hashicorp__lib + "/" + item + "/" + hashicorp__combined_version_map[item] }}'
     state: 'directory'
     owner: '{{ hashicorp__user }}'
@@ -74,23 +74,23 @@
   tags: [ 'role::hashicorp:unpack', 'role::hashicorp:install' ]
 
 - name: Create Consul Web UI library directory
-  ansible.builtin.file:
+  file:
     path: '{{ hashicorp__lib + "/" + item + "/" + hashicorp__combined_version_map[item] + "/web_ui" }}'
     state: 'directory'
     owner: '{{ hashicorp__user }}'
     group: '{{ hashicorp__group }}'
     mode: '0755'
   with_items: '{{ (hashicorp__applications + hashicorp__dependent_applications) | unique }}'
-  when: (hashicorp__consul_webui | bool and item == 'consul')
+  when: (hashicorp__consul_webui|bool and item == 'consul')
 
 - name: Create Consul Web UI directory
-  ansible.builtin.file:
+  file:
     path: '{{ hashicorp__consul_webui_path }}'
     state: 'directory'
     owner: 'root'
     group: 'root'
     mode: '0755'
-  when: (hashicorp__consul_webui | bool and
+  when: (hashicorp__consul_webui|bool and
          ('consul' in (hashicorp__applications + hashicorp__dependent_applications | unique)))
 
 
@@ -105,7 +105,7 @@
     # HashiCorp application archive download [[[2
 
     - name: Download requested application files
-      ansible.builtin.get_url:
+      get_url:
         url: '{{ hashicorp__base_url + item.0 + "/" +
                  hashicorp__combined_version_map[item.0] + "/" + item.0 + "_" +
                  hashicorp__combined_version_map[item.0] + "_" + item.1 }}'
@@ -115,13 +115,13 @@
         - '{{ (hashicorp__applications + hashicorp__dependent_applications) | unique }}'
         - [ '{{ hashicorp__tar_suffix }}', '{{ hashicorp__hash_suffix }}', '{{ hashicorp__sig_suffix }}' ]
       when: (ansible_local.hashicorp is not defined or
-             (ansible_local.hashicorp | d() and ansible_local.hashicorp.applications | d() and
+             (ansible_local.hashicorp|d() and ansible_local.hashicorp.applications|d() and
               (ansible_local.hashicorp.applications[item.0] is not defined or
                (ansible_local.hashicorp.applications[item.0] != hashicorp__combined_version_map[item.0]))))
       tags: [ 'role::hashicorp:download', 'role::hashicorp:verify' ]
 
     - name: Download Consul Web UI
-      ansible.builtin.get_url:
+      get_url:
         url: '{{ hashicorp__base_url + item.0 + "/" +
                  hashicorp__combined_version_map[item.0] + "/" + item.0 + "_" +
                  hashicorp__combined_version_map[item.0] + "_" + item.1 }}'
@@ -130,10 +130,10 @@
       with_nested:
         - [ 'consul' ]
         - [ '{{ hashicorp__consul_webui_suffix }}' ]
-      when: (hashicorp__consul_webui | bool and
+      when: (hashicorp__consul_webui|bool and
              ('consul' in (hashicorp__applications + hashicorp__dependent_applications) | unique) and
               (ansible_local.hashicorp is not defined or
-               (ansible_local.hashicorp | d() and ansible_local.hashicorp.applications | d() and
+               (ansible_local.hashicorp|d() and ansible_local.hashicorp.applications|d() and
                 (ansible_local.hashicorp.applications['consul'] is not defined or
                  (ansible_local.hashicorp.applications['consul'] != hashicorp__combined_version_map['consul'])) or
                 not ansible_local.hashicorp.consul_webui | bool)))
@@ -143,7 +143,7 @@
     # SHA256 signature verification [[[2
 
     - name: Verify signatures with HashiCorp GPG key
-      ansible.builtin.command: gpg --verify {{ item + '_' + hashicorp__combined_version_map[item] + '_' + hashicorp__sig_suffix }}
+      command: gpg --verify {{ item + '_' + hashicorp__combined_version_map[item] + '_' + hashicorp__sig_suffix }}
                             {{ item + '_' + hashicorp__combined_version_map[item] + '_' + hashicorp__hash_suffix }}
       args:
         chdir: '{{ hashicorp__src + "/" + item + "/" + hashicorp__combined_version_map[item] }}'
@@ -154,7 +154,7 @@
       tags: [ 'role::hashicorp:verify' ]
 
     - name: Check file signatures
-      ansible.builtin.shell: grep --file <(find . -type f -printf "%f$\n")
+      shell: grep --file <(find . -type f -printf "%f$\n")
              {{ item + '_' + hashicorp__combined_version_map[item] + '_' + hashicorp__hash_suffix }}
              | sha256sum --check --status
       args:
@@ -170,7 +170,7 @@
     # HashiCorp application archive unpack [[[2
 
     - name: Unpack the file archives
-      ansible.builtin.unarchive:
+      unarchive:
         remote_src: True
         src: '{{ hashicorp__src + "/" + item + "/" + hashicorp__combined_version_map[item] + "/" +
                  item + "_" + hashicorp__combined_version_map[item] + "_" + hashicorp__tar_suffix }}'
@@ -179,14 +179,14 @@
         creates: '{{ hashicorp__lib + "/" + item + "/" + hashicorp__combined_version_map[item] + "/" +
                      ((hashicorp__combined_binary_map[item]
                        if hashicorp__combined_binary_map[item] is string
-                       else hashicorp__combined_binary_map[item] | first)
-                      if hashicorp__combined_binary_map[item] | d() else item) }}'
+                       else hashicorp__combined_binary_map[item]|first)
+                      if hashicorp__combined_binary_map[item]|d() else item) }}'
       with_items: '{{ (hashicorp__applications + hashicorp__dependent_applications) | unique }}'
       register: hashicorp__register_unpack
       tags: [ 'role::hashicorp:unpack', 'role::hashicorp:install' ]
 
     - name: Unpack the Consul Web UI
-      ansible.builtin.unarchive:
+      unarchive:
         copy: False
         src: '{{ hashicorp__src + "/" + item + "/" + hashicorp__combined_version_map[item] + "/" +
                  item + "_" + hashicorp__combined_version_map[item] + "_" + hashicorp__consul_webui_suffix }}'
@@ -196,18 +196,18 @@
                      + hashicorp__combined_version_map[item] + "/web_ui/index.html" }}'
       with_items: '{{ (hashicorp__applications + hashicorp__dependent_applications) | unique }}'
       register: hashicorp__register_unpack_webui
-      when: hashicorp__consul_webui | bool and item == 'consul'
+      when: hashicorp__consul_webui|bool and item == 'consul'
       tags: [ 'role::hashicorp:unpack', 'role::hashicorp:install' ]
 
 
 # HashiCorp application installation [[[1
 
 - name: Install HashiCorp applications
-  ansible.builtin.shell: install --mode 755 --owner root --group root --target-directory {{ hashicorp__bin }}
+  shell: install --mode 755 --owner root --group root --target-directory {{ hashicorp__bin }}
          {{ ((hashicorp__combined_binary_map[item.0]
               if hashicorp__combined_binary_map[item.0] is string
               else hashicorp__combined_binary_map[item.0] | join(' '))
-             if hashicorp__combined_binary_map[item.0] | d() else item.0) }}
+             if hashicorp__combined_binary_map[item.0]|d() else item.0) }}
          {% if item.0 == 'terraform' %}
          ; find . -maxdepth 1 -type f -name 'terraform-*'
                   -exec install -m 755 -o root -g root -t {{ hashicorp__bin }} {} +
@@ -217,27 +217,25 @@
   with_together:
     - '{{ (hashicorp__applications + hashicorp__dependent_applications) | unique }}'
     - '{{ hashicorp__register_unpack.results }}'
-  when: (item.1 is changed or (ansible_local | d() and
+  when: (item.1 is changed or (ansible_local|d() and
          (ansible_local.hashicorp is not defined or
-          (ansible_local.hashicorp | d() and ansible_local.hashicorp.applications | d() and
+          (ansible_local.hashicorp|d() and ansible_local.hashicorp.applications|d() and
            (ansible_local.hashicorp.applications[item.0] is not defined or
             (ansible_local.hashicorp.applications[item.0] != hashicorp__combined_version_map[item.0]))))))
   tags: [ 'role::hashicorp:install' ]
 
 - name: Synchronize Consul Web UI public directory
-  ansible.builtin.shell: 'rsync --delete --recursive --prune-empty-dirs
+  shell: 'rsync --delete --recursive --prune-empty-dirs
          {{ hashicorp__lib + "/" + item + "/" + hashicorp__combined_version_map[item] + "/web_ui/" }}
          {{ hashicorp__consul_webui_path }} && chown -R root:root {{ hashicorp__consul_webui_path }}'
-  args:  # noqa no-handler
-    warn: False
   with_items: '{{ (hashicorp__applications + hashicorp__dependent_applications) | unique }}'
-  when: (hashicorp__consul_webui | bool and item == 'consul' and hashicorp__register_unpack_webui is changed)
+  when: (hashicorp__consul_webui|bool and item == 'consul' and hashicorp__register_unpack_webui is changed)
 
 
 # Ansible local facts [[[1
 
 - name: Make sure Ansible fact directory exists
-  ansible.builtin.file:
+  file:
     path: '/etc/ansible/facts.d'
     state: 'directory'
     owner: 'root'
@@ -246,7 +244,7 @@
   when: (hashicorp__applications or hashicorp__dependent_applications)
 
 - name: Save HashiCorp local facts
-  ansible.builtin.template:
+  template:
     src: 'etc/ansible/facts.d/hashicorp.fact.j2'
     dest: '/etc/ansible/facts.d/hashicorp.fact'
     owner: 'root'
@@ -257,4 +255,4 @@
   tags: [ 'meta::facts' ]
 
 - name: Reload facts if they were modified
-  ansible.builtin.meta: 'flush_handlers'
+  meta: 'flush_handlers'

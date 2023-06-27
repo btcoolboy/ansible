@@ -5,21 +5,21 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Install required packages
-  ansible.builtin.package:
+  package:
     name: '{{ (ntp__base_packages + ntp__packages) | flatten }}'
     state: 'present'
   register: ntp__register_apt_install
   until: ntp__register_apt_install is succeeded
 
 - name: Query available systemd services
-  ansible.builtin.service_facts:
+  service_facts:
   when: ansible_service_mgr == "systemd"
 
 - name: Manage systemd-timesyncd state
-  ansible.builtin.service:
+  service:
     name: 'systemd-timesyncd'
-    state: '{{ "started" if (ntp__daemon in ["systemd-timesyncd"]) else "stopped" }}'
-    enabled: '{{ True if (ntp__daemon in ["systemd-timesyncd"]) else False }}'
+    state: '{{ "started" if (ntp__daemon in [ "systemd-timesyncd" ]) else "stopped" }}'
+    enabled: '{{ True if (ntp__daemon in [ "systemd-timesyncd" ]) else False }}'
   when:
     - ansible_service_mgr == "systemd"
     - ("systemd-timesyncd.service" in ansible_facts.services and
@@ -29,22 +29,19 @@
 # will pick up the configuration from `/etc/ntp.conf` when it exists.
 
 # Install chrony on all hosts except inside containers
-- name: Install chrony
-  ansible.builtin.include_tasks: chrony.yml
+- include: chrony.yml
   when: ntp__daemon == 'chrony'
 
   # Install NTPd on all hosts except inside containers
-- name: Install ntpd
-  ansible.builtin.include_tasks: ntpd.yml
+- include: ntpd.yml
   when: ntp__daemon in [ 'ntpd', 'ntpdate' ]
 
   # Install OpenNTPd on all hosts except inside containers
-- name: Install OpenNTPd
-  ansible.builtin.include_tasks: openntpd.yml
+- include: openntpd.yml
   when: ntp__daemon == 'openntpd'
 
   # Configure systemd-timesyncd
 - name: Include systemd-timesyncd configuration
-  ansible.builtin.include_tasks: systemd-timesyncd.yml
+  include: systemd-timesyncd.yml
   when: (ansible_service_mgr == "systemd" and
          ntp__daemon == 'systemd-timesyncd')

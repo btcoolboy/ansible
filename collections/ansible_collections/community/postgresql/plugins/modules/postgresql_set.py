@@ -62,7 +62,6 @@ options:
     version_added: '0.2.0'
 notes:
 - Supported version of PostgreSQL is 9.4 and later.
-- Supports C(check_mode).
 - Pay attention, change setting with 'postmaster' context can return changed is true
   when actually nothing changes because the same value may be presented in
   several different form, for example, 1024MB, 1GB, etc. However in pg_settings
@@ -71,6 +70,11 @@ notes:
   not restarted and the value in pg_settings is not updated yet.
 - For some parameters restart of PostgreSQL server is required.
   See official documentation U(https://www.postgresql.org/docs/current/view-pg-settings.html).
+
+attributes:
+  check_mode:
+    support: full
+
 seealso:
 - module: community.postgresql.postgresql_info
 - name: PostgreSQL server configuration
@@ -86,7 +90,6 @@ author:
 - Andrew Klychkov (@Andersson007)
 extends_documentation_fragment:
 - community.postgresql.postgres
-
 '''
 
 EXAMPLES = r'''
@@ -269,7 +272,11 @@ def pretty_to_bytes(pretty_val):
             pretty_val = int(pretty_val)
 
         except ValueError:
-            pretty_val = float(pretty_val)
+            try:
+                pretty_val = float(pretty_val)
+
+            except ValueError:
+                return pretty_val
 
         return pretty_val
 
@@ -315,7 +322,7 @@ def param_set(cursor, module, name, value, context):
         if str(value).lower() == 'default':
             query = "ALTER SYSTEM SET %s = DEFAULT" % name
         else:
-            if isinstance(value, str) and ',' in value:
+            if isinstance(value, str) and ',' in value and not name.endswith(('_command', '_prefix')):
                 # Issue https://github.com/ansible-collections/community.postgresql/issues/78
                 # Change value from 'one, two, three' -> "'one','two','three'"
                 value = ','.join(["'" + elem.strip() + "'" for elem in value.split(',')])

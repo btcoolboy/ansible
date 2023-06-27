@@ -1,3 +1,4 @@
+---
 ####################################################################
 # WARNING: These are designed specifically for Ansible tests       #
 # and should not be used as examples of how to write Ansible roles #
@@ -24,126 +25,81 @@
 # ============================================================
 # create mysql user and verify user is added to mysql database
 #
-- name: alias mysql command to include default options
-  set_fact:
-    mysql_command: "mysql -u{{ mysql_user }} -p{{ mysql_password }} -P{{ mysql_primary_port }} --protocol=tcp"
 
 - vars:
     mysql_parameters: &mysql_params
       login_user: '{{ mysql_user }}'
       login_password: '{{ mysql_password }}'
-      login_host: 127.0.0.1
+      login_host: '{{ mysql_host }}'
       login_port: '{{ mysql_primary_port }}'
 
   block:
 
-    - include: issue-121.yml
+    - include_tasks: issue-121.yml
 
-    - include: issue-28.yml
+    - include_tasks: issue-28.yml
 
-    - include: create_user.yml user_name={{user_name_1}} user_password={{ user_password_1 }}
+    - include_tasks: test_resource_limits.yml
 
-    - include: resource_limits.yml
-
-    - include: assert_user.yml user_name={{user_name_1}}
-
-    - include: remove_user.yml user_name={{user_name_1}} user_password={{ user_password_1 }}
-
-    - include: assert_no_user.yml user_name={{user_name_1}}
-
-    # ============================================================
-    # Create mysql user that already exist on mysql database
-    #
-    - include: create_user.yml user_name={{user_name_1}} user_password={{ user_password_1 }}
-
-    - name: create mysql user that already exist (expect changed=false)
-      mysql_user:
-        <<: *mysql_params
-        name: '{{user_name_1}}'
-        password: '{{user_password_1}}'
-        state: present
-      register: result
-
-    - name: assert output message mysql user was not created
-      assert:
-        that:
-          - result is not changed
-
-    # ============================================================
-    # remove mysql user and verify user is removed from mysql database
-    #
-    - name: remove mysql user state=absent (expect changed=true)
-      mysql_user:
-        <<: *mysql_params
-        name: '{{ user_name_1 }}'
-        password: '{{ user_password_1 }}'
-        state: absent
-      register: result
-
-    - name: assert output message mysql user was removed
-      assert:
-        that:
-          - result is changed
-
-    - include: assert_no_user.yml user_name={{user_name_1}}
-
-    # ============================================================
-    # remove mysql user that does not exist on mysql database
-    #
-    - name: remove mysql user that does not exist state=absent (expect changed=false)
-      mysql_user:
-        <<: *mysql_params
-        name: '{{ user_name_1 }}'
-        password: '{{ user_password_1 }}'
-        state: absent
-      register: result
-
-    - name: assert output message mysql user that does not exist
-      assert:
-        that:
-          - result is not changed
-
-    - include: assert_no_user.yml user_name={{user_name_1}}
+    - include_tasks: test_idempotency.yml
 
     # ============================================================
     # Create user with no privileges and verify default privileges are assign
     #
-    - name: create user with select privilege state=present (expect changed=true)
+    - name: create user with DEFAULT privilege state=present (expect changed=true)
       mysql_user:
         <<: *mysql_params
-        name: '{{ user_name_1 }}'
-        password: '{{ user_password_1 }}'
+        name: "{{ user_name_1 }}"
+        password: "{{ user_password_1 }}"
         state: present
       register: result
 
-    - include: assert_user.yml user_name={{user_name_1}} priv=USAGE
+    - include_tasks: utils/assert_user.yml
+      vars:
+        user_name: "{{ user_name_1 }}"
+        user_host: localhost
+        priv: USAGE
 
-    - include: remove_user.yml user_name={{user_name_1}} user_password={{ user_password_1 }}
+    - include_tasks: utils/remove_user.yml
+      vars:
+        user_name: "{{ user_name_1 }}"
 
-    - include: assert_no_user.yml user_name={{user_name_1}}
+    - include_tasks: utils/assert_no_user.yml
+      vars:
+        user_name: "{{ user_name_1 }}"
+
 
     # ============================================================
     # Create user with select privileges and verify select privileges are assign
     #
-    - name: create user with select privilege state=present (expect changed=true)
+    - name: Create user with SELECT privilege state=present (expect changed=true)
       mysql_user:
         <<: *mysql_params
-        name: '{{ user_name_2 }}'
-        password: '{{ user_password_2 }}'
+        name: "{{ user_name_2 }}"
+        password: "{{ user_password_2 }}"
         state: present
         priv: '*.*:SELECT'
       register: result
 
-    - include: assert_user.yml user_name={{user_name_2}} priv=SELECT
+    - include_tasks: utils/assert_user.yml
+      vars:
+        user_name: "{{ user_name_2 }}"
+        user_host: localhost
+        priv: SELECT
 
-    - include: remove_user.yml user_name={{user_name_2}} user_password={{ user_password_2 }}
+    - include_tasks: utils/remove_user.yml
+      vars:
+        user_name: "{{ user_name_2 }}"
 
-    - include: assert_no_user.yml user_name={{user_name_2}}
+    - include_tasks: utils/assert_no_user.yml
+      vars:
+        user_name: "{{ user_name_2 }}"
+
 
     # ============================================================
     # Assert user has access to multiple databases
     #
-    - name: give users access to multiple databases
+    - name: Give users access to multiple databases
       mysql_user:
         <<: *mysql_params
         name: '{{ item[0] }}'
@@ -151,34 +107,38 @@
         append_privs: yes
         password: '{{ user_password_1 }}'
       with_nested:
-        - [ '{{ user_name_1 }}', '{{ user_name_2 }}']
+        - ['{{ user_name_1 }}', '{{ user_name_2 }}']
         - "{{db_names}}"
 
-    - name: show grants access for user1 on multiple database
+    - name: Show grants access for user1 on multiple database
       command: "{{ mysql_command }} -e \"SHOW GRANTS FOR '{{ user_name_1 }}'@'localhost'\""
       register: result
 
-    - name: assert grant access for user1 on multiple database
+    - name: Assert grant access for user1 on multiple database
       assert:
         that:
           - "'{{ item }}' in result.stdout"
-      with_items: "{{db_names}}"
+      with_items: "{{ db_names }}"
 
-    - name: show grants access for user2 on multiple database
+    - name: Show grants access for user2 on multiple database
       command: "{{ mysql_command }} -e \"SHOW GRANTS FOR '{{ user_name_2 }}'@'localhost'\""
       register: result
 
-    - name: assert grant access for user2 on multiple database
+    - name: Assert grant access for user2 on multiple database
       assert:
         that:
           - "'{{ item }}' in result.stdout"
       with_items: "{{db_names}}"
 
-    - include: remove_user.yml user_name={{user_name_1}} user_password={{ user_password_1 }}
+    - include_tasks: utils/remove_user.yml
+      vars:
+        user_name: "{{ user_name_1 }}"
 
-    - include: remove_user.yml user_name={{user_name_2}} user_password={{ user_password_1 }}
+    - include_tasks: utils/remove_user.yml
+      vars:
+        user_name: "{{ user_name_2 }}"
 
-    - name: give user access to database via wildcard
+    - name: Give user SELECT access to database via wildcard
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_1 }}'
@@ -186,7 +146,7 @@
         append_privs: yes
         password: '{{ user_password_1 }}'
 
-    - name: show grants access for user1 on multiple database
+    - name: Show grants access for user1 on database via wildcard
       command: "{{ mysql_command }} -e \"SHOW GRANTS FOR '{{ user_name_1 }}'@'localhost'\""
       register: result
 
@@ -201,8 +161,8 @@
         <<: *mysql_params
         name: '{{ user_name_1 }}'
         priv:
-        - unsuitable
-        - type
+          - unsuitable
+          - type
         append_privs: yes
         host_all: yes
         password: '{{ user_password_1 }}'
@@ -215,7 +175,7 @@
           - result is failed
           - result.msg is search('priv parameter must be str or dict')
 
-    - name: change user access to database via wildcard
+    - name: Change SELECT to INSERT for user access to database via wildcard
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_1 }}'
@@ -224,7 +184,7 @@
         host_all: yes
         password: '{{ user_password_1 }}'
 
-    - name: show grants access for user1 on multiple database
+    - name: Show grants access for user1 on database via wildcard
       command: "{{ mysql_command }} -e \"SHOW GRANTS FOR '{{ user_name_1 }}'@'localhost'\""
       register: result
 
@@ -234,55 +194,81 @@
           - "'%db' in result.stdout"
           - "'INSERT' in result.stdout"
 
-    - include: remove_user.yml user_name={{user_name_1}} user_password={{ user_password_1 }}
+    - include_tasks: utils/remove_user.yml
+      vars:
+        user_name: "{{user_name_1}}"
 
     # ============================================================
     # Test plaintext and encrypted password scenarios.
     #
-    - include: test_user_password.yml
+    - include_tasks: test_user_password.yml
 
     # ============================================================
     # Test plugin authentication scenarios.
     #
     # FIXME: mariadb sql syntax for create/update user is not compatible
-    - include: test_user_plugin_auth.yml
-      when: install_type == 'mysql'
+    - include_tasks: test_user_plugin_auth.yml
+      when: db_engine == 'mysql'
 
     # ============================================================
     # Assert create user with SELECT privileges, attempt to create database and update privileges to create database
     #
-    - include: test_privs.yml current_privilege=SELECT current_append_privs=no
+    - include_tasks: test_privs.yml
+      vars:
+        current_privilege: SELECT
+        current_append_privs: no
 
     # ============================================================
     # Assert creating user with SELECT privileges, attempt to create database and append privileges to create database
     #
-    - include: test_privs.yml current_privilege=DROP current_append_privs=yes
+    - include_tasks: test_privs.yml
+      vars:
+        current_privilege: DROP
+        current_append_privs: yes
 
     # ============================================================
     # Assert create user with SELECT privileges, attempt to create database and update privileges to create database
     #
-    - include: test_privs.yml current_privilege='UPDATE,ALTER' current_append_privs=no
+    - include_tasks: test_privs.yml
+      vars:
+        current_privilege: 'UPDATE,ALTER'
+        current_append_privs: no
 
     # ============================================================
     # Assert creating user with SELECT privileges, attempt to create database and append privileges to create database
     #
-    - include: test_privs.yml current_privilege='INSERT,DELETE' current_append_privs=yes
+    - include_tasks: test_privs.yml
+      vars:
+        current_privilege: 'INSERT,DELETE'
+        current_append_privs: yes
 
     # Tests for the priv parameter with dict value (https://github.com/ansible/ansible/issues/57533)
-    - include: test_priv_dict.yml
+    - include_tasks: test_priv_dict.yml
 
     # Test that append_privs will not attempt to make a change where current privileges are a superset of new privileges
     # (https://github.com/ansible-collections/community.mysql/issues/69)
-    - include: test_priv_append.yml enable_check_mode=no
-    - include: test_priv_append.yml enable_check_mode=yes
+    - include_tasks: test_priv_append.yml
+      vars:
+        enable_check_mode: no
+    - include_tasks: test_priv_append.yml
+      vars:
+        enable_check_mode: yes
 
     # Test that subtract_privs will only revoke the grants given by priv
     # (https://github.com/ansible-collections/community.mysql/issues/331)
-    - include: test_priv_subtract.yml enable_check_mode=no
-    - include: test_priv_subtract.yml enable_check_mode=yes
+    - include_tasks: test_priv_subtract.yml
+      vars:
+        enable_check_mode: no
+    - include_tasks: test_priv_subtract.yml
+      vars:
+        enable_check_mode: yes
+
+    - import_tasks: test_privs_issue_465.yml
+      tags:
+        - issue_465
 
     # Tests for the TLS requires dictionary
-    - include: tls_requirements.yml
+    - include_tasks: test_tls_requirements.yml
 
     - import_tasks: issue-29511.yaml
       tags:
@@ -294,7 +280,9 @@
 
     # Test that mysql_user still works with force_context enabled (database set to "mysql")
     # (https://github.com/ansible-collections/community.mysql/issues/265)
-    - include: issue-265.yml
+    - include_tasks: issue-265.yml
 
     # https://github.com/ansible-collections/community.mysql/issues/231
-    - include: test_user_grants_with_roles_applied.yml
+    - include_tasks: test_user_grants_with_roles_applied.yml
+
+    - include_tasks: test_revoke_only_grant.yml

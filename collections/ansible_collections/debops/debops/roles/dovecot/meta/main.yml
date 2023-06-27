@@ -1,7 +1,7 @@
 ---
 # Copyright (C) 2015      Reto Gantenbein <reto.gantenbein@linuxmonk.ch>
 # Copyright (C) 2017-2020 Maciej Delmanowski <drybjed@gmail.com>
-# Copyright (C) 2015-2022 DebOps <https://debops.org/>
+# Copyright (C) 2015-2020 DebOps <https://debops.org/>
 # SPDX-License-Identifier: GPL-3.0-only
 
 # Ensure that custom Ansible plugins and modules included in the main DebOps
@@ -14,18 +14,13 @@ galaxy_info:
 
   author: 'Reto Gantenbein'
   description: 'Configure Dovecot IMAP/POP3 service'
-  company: 'DebOps'
   license: 'GPL-3.0-only'
   min_ansible_version: '1.7.0'
-
   platforms:
-
-    - name: 'Ubuntu'
-      versions: [ 'all' ]
-
-    - name: 'Debian'
-      versions: [ 'all' ]
-
+    - name: Debian
+      versions:
+        - wheezy
+        - jessie
   galaxy_tags:
     - imap
     - pop3

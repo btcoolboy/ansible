@@ -42,16 +42,16 @@ preseed__base_domain: '{{ preseed__subdomain + "." + ansible_domain }}'
 preseed__domains:
   - '{{ preseed__base_domain }}'
   - '{{ preseed__base_domain | split(".") | first }}'
-  - '{{ "~^(?<preseed>.+)\." + preseed__base_domain | replace(".", "\.") + "$" }}'
-  - '{{ "~^(?<preseed>.+)\." + ansible_domain | replace(".", "\.") + "$" }}'
-  - '{{ "~^(?<preseed>.+)\." + preseed__subdomain | replace(".", "\.") + "$" }}'
+  - '{{ "~^(?<preseed>.+)\." + preseed__base_domain | replace(".","\.") + "$" }}'
+  - '{{ "~^(?<preseed>.+)\." + ansible_domain       | replace(".","\.") + "$" }}'
+  - '{{ "~^(?<preseed>.+)\." + preseed__subdomain   | replace(".","\.") + "$" }}'
   - '{{ "~^(?<preseed>.+)$" }}'
 
                                                                    # ]]]
 # .. envvar:: preseed__www [[[
 #
 # Path to main directory where Preseed files are served from.
-preseed__www: '{{ (ansible_local.fhs.www | d("/srv/www"))
+preseed__www: '{{ (ansible_local.fhs.www|d("/srv/www"))
                   + "/sites/debian-preseed/public" }}'
                                                                    # ]]]
                                                                    # ]]]
@@ -62,7 +62,7 @@ preseed__www: '{{ (ansible_local.fhs.www | d("/srv/www"))
 #
 # List of SSH public keys installed on the ``root`` UNIX account of the
 # preseeded host.
-preseed__root_sshkeys: [ '{{ lookup("pipe", "ssh-add -L | grep ^\\\(sk-\\\)\\\?ssh || cat ~/.ssh/*.pub || cat ~/.ssh/authorized_keys || true") }}' ]  # noqa var-spacing
+preseed__root_sshkeys: [ '{{ lookup("pipe", "ssh-add -L | grep ^\\\(sk-\\\)\\\?ssh || cat ~/.ssh/*.pub || cat ~/.ssh/authorized_keys || true") }}' ]
 
                                                                    # ]]]
 # .. envvar:: preseed__admin_name [[[
@@ -83,7 +83,7 @@ preseed__admin_fullname: 'Ansible Control User'
 #
 # List of SSH public keys installed on the administrative UNIX account of the
 # preseeded host.
-preseed__admin_sshkeys: [ '{{ lookup("pipe", "ssh-add -L | grep ^\\\(sk-\\\)\\\?ssh || cat ~/.ssh/*.pub || cat ~/.ssh/authorized_keys || true") }}' ]  # noqa var-spacing
+preseed__admin_sshkeys: [ '{{ lookup("pipe", "ssh-add -L | grep ^\\\(sk-\\\)\\\?ssh || cat ~/.ssh/*.pub || cat ~/.ssh/authorized_keys || true") }}' ]
 
                                                                    # ]]]
 # .. envvar:: preseed__debian_postinst_commands [[[
@@ -159,6 +159,18 @@ preseed__debian_admin_password: "{{ lookup('password', secret + '/credentials/' 
 # List of Preseed definitions created by default by the role.
 preseed__default_definitions:
 
+  - name: 'debian-wheezy'
+    flavor: 'debian'
+    release: 'wheezy'
+    options: '{{ preseed__options_interactive_partman
+                 + preseed__options_enable_nonfree }}'
+
+  - name: 'debian-jessie'
+    flavor: 'debian'
+    release: 'jessie'
+    options: '{{ preseed__options_interactive_partman
+                 + preseed__options_enable_nonfree }}'
+
   - name: 'debian-stretch'
     flavor: 'debian'
     release: 'stretch'
@@ -176,6 +188,22 @@ preseed__default_definitions:
     release: 'bullseye'
     options: '{{ preseed__options_interactive_partman
                  + preseed__options_enable_nonfree }}'
+
+  - name: 'debian-wheezy-user'
+    flavor: 'debian-user'
+    release: 'wheezy'
+    options: '{{ preseed__options_interactive_partman
+                 + preseed__options_ansible_user
+                 + preseed__options_enable_nonfree }}'
+    admin_username: '{{ preseed__admin_name }}'
+
+  - name: 'debian-jessie-user'
+    flavor: 'debian-user'
+    release: 'jessie'
+    options: '{{ preseed__options_interactive_partman
+                 + preseed__options_ansible_user
+                 + preseed__options_enable_nonfree }}'
+    admin_username: '{{ preseed__admin_name }}'
 
   - name: 'debian-stretch-user'
     flavor: 'debian-user'
@@ -201,6 +229,14 @@ preseed__default_definitions:
                  + preseed__options_enable_nonfree }}'
     admin_username: '{{ preseed__admin_name }}'
 
+  - name: 'debian-wheezy-vm'
+    flavor: 'debian-vm'
+    release: 'wheezy'
+
+  - name: 'debian-jessie-vm'
+    flavor: 'debian-vm'
+    release: 'jessie'
+
   - name: 'debian-stretch-vm'
     flavor: 'debian-vm'
     release: 'stretch'
@@ -212,6 +248,18 @@ preseed__default_definitions:
   - name: 'debian-bullseye-vm'
     flavor: 'debian-vm'
     release: 'bullseye'
+
+  - name: 'debian-wheezy-vm-user'
+    flavor: 'debian-vm-user'
+    release: 'wheezy'
+    options: '{{ preseed__options_ansible_user }}'
+    admin_username: '{{ preseed__admin_name }}'
+
+  - name: 'debian-jessie-vm-user'
+    flavor: 'debian-vm-user'
+    release: 'jessie'
+    options: '{{ preseed__options_ansible_user }}'
+    admin_username: '{{ preseed__admin_name }}'
 
   - name: 'debian-stretch-vm-user'
     flavor: 'debian-vm-user'
@@ -311,7 +359,7 @@ preseed__original_configuration:
   - name: 'keyboard-configuration/xkb-keymap'
     comment: 'Keyboard selection.'
     type: 'select'
-    value: 'en'
+    value: 'us'
 
   - name: 'keyboard-configuration/toggle'
     type: 'select'
@@ -665,7 +713,7 @@ preseed__original_configuration:
       - home:   separate /home partition
       - multi:  separate /home, /var, and /tmp partitions
     type: 'select'
-    value: 'atomic'
+    value: 'multi'
 
   - name: 'partman-auto/expert_recipe_file'
     comment: |
@@ -991,7 +1039,7 @@ preseed__original_configuration:
     option: 'grub-installer/only_debian'
     comment: |
       Alternatively, if you want to install to a location other than the UEFI
-      parition/boot record, uncomment and edit these lines:
+      partition/boot record, uncomment and edit these lines:
     value: False
     state: 'comment'
 
@@ -1134,9 +1182,6 @@ preseed__default_configuration:
   - name: 'debian-installer/locale'
     value: '{{ ansible_local.locales.system_locale | d("en_US.UTF-8") }}'
 
-  - name: 'keyboard-configuration/xkb-keymap'
-    value: '{{ ansible_local.locales.system_language | d("en") }}'
-
   - name: 'mirror/http/hostname'
     value: 'deb.debian.org'
 
@@ -1186,6 +1231,10 @@ preseed__default_configuration:
   - name: 'apt-setup/cdrom/set-failed'
     copy_id_from: 'apt-setup/multiarch'
     value: False
+
+  - name: 'apt-setup/disable-cdrom-entries'
+    copy_id_from: 'apt-setup/multiarch'
+    value: True
 
   - name: 'tasksel/first'
     value: 'ssh-server'
@@ -1408,6 +1457,6 @@ preseed__nginx__dependent_servers:
         types {
                 text/plain cfg sh;
         }
-    state: '{{ "present" if (ansible_local.pki.enabled | d()) | bool else "absent" }}'
+    state: '{{ "present" if (ansible_local.pki.enabled|d())|bool else "absent" }}'
                                                                    # ]]]
                                                                    # ]]]

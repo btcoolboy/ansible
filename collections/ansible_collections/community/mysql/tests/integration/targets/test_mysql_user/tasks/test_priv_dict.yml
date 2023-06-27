@@ -1,24 +1,25 @@
+---
 - vars:
     mysql_parameters: &mysql_params
       login_user: '{{ mysql_user }}'
       login_password: '{{ mysql_password }}'
-      login_host: 127.0.0.1
+      login_host: '{{ mysql_host }}'
       login_port: '{{ mysql_primary_port }}'
 
   block:
 
     # Tests for priv parameter value passed as a dict
-    - name: Create test databases
+    - name: Priv dict | Create test databases
       mysql_db:
         <<: *mysql_params
         name: '{{ item }}'
         state: present
       loop:
-      - data1
-      - data2
-      - data3
+        - data1
+        - data2
+        - data3
 
-    - name: Create user with privileges
+    - name: Priv dict | Create user with privileges
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_3 }}'
@@ -28,7 +29,7 @@
           "data2.*": "SELECT"
         state: present
 
-    - name: Run command to show privileges for user (expect privileges in stdout)
+    - name: Priv dict | Run command to show privileges for user (expect privileges in stdout)
       command: "{{ mysql_command }} -e \"SHOW GRANTS FOR '{{ user_name_3 }}'@'localhost'\""
       register: result
 
@@ -39,12 +40,12 @@
           - "'GRANT SELECT ON `data2`.*' in result.stdout"
 
     # Issue https://github.com/ansible-collections/community.mysql/issues/99
-    - name: Create test table test_table_issue99
+    - name: Priv dict | Create test table test_table_issue99
       mysql_query:
         <<: *mysql_params
         query: "CREATE TABLE IF NOT EXISTS data3.test_table_issue99 (a INT, b INT, c INT)"
 
-    - name: Grant select on a column
+    - name: Priv dict | Grant select on a column
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_3 }}'
@@ -52,11 +53,12 @@
           'data3.test_table_issue99': 'SELECT (a)'
       register: result
 
-    - assert:
+    - name: Priv dict | Assert that select on a column is changed
+      assert:
         that:
-        - result is changed
+          - result is changed
 
-    - name: Grant select on the column again
+    - name: Priv dict | Grant select on the column again
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_3 }}'
@@ -64,12 +66,12 @@
           'data3.test_table_issue99': 'SELECT (a)'
       register: result
 
-    - assert:
+    - name: Priv dict | Assert that select on the column is not changed
+      assert:
         that:
-        - result is not changed
+          - result is not changed
 
-
-    - name: Grant select on columns
+    - name: Priv dict | Grant select on columns
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_3 }}'
@@ -77,11 +79,12 @@
           'data3.test_table_issue99': 'SELECT (a, b),INSERT'
       register: result
 
-    - assert:
+    - name: Priv dict | Assert select on columns is changed
+      assert:
         that:
-        - result is changed
+          - result is changed
 
-    - name: Grant select on columns again
+    - name: Priv dict | Grant select on columns again
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_3 }}'
@@ -89,11 +92,12 @@
           'data3.test_table_issue99': 'SELECT (a, b),INSERT'
       register: result
 
-    - assert:
+    - name: Priv dict | Assert that select on columns again is not changed
+      assert:
         that:
-        - result is not changed
+          - result is not changed
 
-    - name: Grant privs on columns
+    - name: Priv dict | Grant privs on columns
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_3 }}'
@@ -101,11 +105,12 @@
           'data3.test_table_issue99': 'SELECT (a, b), INSERT (a, b), UPDATE'
       register: result
 
-    - assert:
+    - name: Priv dict | Assert that grant privs on columns is changed
+      assert:
         that:
-        - result is changed
+          - result is changed
 
-    - name: Grant same privs on columns again, note that the column order is different
+    - name: Priv dict | Grant same privs on columns again, note that the column order is different
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_3 }}'
@@ -113,21 +118,22 @@
           'data3.test_table_issue99': 'SELECT (a, b), UPDATE, INSERT (b, a)'
       register: result
 
-    - assert:
+    - name: Priv dict | Assert that grants same privs with different order is not changed
+      assert:
         that:
-        - result is not changed
+          - result is not changed
 
-    - name: Run command to show privileges for user (expect privileges in stdout)
+    - name: Priv dict | Run command to show privileges for user (expect privileges in stdout)
       command: "{{ mysql_command }} -e \"SHOW GRANTS FOR '{{ user_name_3 }}'@'localhost'\""
       register: result
 
-    - name: Assert user has giving privileges
+    - name: Priv dict | Assert user has giving privileges
       assert:
         that:
           - "'GRANT SELECT (`A`, `B`), INSERT (`A`, `B`), UPDATE' in result.stdout"
       when: "'(`A`, `B`)' in result.stdout"
 
-    - name: Assert user has giving privileges
+    - name: Priv dict | Assert user has giving privileges
       assert:
         that:
           - "'GRANT SELECT (A, B), INSERT (A, B), UPDATE' in result.stdout"
@@ -135,18 +141,16 @@
 
     ##########
     # Clean up
-    - name: Drop test databases
+    - name: Priv dict | Drop test databases
       mysql_db:
         <<: *mysql_params
         name: '{{ item }}'
         state: present
       loop:
-      - data1
-      - data2
-      - data3
+        - data1
+        - data2
+        - data3
 
-    - name: Drop test user
-      mysql_user:
-        <<: *mysql_params
-        name: '{{ user_name_3 }}'
-        state: absent
+    - include_tasks: utils/remove_user.yml
+      vars:
+        user_name: "{{ user_name_3 }}"

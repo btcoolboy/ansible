@@ -27,9 +27,9 @@
 # POSIX capability is set on the host.
 ferm__enabled: '{{ True
                    if (ansible_system_capabilities is undefined or
-                       (((ansible_system_capabilities_enforced | d()) | bool and
+                       (((ansible_system_capabilities_enforced|d())|bool and
                          "cap_net_admin" in ansible_system_capabilities) or
-                        not (ansible_system_capabilities_enforced | d(True)) | bool))
+                        not (ansible_system_capabilities_enforced|d(True))|bool))
                    else False }}'
 
                                                                    # ]]]
@@ -46,9 +46,9 @@ ferm__flush: '{{ ferm__enabled | bool }}'
 # Enable or disable configuration of the :command:`iptables` backend symlink
 # using the "alternatives" system, supported on Debian 10 and later.
 ferm__iptables_backend_enabled: '{{ False
-                                    if ansible_distribution_release in
-                                    ["stretch", "trusty", "xenial",
-                                     "bionic", "focal"]
+                                    if ansible_distribution_release in [ "wheezy", "jessie", "stretch",
+                                                                         "trusty", "xenial", "bionic",
+                                                                         "focal" ]
                                     else True }}'
 
                                                                    # ]]]
@@ -89,9 +89,9 @@ ferm__packages: []
 #   Enables IPv6 support (:command:`ip6tables`).
 #
 ferm__domains: '{{ lookup("flattened",
-                          ((["ip"] if (ansible_all_ipv4_addresses | d()) else [])
-                           + (["ip6"] if (ansible_all_ipv6_addresses | d()) else [])),
-                          wantlist=True) }}'
+                   ( ([ "ip"  ] if (ansible_all_ipv4_addresses|d()) else [])
+                   + ([ "ip6" ] if (ansible_all_ipv6_addresses|d()) else []) )
+                   , wantlist=True ) }}'
 
                                                                    # ]]]
 # .. envvar:: ferm__ansible_controllers [[[
@@ -470,7 +470,7 @@ ferm__default_rules:
     comment: 'Define custom variables available in the firewall'
     rules: |
       @def $domains      = ({{ ferm__domains | unique | join(" ") }});
-      @def $ipv4_enabled = {{ "1" if "ip" in ferm__domains else "0" }};
+      @def $ipv4_enabled = {{ "1" if "ip"  in ferm__domains else "0" }};
       @def $ipv6_enabled = {{ "1" if "ip6" in ferm__domains else "0" }};
 
   - name: 'firewall_log'
@@ -579,13 +579,13 @@ ferm__default_rules:
     protocol: 'udp'
     accept_any: True
     rule_state: '{{ "present"
-                    if ((ansible_local.nsswitch.conf | d() and
+                    if ((ansible_local.nsswitch.conf|d() and
                          ("mdns4_minimal" in q("flattened",
-                                               ansible_local.nsswitch.conf.hosts | d([])) or
+                                               ansible_local.nsswitch.conf.hosts|d([])) or
                           "mdns_minimal" in q("flattened",
-                                              ansible_local.nsswitch.conf.hosts | d([])))) and
-                        (ansible_local | d(True) and ansible_local.avahi | d(True) and
-                         ((ansible_local["avahi"] | d({})).enabled | d(True)) | bool))
+                                              ansible_local.nsswitch.conf.hosts|d([])))) and
+                        (ansible_local|d(True) and ansible_local.avahi|d(True) and
+                         ((ansible_local["avahi"]|d({})).enabled|d(True))|bool))
                     else "absent" }}'
 
   - name: 'jump_to_legacy_input_rules'
@@ -617,7 +617,7 @@ ferm__default_rules:
   - name: 'fail2ban-hook'
     type: 'fail2ban'
     comment: 'Reload fail2ban rules'
-    rule_state: '{{ "present" if (ferm__fail2ban | bool) else "absent" }}'
+    rule_state: '{{ "present" if (ferm__fail2ban  | bool) else "absent" }}'
     rules: |
       @hook post "type fail2ban-server > /dev/null && (fail2ban-client ping > /dev/null && fail2ban-client reload > /dev/null || true) || true";
       @hook flush "type fail2ban-server > /dev/null && (fail2ban-client ping > /dev/null && fail2ban-client reload > /dev/null || true) || true";

@@ -24,16 +24,16 @@
 # Enable or disable support for local device mounts, bind mounts and custom
 # directories.
 mount__enabled: '{{ True
-                    if (((ansible_system_capabilities_enforced | d()) | bool and
+                    if (((ansible_system_capabilities_enforced|d())|bool and
                          "cap_sys_admin" in ansible_system_capabilities) or
-                        not (ansible_system_capabilities_enforced | d(True)) | bool)
+                        not (ansible_system_capabilities_enforced|d(True))|bool)
                     else False }}'
 
                                                                    # ]]]
 # .. envvar:: mount__base_packages [[[
 #
 # List of APT packages to install for correct filesystem management.
-mount__base_packages: '{{ ["acl"]
+mount__base_packages: '{{ [ "acl" ]
                           if (((mount__directories
                                 + mount__group_directories
                                 + mount__host_directories)
@@ -96,6 +96,33 @@ mount__group_directories: []
 #
 # List of directories to manage on specific hosts in the Ansible inventory.
 mount__host_directories: []
+                                                                   # ]]]
+                                                                   # ]]]
+# Manage custom files [[[
+# -----------------------
+
+# These variables can be used to create custom files that can hold credentials
+# and can be referenced in the :file:`/etc/fstab` database.
+#
+# See :ref:`resources__ref_files` for more details (the same syntax is used in
+# both roles).
+
+# .. envvar:: mount__files [[[
+#
+# Manage file contents on all hosts in Ansible inventory.
+mount__files: []
+
+                                                                   # ]]]
+# .. envvar:: mount__group_files [[[
+#
+# Manage file contents on hosts in a specific group in Ansible inventory.
+mount__group_files: []
+
+                                                                   # ]]]
+# .. envvar:: mount__host_files [[[
+#
+# Manage file contents on specific hosts in Ansible inventory.
+mount__host_files: []
                                                                    # ]]]
                                                                    # ]]]
 # Bind mounts [[[

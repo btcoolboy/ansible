@@ -4,14 +4,12 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Install Box Backup server packages
-  ansible.builtin.package:
-    name: 'boxbackup-server'
-    state: 'present'
+  apt: pkg=boxbackup-server state=present install_recommends=no
   register: boxbackup__register_server_packages
   until: boxbackup__register_server_packages is succeeded
 
 - name: Make sure that boxbackup server directories exists
-  ansible.builtin.file:
+  file:
     path: '{{ item }}'
     state: 'directory'
     owner: 'bbstored'
@@ -21,7 +19,7 @@
                 '{{ boxbackup_storage }}', '{{ boxbackup_storage }}/backup' ]
 
 - name: Check block size of storage device
-  ansible.builtin.shell: "set -o nounset -o pipefail -o errexit &&
+  shell: "set -o nounset -o pipefail -o errexit &&
           dumpe2fs -h $(df {{ boxbackup_storage }} | tail -n 1 \
           | awk '{ print $1 }') | grep 'Block size' | awk '{ print $3 }'"
   args:
@@ -30,7 +28,7 @@
   changed_when: False
 
 - name: Make sure accounts.txt file exists
-  ansible.builtin.copy:
+  copy:
     force: false
     dest: /etc/boxbackup/bbstored/accounts.txt
     content: ''
@@ -39,7 +37,7 @@
     mode: '0600'
 
 - name: Configure boxbackup server
-  ansible.builtin.template:
+  template:
     src: '{{ item }}.j2'
     dest: '/{{ item }}'
     owner: 'bbstored'

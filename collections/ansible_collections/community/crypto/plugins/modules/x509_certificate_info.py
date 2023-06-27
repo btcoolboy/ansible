@@ -40,6 +40,7 @@ options:
         description:
             - Remote absolute path where the certificate file is loaded from.
             - Either I(path) or I(content) must be specified, but not both.
+            - PEM and DER formats are supported.
         type: path
     content:
         description:
@@ -73,6 +74,10 @@ notes:
 seealso:
     - module: community.crypto.x509_certificate
     - module: community.crypto.x509_certificate_pipe
+    - ref: community.crypto.x509_certificate_info filter <ansible_collections.community.crypto.x509_certificate_info_filter>
+    # - plugin: community.crypto.x509_certificate_info
+    #   plugin_type: filter
+      description: A filter variant of this module.
 '''
 
 EXAMPLES = r'''
@@ -110,7 +115,7 @@ EXAMPLES = r'''
   register: result
 
 - name: Validate that certificate is valid tomorrow, but not in three weeks
-  assert:
+  ansible.builtin.assert:
     that:
       - result.valid_at.point_1      # valid in one day
       - not result.valid_at.point_2  # not valid in three weeks
@@ -443,7 +448,7 @@ def main():
             valid_at[k] = get_relative_time_option(v, 'valid_at.{0}'.format(k))
 
     try:
-        result = module_backend.get_info()
+        result = module_backend.get_info(der_support_enabled=module.params['content'] is None)
 
         not_before = module_backend.get_not_before()
         not_after = module_backend.get_not_after()

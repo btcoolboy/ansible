@@ -13,12 +13,17 @@ module: ipa_group
 author: Thomas Krahn (@Nosmoht)
 short_description: Manage FreeIPA group
 description:
-- Add, modify and delete group within IPA server
+  - Add, modify and delete group within IPA server
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   append:
     description:
-    - If C(true), add the listed I(user) and I(group) to the group members.
-    - If C(false), only the listed I(user) and I(group) will be group members, removing any other members.
+    - If V(true), add the listed O(user) and O(group) to the group members.
+    - If V(false), only the listed O(user) and O(group) will be group members, removing any other members.
     default: false
     type: bool
     version_added: 4.0.0
@@ -45,9 +50,9 @@ options:
   group:
     description:
     - List of group names assigned to this group.
-    - If I(append=false) and an empty list is passed all groups will be removed from this group.
+    - If O(append=false) and an empty list is passed all groups will be removed from this group.
     - Groups that are already assigned but not passed will be removed.
-    - If I(append=true) the listed groups will be assigned without removing other groups.
+    - If O(append=true) the listed groups will be assigned without removing other groups.
     - If option is omitted assigned groups will not be checked or changed.
     type: list
     elements: str
@@ -58,12 +63,23 @@ options:
   user:
     description:
     - List of user names assigned to this group.
-    - If I(append=false) and an empty list is passed all users will be removed from this group.
+    - If O(append=false) and an empty list is passed all users will be removed from this group.
     - Users that are already assigned but not passed will be removed.
-    - If I(append=true) the listed users will be assigned without removing other users.
+    - If O(append=true) the listed users will be assigned without removing other users.
     - If option is omitted assigned users will not be checked or changed.
     type: list
     elements: str
+  external_user:
+    description:
+    - List of external users assigned to this group.
+    - Behaves identically to O(user) with respect to O(append) attribute.
+    - List entries can be in V(DOMAIN\\\\username) or SID format.
+    - Unless SIDs are provided, the module will always attempt to make changes even if the group already has all the users.
+      This is because only SIDs are returned by IPA query.
+    - O(external=true) is needed for this option to work.
+    type: list
+    elements: str
+    version_added: 6.3.0
   state:
     description:
     - State to ensure
@@ -71,7 +87,8 @@ options:
     choices: ["absent", "present"]
     type: str
 extends_documentation_fragment:
-- community.general.ipa.documentation
+  - community.general.ipa.documentation
+  - community.general.attributes
 
 '''
 
@@ -115,6 +132,28 @@ EXAMPLES = r'''
     ipa_host: ipa.example.com
     ipa_user: admin
     ipa_pass: topsecret
+
+- name: Add external user to a group
+  community.general.ipa_group:
+   name: developers
+   external: true
+   append: true
+   external_user:
+   - S-1-5-21-123-1234-12345-63421
+   ipa_host: ipa.example.com
+   ipa_user: admin
+   ipa_pass: topsecret
+
+- name: Add a user from MYDOMAIN
+  community.general.ipa_group:
+   name: developers
+   external: true
+   append: true
+   external_user:
+   - MYDOMAIN\\john
+   ipa_host: ipa.example.com
+   ipa_user: admin
+   ipa_pass: topsecret
 
 - name: Ensure group is absent
   community.general.ipa_group:
@@ -164,6 +203,9 @@ class GroupIPAClient(IPAClient):
     def group_add_member_user(self, name, item):
         return self.group_add_member(name=name, item={'user': item})
 
+    def group_add_member_externaluser(self, name, item):
+        return self.group_add_member(name=name, item={'ipaexternalmember': item})
+
     def group_remove_member(self, name, item):
         return self._post_json(method='group_remove_member', name=name, item=item)
 
@@ -172,6 +214,9 @@ class GroupIPAClient(IPAClient):
 
     def group_remove_member_user(self, name, item):
         return self.group_remove_member(name=name, item={'user': item})
+
+    def group_remove_member_externaluser(self, name, item):
+        return self.group_remove_member(name=name, item={'ipaexternalmember': item})
 
 
 def get_group_dict(description=None, external=None, gid=None, nonposix=None):
@@ -208,11 +253,18 @@ def ensure(module, client):
     name = module.params['cn']
     group = module.params['group']
     user = module.params['user']
+    external = module.params['external']
+    external_user = module.params['external_user']
     append = module.params['append']
 
-    module_group = get_group_dict(description=module.params['description'], external=module.params['external'],
-                                  gid=module.params['gidnumber'], nonposix=module.params['nonposix'])
+    module_group = get_group_dict(description=module.params['description'],
+                                  external=external,
+                                  gid=module.params['gidnumber'],
+                                  nonposix=module.params['nonposix'])
     ipa_group = client.group_find(name=name)
+
+    if (not (external or external_user is None)):
+        module.fail_json("external_user can only be set if external = True")
 
     changed = False
     if state == 'present':
@@ -242,6 +294,11 @@ def ensure(module, client):
                                             client.group_remove_member_user,
                                             append=append) or changed
 
+        if external_user is not None:
+            changed = client.modify_if_diff(name, ipa_group.get('ipaexternalmember', []), external_user,
+                                            client.group_add_member_externaluser,
+                                            client.group_remove_member_externaluser,
+                                            append=append) or changed
     else:
         if ipa_group:
             changed = True
@@ -256,6 +313,7 @@ def main():
     argument_spec.update(cn=dict(type='str', required=True, aliases=['name']),
                          description=dict(type='str'),
                          external=dict(type='bool'),
+                         external_user=dict(type='list', elements='str'),
                          gidnumber=dict(type='str', aliases=['gid']),
                          group=dict(type='list', elements='str'),
                          nonposix=dict(type='bool'),

@@ -4,10 +4,11 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Remove user groups if requested
-  ansible.builtin.group:
+  group:
     name: '{{ item.group | default(item.name + gitusers_name_suffix) }}'
     state: 'absent'
-  loop: '{{ q("flattened", gitusers_list
-                           + gitusers_group_list
-                           + gitusers_host_list) }}'
+  with_flattened:
+    - '{{ gitusers_list }}'
+    - '{{ gitusers_group_list }}'
+    - '{{ gitusers_host_list }}'
   when: (item.name is defined and (item.state is defined and item.state == 'absent'))

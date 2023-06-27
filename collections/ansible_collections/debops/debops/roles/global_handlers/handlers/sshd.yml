@@ -5,10 +5,11 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Test sshd configuration and restart
-  ansible.builtin.command: sshd -t
+  command: sshd -t
   notify: [ 'Restart sshd' ]
 
 - name: Restart sshd
-  ansible.builtin.service:
+  service:
     name: 'ssh'
     state: 'restarted'
+  when: (ansible_local.sshd.socket_activation | d('disabled')) == 'disabled'

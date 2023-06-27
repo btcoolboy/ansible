@@ -17,13 +17,13 @@
   pre_tasks:
 
     - name: Prepare dovecot environment
-      ansible.builtin.import_role:
+      import_role:
         name: 'dovecot'
         tasks_from: 'main_env'
       tags: [ 'role::dovecot', 'role::secret', 'role::ferm' ]
 
     - name: Prepare postfix environment
-      ansible.builtin.import_role:
+      import_role:
         name: 'postfix'
         tasks_from: 'main_env'
       vars:

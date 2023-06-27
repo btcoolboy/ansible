@@ -15,6 +15,13 @@ module: gem
 short_description: Manage Ruby gems
 description:
   - Manage installation and uninstallation of Ruby gems.
+extends_documentation_fragment:
+  - community.general.attributes
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 options:
   name:
     type: str
@@ -24,7 +31,7 @@ options:
   state:
     type: str
     description:
-      - The desired state of the gem. C(latest) ensures that the latest version is installed.
+      - The desired state of the gem. V(latest) ensures that the latest version is installed.
     required: false
     choices: [present, absent, latest]
     default: present
@@ -73,7 +80,7 @@ options:
     default: true
     description:
     - Avoid loading any C(.gemrc) file. Ignored for RubyGems prior to 2.5.2.
-    - The default changed from C(false) to C(true) in community.general 6.0.0.
+    - The default changed from V(false) to V(true) in community.general 6.0.0.
     version_added: 3.3.0
   env_shebang:
     description:
@@ -105,7 +112,7 @@ options:
     required: false
   force:
     description:
-      - Force gem to install, bypassing dependency checks.
+      - Force gem to (un-)install, bypassing dependency checks.
     required: false
     default: false
     type: bool
@@ -234,7 +241,9 @@ def uninstall(module):
         cmd.extend(['--version', module.params['version']])
     else:
         cmd.append('--all')
-        cmd.append('--executable')
+    cmd.append('--executable')
+    if module.params['force']:
+        cmd.append('--force')
     cmd.append(module.params['name'])
     module.run_command(cmd, environ_update=environ, check_rc=True)
 

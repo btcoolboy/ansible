@@ -4,5 +4,5 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Prepare OpenDKIM environment
-  ansible.builtin.set_fact:
+  set_fact:
     opendkim__secret__directories: '{{ lookup("template", "lookup/opendkim__secret__directories.j2") | from_yaml }}'

@@ -1,3 +1,4 @@
+---
 # test code for privileges for mysql_user module
 # (c) 2014,  Wayne Rosario <wrosario@ansible.com>
 
@@ -20,56 +21,62 @@
     mysql_parameters: &mysql_params
       login_user: '{{ mysql_user }}'
       login_password: '{{ mysql_password }}'
-      login_host: 127.0.0.1
+      login_host: '{{ mysql_host }}'
       login_port: '{{ mysql_primary_port }}'
 
   block:
 
     # ============================================================
-    - name: create user with basic select privileges
+    - name: Privs | Create user with basic select privileges
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_2 }}'
+        host: '%'
         password: '{{ user_password_2 }}'
         priv: '*.*:SELECT'
         state: present
       when: current_append_privs ==  "yes"
 
-    - include: assert_user.yml user_name={{user_name_2}} priv='SELECT'
+    - include_tasks: utils/assert_user.yml
+      vars:
+        user_name: "{{ user_name_2 }}"
+        user_host: "%"
+        priv: 'SELECT'
       when: current_append_privs ==  "yes"
 
-    - name: create user with current privileges (expect changed=true)
+    - name: Privs | Create user with current privileges (expect changed=true)
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_2 }}'
+        host: '%'
         password: '{{ user_password_2 }}'
-        priv: '*.*:{{current_privilege}}'
-        append_privs: '{{current_append_privs}}'
+        priv: '*.*:{{ current_privilege }}'
+        append_privs: '{{ current_append_privs }}'
         state: present
       register: result
 
-    - name: assert output message for current privileges
+    - name: Privs | Assert output message for current privileges
       assert:
         that:
           - result is changed
 
-    - name: run command to show privileges for user (expect privileges in stdout)
-      command: "{{ mysql_command }} -e \"SHOW GRANTS FOR '{{user_name_2}}'@'localhost'\""
+    - name: Privs | Run command to show privileges for user (expect privileges in stdout)
+      command: "{{ mysql_command }} -e \"SHOW GRANTS FOR '{{user_name_2}}'@'%'\""
       register: result
 
-    - name: assert user has correct privileges
+    - name: Privs | Assert user has correct privileges
       assert:
         that:
-          - "'GRANT {{current_privilege | replace(',', ', ')}} ON *.*' in result.stdout"
+          - "'GRANT {{ current_privilege | replace(',', ', ') }} ON *.*' in result.stdout"
       when: current_append_privs ==  "no"
 
-    - name: assert user has correct privileges
+    - name: Privs | Assert user has correct privileges
       assert:
         that:
-          - "'GRANT SELECT, {{current_privilege | replace(',', ', ')}} ON *.*' in result.stdout"
+          - "'GRANT SELECT, {{ current_privilege | replace(',', ', ') }} ON *.*' in result.stdout"
       when: current_append_privs ==  "yes"
 
-    - name: create database using user current privileges
+    - name: Privs | Create database using user current privileges
       mysql_db:
         login_user: '{{ user_name_2 }}'
         login_password: '{{ user_password_2 }}'
@@ -79,56 +86,59 @@
         state: present
       ignore_errors: true
 
-    - name: run command to test that database was not created
+    - name: Privs | Run command to test that database was not created
       command: "{{ mysql_command }} -e \"show databases like '{{ db_name }}'\""
       register: result
 
-    - name: assert database was not created
+    - name: Privs | Assert database was not created
       assert:
         that:
-          - "'{{ db_name }}' not in result.stdout"
+          - db_name not in result.stdout
 
     # ============================================================
-    - name: Add privs to a specific table (expect changed)
+    - name: Privs | Add privs to a specific table (expect changed)
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_2 }}'
+        host: '%'
         password: '{{ user_password_2 }}'
         priv: 'jmainguy.jmainguy:ALL'
         state: present
       register: result
 
-    - name: Assert that priv changed
+    - name: Privs | Assert that priv changed
       assert:
         that:
           - result is changed
 
-    - name: Add privs to a specific table (expect ok)
+    - name: Privs | Add privs to a specific table (expect ok)
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_2 }}'
+        host: '%'
         password: '{{ user_password_2 }}'
         priv: 'jmainguy.jmainguy:ALL'
         state: present
       register: result
 
-    - name: Assert that priv did not change
+    - name: Privs | Assert that priv did not change
       assert:
         that:
           - result is not changed
 
     # ============================================================
-    - name: update user with all privileges
+    - name: Privs | Grant ALL to user {{ user_name_2 }}
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_2 }}'
+        host: '%'
         password: '{{ user_password_2 }}'
         priv: '*.*:ALL'
         state: present
 
-    # - include: assert_user.yml user_name={{user_name_2}} priv='ALL PRIVILEGES'
+    # - include_tasks: utils/assert_user.yml user_name={{user_name_2}} user_host=% priv='ALL PRIVILEGES'
 
-    - name: create database using user
+    - name: Privs | Create database using user {{ user_name_2 }}
       mysql_db:
         login_user: '{{ user_name_2 }}'
         login_password: '{{ user_password_2 }}'
@@ -137,10 +147,10 @@
         name: '{{ db_name }}'
         state: present
 
-    - name: run command to test database was created using user new privileges
+    - name: Privs | Run command to test database was created using user new privileges
       command: "{{ mysql_command }} -e \"SHOW CREATE DATABASE {{ db_name }}\""
 
-    - name: drop database using user
+    - name: Privs | Drop database using user {{ user_name_2 }}
       mysql_db:
         login_user: '{{ user_name_2 }}'
         login_password: '{{ user_password_2 }}'
@@ -150,24 +160,26 @@
         state: absent
 
     # ============================================================
-    - name: update user with a long privileges list (mysql has a special multiline grant output)
+    - name: Privs | Update user with a long privileges list (mysql has a special multiline grant output)
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_2 }}'
+        host: '%'
         password: '{{ user_password_2 }}'
         priv: '*.*:CREATE USER,FILE,PROCESS,RELOAD,REPLICATION CLIENT,REPLICATION SLAVE,SHOW DATABASES,SHUTDOWN,SUPER,CREATE,DROP,EVENT,LOCK TABLES,INSERT,UPDATE,DELETE,SELECT,SHOW VIEW,GRANT'
         state: present
       register: result
 
-    - name: Assert that priv changed
+    - name: Privs | Assert that priv changed
       assert:
         that:
           - result is changed
 
-    - name: Test idempotency with a long privileges list (expect ok)
+    - name: Privs | Test idempotency with a long privileges list (expect ok)
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_2 }}'
+        host: '%'
         password: '{{ user_password_2 }}'
         priv: '*.*:CREATE USER,FILE,PROCESS,RELOAD,REPLICATION CLIENT,REPLICATION SLAVE,SHOW DATABASES,SHUTDOWN,SUPER,CREATE,DROP,EVENT,LOCK TABLES,INSERT,UPDATE,DELETE,SELECT,SHOW VIEW,GRANT'
         state: present
@@ -175,20 +187,17 @@
 
     # FIXME: on mysql >=8 and mariadb >=10.5.2 there's always a change because
     # the REPLICATION CLIENT privilege was renamed to BINLOG MONITOR
-    - name: Assert that priv did not change
+    - name: Privs | Assert that priv did not change
       assert:
         that:
           - result is not changed
 
-    - name: remove username
-      mysql_user:
-        <<: *mysql_params
-        name: '{{ user_name_2 }}'
-        password: '{{ user_password_2 }}'
-        state: absent
+    - include_tasks: utils/remove_user.yml
+      vars:
+        user_name: "{{ user_name_2 }}"
 
     # ============================================================
-    - name: grant all privileges with grant option
+    - name: Privs | Grant all privileges with grant option
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_2 }}'
@@ -197,23 +206,23 @@
         state: present
       register: result
 
-    - name: Assert that priv changed
+    - name: Privs | Assert that priv changed
       assert:
         that:
           - result is changed
 
-    - name: Collect user info by host
+    - name: Privs | Collect user info by host
       community.mysql.mysql_info:
         <<: *mysql_params
         filter: "users"
       register: mysql_info_about_users
 
-    - name: Assert that 'GRANT' permission is present
+    - name: Privs | Assert that 'GRANT' permission is present
       assert:
         that:
           - mysql_info_about_users.users.localhost.{{ user_name_2 }}.Grant_priv == 'Y'
 
-    - name: Test idempotency (expect ok)
+    - name: Privs | Test idempotency (expect ok)
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_2 }}'
@@ -223,24 +232,24 @@
       register: result
 
     # FIXME: on mysql >=8 there's always a change (ALL PRIVILEGES -> specific privileges)
-    - name: Assert that priv did not change
+    - name: Privs | Assert that priv did not change
       assert:
         that:
           - result is not changed
 
-    - name: Collect user info by host
+    - name: Privs | Collect user info by host
       community.mysql.mysql_info:
         <<: *mysql_params
         filter: "users"
       register: mysql_info_about_users
 
-    - name: Assert that 'GRANT' permission is present
+    - name: Privs | Assert that 'GRANT' permission is present (by host)
       assert:
         that:
           - mysql_info_about_users.users.localhost.{{ user_name_2 }}.Grant_priv == 'Y'
 
     # ============================================================
-    - name: update user with invalid privileges
+    - name: Privs | Update user with invalid privileges
       mysql_user:
         <<: *mysql_params
         name: '{{ user_name_2 }}'
@@ -250,15 +259,12 @@
       register: result
       ignore_errors: yes
 
-    - name: Assert that priv did not change
+    - name: Privs | Assert that priv did not change
       assert:
         that:
           - result is failed
           - "'Error granting privileges' in result.msg"
 
-    - name: remove username
-      mysql_user:
-        <<: *mysql_params
-        name: '{{ user_name_2 }}'
-        password: '{{ user_password_2 }}'
-        state: absent
+    - include_tasks: utils/remove_user.yml
+      vars:
+        user_name: "{{ user_name_2 }}"

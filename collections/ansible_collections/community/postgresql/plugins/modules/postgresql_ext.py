@@ -100,27 +100,23 @@ seealso:
 - name: DROP EXTENSION reference
   description: Complete reference of the DROP EXTENSION command documentation.
   link: https://www.postgresql.org/docs/current/sql-droppublication.html
+
 notes:
-- Supports C(check_mode).
-- The default authentication assumes that you are either logging in as
-  or sudo'ing to the C(postgres) account on the host.
-- This module uses I(psycopg2), a Python PostgreSQL database adapter.
-- You must ensure that C(psycopg2) is installed on the host before using this module.
-- If the remote host is the PostgreSQL server (which is the default case),
-  then PostgreSQL must also be installed on the remote host.
-- For Ubuntu-based systems, install the C(postgresql), C(libpq-dev),
-  and C(python-psycopg2) packages on the remote host before using this module.
 - Incomparable versions, for example PostGIS ``unpackaged``, cannot be installed.
-requirements: [ psycopg2 ]
+
+attributes:
+  check_mode:
+    support: full
+
 author:
 - Daniel Schep (@dschep)
 - Thomas O'Donnell (@andytom)
 - Sandro Santilli (@strk)
 - Andrew Klychkov (@Andersson007)
 - Keith Fiske (@keithf4)
+
 extends_documentation_fragment:
 - community.postgresql.postgres
-
 '''
 
 EXAMPLES = r'''

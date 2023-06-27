@@ -143,9 +143,9 @@ class CertificateInfoRetrieval(object):
     def _get_issuer_uri(self):
         pass
 
-    def get_info(self, prefer_one_fingerprint=False):
+    def get_info(self, prefer_one_fingerprint=False, der_support_enabled=False):
         result = dict()
-        self.cert = load_certificate(None, content=self.content, backend=self.backend)
+        self.cert = load_certificate(None, content=self.content, backend=self.backend, der_support_enabled=der_support_enabled)
 
         result['signature_algorithm'] = self._get_signature_algorithm()
         subject = self._get_subject_ordered()
@@ -171,7 +171,7 @@ class CertificateInfoRetrieval(object):
         result['not_after'] = not_after.strftime(TIMESTAMP_FORMAT)
         result['expired'] = not_after < datetime.datetime.utcnow()
 
-        result['public_key'] = self._get_public_key_pem()
+        result['public_key'] = to_native(self._get_public_key_pem())
 
         public_key_info = get_publickey_info(
             self.module,

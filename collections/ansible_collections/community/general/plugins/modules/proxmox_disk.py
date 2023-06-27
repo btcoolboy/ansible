@@ -16,21 +16,26 @@ version_added: 5.7.0
 description:
   - Allows you to perform some supported operations on a disk in Qemu(KVM) Virtual Machines in a Proxmox VE cluster.
 author: "Castor Sky (@castorsky) <csky57@gmail.com>"
+attributes:
+  check_mode:
+    support: none
+  diff_mode:
+    support: none
 options:
   name:
     description:
       - The unique name of the VM.
-      - You can specify either I(name) or I(vmid) or both of them.
+      - You can specify either O(name) or O(vmid) or both of them.
     type: str
   vmid:
     description:
       - The unique ID of the VM.
-      - You can specify either I(vmid) or I(name) or both of them.
+      - You can specify either O(vmid) or O(name) or both of them.
     type: int
   disk:
     description:
-      - The disk key (C(unused[n]), C(ide[n]), C(sata[n]), C(scsi[n]) or C(virtio[n])) you want to operate on.
-      - Disk buses (IDE, SATA and so on) have fixed ranges of C(n) that accepted by Proxmox API.
+      - The disk key (V(unused[n]), V(ide[n]), V(sata[n]), V(scsi[n]) or V(virtio[n])) you want to operate on.
+      - Disk buses (IDE, SATA and so on) have fixed ranges of V(n) that accepted by Proxmox API.
       - >
         For IDE: 0-3;
         for SCSI: 0-30;
@@ -43,78 +48,79 @@ options:
     description:
       - Indicates desired state of the disk.
       - >
-        I(state=present) can be used to create, replace disk or update options in existing disk. It will create missing
-        disk or update options in existing one by default. See the I(create) parameter description to control behavior
+        O(state=present) can be used to create, replace disk or update options in existing disk. It will create missing
+        disk or update options in existing one by default. See the O(create) parameter description to control behavior
         of this option.
-      - Some updates on options (like I(cache)) are not being applied instantly and require VM restart.
+      - Some updates on options (like O(cache)) are not being applied instantly and require VM restart.
       - >
-        Use I(state=detached) to detach existing disk from VM but do not remove it entirely.
-        When I(state=detached) and disk is C(unused[n]) it will be left in same state (not removed).
+        Use O(state=detached) to detach existing disk from VM but do not remove it entirely.
+        When O(state=detached) and disk is V(unused[n]) it will be left in same state (not removed).
       - >
-        I(state=moved) may be used to change backing storage for the disk in bounds of the same VM
+        O(state=moved) may be used to change backing storage for the disk in bounds of the same VM
         or to send the disk to another VM (using the same backing storage).
       - >
-        I(state=resized) intended to change the disk size. As of Proxmox 7.2 you can only increase the disk size
+        O(state=resized) intended to change the disk size. As of Proxmox 7.2 you can only increase the disk size
         because shrinking disks is not supported by the PVE API and has to be done manually.
-      - To entirely remove the disk from backing storage use I(state=absent).
+      - To entirely remove the disk from backing storage use O(state=absent).
     type: str
     choices: ['present', 'resized', 'detached', 'moved', 'absent']
     default: present
   create:
     description:
-      - With I(create) flag you can control behavior of I(state=present).
-      - When I(create=disabled) it will not create new disk (if not exists) but will update options in existing disk.
-      - When I(create=regular) it will either create new disk (if not exists) or update options in existing disk.
-      - When I(create=forced) it will always create new disk (if disk exists it will be detached and left unused).
+      - With O(create) flag you can control behavior of O(state=present).
+      - When O(create=disabled) it will not create new disk (if not exists) but will update options in existing disk.
+      - When O(create=regular) it will either create new disk (if not exists) or update options in existing disk.
+      - When O(create=forced) it will always create new disk (if disk exists it will be detached and left unused).
     type: str
     choices: ['disabled', 'regular', 'forced']
     default: regular
   storage:
     description:
       - The drive's backing storage.
-      - Used only when I(state) is C(present).
+      - Used only when O(state) is V(present).
     type: str
   size:
     description:
-      - Desired volume size in GB to allocate when I(state=present) (specify I(size) without suffix).
+      - Desired volume size in GB to allocate when O(state=present) (specify O(size) without suffix).
       - >
-        New (or additional) size of volume when I(state=resized). With the C(+) sign
+        New (or additional) size of volume when O(state=resized). With the V(+) sign
         the value is added to the actual size of the volume
         and without it, the value is taken as an absolute one.
     type: str
   bwlimit:
     description:
       - Override I/O bandwidth limit (in KB/s).
-      - Used only when I(state=moved).
+      - Used only when O(state=moved).
     type: int
   delete_moved:
     description:
       - Delete the original disk after successful copy.
       - By default the original disk is kept as unused disk.
-      - Used only when I(state=moved).
+      - Used only when O(state=moved).
     type: bool
   target_disk:
     description:
-      - The config key the disk will be moved to on the target VM (for example, C(ide0) or C(scsi1)).
+      - The config key the disk will be moved to on the target VM (for example, V(ide0) or V(scsi1)).
       - Default is the source disk key.
-      - Used only when I(state=moved).
+      - Used only when O(state=moved).
     type: str
   target_storage:
     description:
-      - Move the disk to this storage when I(state=moved).
+      - Move the disk to this storage when O(state=moved).
       - You can move between storages only in scope of one VM.
-      - Mutually exclusive with I(target_vmid).
+      - Mutually exclusive with O(target_vmid).
+      - Consider increasing O(timeout) in case of large disk images or slow storage backend.
     type: str
   target_vmid:
     description:
-      - The (unique) ID of the VM where disk will be placed when I(state=moved).
+      - The (unique) ID of the VM where disk will be placed when O(state=moved).
       - You can move disk between VMs only when the same storage is used.
-      - Mutually exclusive with I(target_vmid).
+      - Mutually exclusive with O(target_vmid).
     type: int
   timeout:
     description:
-      - Timeout in seconds to wait when moving disk.
-      - Used only when I(state=moved).
+      - Timeout in seconds to wait for slow operations such as importing disk or moving disk between storages.
+      - Used only when O(state) is V(present) or V(moved).
     type: int
     default: 600
   aio:
@@ -171,12 +177,13 @@ options:
       - Volume string format
       - C(<STORAGE>:<VMID>/<FULL_NAME>) or C(<ABSOLUTE_PATH>/<FULL_NAME>)
       - Attention! Only root can use absolute paths.
-      - This parameter is mutually exclusive with I(size).
+      - This parameter is mutually exclusive with O(size).
+      - Increase O(timeout) parameter when importing large disk images or using slow storage.
     type: str
   iops:
     description:
       - Maximum total r/w I/O in operations per second.
-      - You can specify either total limit or per operation (mutually exclusive with I(iops_rd) and I(iops_wr)).
+      - You can specify either total limit or per operation (mutually exclusive with O(iops_rd) and O(iops_wr)).
     type: int
   iops_max:
     description:
@@ -189,7 +196,7 @@ options:
   iops_rd:
     description:
       - Maximum read I/O in operations per second.
-      - You can specify either read or total limit (mutually exclusive with I(iops)).
+      - You can specify either read or total limit (mutually exclusive with O(iops)).
     type: int
   iops_rd_max:
     description:
@@ -202,7 +209,7 @@ options:
   iops_wr:
     description:
       - Maximum write I/O in operations per second.
-      - You can specify either write or total limit (mutually exclusive with I(iops)).
+      - You can specify either write or total limit (mutually exclusive with O(iops)).
     type: int
   iops_wr_max:
     description:
@@ -220,7 +227,7 @@ options:
     description:
       - Maximum total r/w speed in megabytes per second.
       - Can be fractional but use with caution - fractionals less than 1 are not supported officially.
-      - You can specify either total limit or per operation (mutually exclusive with I(mbps_rd) and I(mbps_wr)).
+      - You can specify either total limit or per operation (mutually exclusive with O(mbps_rd) and O(mbps_wr)).
     type: float
   mbps_max:
     description:
@@ -229,7 +236,7 @@ options:
   mbps_rd:
     description:
       - Maximum read speed in megabytes per second.
-      - You can specify either read or total limit (mutually exclusive with I(mbps)).
+      - You can specify either read or total limit (mutually exclusive with O(mbps)).
     type: float
   mbps_rd_max:
     description:
@@ -238,7 +245,7 @@ options:
   mbps_wr:
     description:
       - Maximum write speed in megabytes per second.
-      - You can specify either write or total limit (mutually exclusive with I(mbps)).
+      - You can specify either write or total limit (mutually exclusive with O(mbps)).
     type: float
   mbps_wr_max:
     description:
@@ -305,10 +312,11 @@ options:
     choices: ['enospc', 'ignore', 'report', 'stop']
   wwn:
     description:
-      - The drive's worldwide name, encoded as 16 bytes hex string, prefixed by C(0x).
+      - The drive's worldwide name, encoded as 16 bytes hex string, prefixed by V(0x).
     type: str
 extends_documentation_fragment:
   - community.general.proxmox.documentation
+  - community.general.attributes
 '''
 
 EXAMPLES = '''
@@ -471,6 +479,16 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
         params.update(dict((k, int(v)) for k, v in params.items() if isinstance(v, bool)))
         return params
 
+    def wait_till_complete_or_timeout(self, node_name, task_id):
+        timeout = self.module.params['timeout']
+        while timeout:
+            if self.api_task_ok(node_name, task_id):
+                return True
+            timeout -= 1
+            if timeout <= 0:
+                return False
+            sleep(1)
+
     def create_disk(self, disk, vmid, vm, vm_config):
         create = self.module.params['create']
         if create == 'disabled' and disk not in vm_config:
@@ -484,20 +502,23 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
 
             if import_string:
                 config_str = "%s:%s,import-from=%s" % (self.module.params["storage"], "0", import_string)
+                timeout_str = "Reached timeout while importing VM disk. Last line in task before timeout: %s"
+                ok_str = "Disk %s imported into VM %s"
             else:
                 config_str = "%s:%s" % (self.module.params["storage"], self.module.params["size"])
+                ok_str = "Disk %s created in VM %s"
+                timeout_str = "Reached timeout while creating VM disk. Last line in task before timeout: %s"
 
             for k, v in attributes.items():
                 config_str += ',%s=%s' % (k, v)
 
-            create_disk = {self.module.params["disk"]: config_str}
-            self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**create_disk)
-            return True, "Disk %s created in VM %s" % (disk, vmid)
+            disk_config_to_apply = {self.module.params["disk"]: config_str}
 
         if create in ['disabled', 'regular'] and disk in vm_config:
             # UPDATE
             disk_config = disk_conf_str_to_dict(vm_config[disk])
             config_str = disk_config["volume"]
+            ok_str = "Disk %s updated in VM %s"
             attributes = self.get_create_attributes()
             # 'import_from' fails on disk updates
             attributes.pop('import_from', None)
@@ -513,9 +534,16 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
             if disk_config == attributes:
                 return False, "Disk %s is up to date in VM %s" % (disk, vmid)
 
-            update_disk = {self.module.params["disk"]: config_str}
-            self.proxmox_api.nodes(vm['node']).qemu(vmid).config.set(**update_disk)
-            return True, "Disk %s updated in VM %s" % (disk, vmid)
+            disk_config_to_apply = {self.module.params["disk"]: config_str}
+
+        current_task_id = self.proxmox_api.nodes(vm['node']).qemu(vmid).config.post(**disk_config_to_apply)
+        task_success = self.wait_till_complete_or_timeout(vm['node'], current_task_id)
+        if task_success:
+            return True, ok_str % (disk, vmid)
+        else:
+            self.module.fail_json(
+                msg=timeout_str % self.proxmox_api.nodes(vm['node']).tasks(current_task_id).log.get()[:1]
+            )
 
     def move_disk(self, disk, vmid, vm, vm_config):
         params = dict()
@@ -535,20 +563,15 @@ class ProxmoxDiskAnsible(ProxmoxAnsible):
             if params['storage'] == disk_config['storage_name']:
                 return False
 
-        taskid = self.proxmox_api.nodes(vm['node']).qemu(vmid).move_disk.post(**params)
-        timeout = self.module.params['timeout']
-        while timeout:
-            status_data = self.proxmox_api.nodes(vm['node']).tasks(taskid).status.get()
-            if status_data['status'] == 'stopped' and status_data['exitstatus'] == 'OK':
-                return True
-            if timeout <= 0:
-                self.module.fail_json(
-                    msg='Reached timeout while waiting for moving VM disk. Last line in task before timeout: %s' %
-                        self.proxmox_api.nodes(vm['node']).tasks(taskid).log.get()[:1])
-
-            sleep(1)
-            timeout -= 1
-        return True
+        task_id = self.proxmox_api.nodes(vm['node']).qemu(vmid).move_disk.post(**params)
+        task_success = self.wait_till_complete_or_timeout(vm['node'], task_id)
+        if task_success:
+            return True
+        else:
+            self.module.fail_json(
+                msg='Reached timeout while waiting for moving VM disk. Last line in task before timeout: %s' %
+                    self.proxmox_api.nodes(vm['node']).tasks(task_id).log.get()[:1]
+            )
 
 
 def main():
@@ -699,7 +722,7 @@ def main():
                 module.exit_json(changed=False, vmid=vmid, msg='Disk %s already detached in VM %s' % (disk, vmid))
             if disk not in vm_config:
                 module.exit_json(changed=False, vmid=vmid, msg="Disk %s not present in VM %s config" % (disk, vmid))
-            proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).unlink.put(vmid=vmid, idlist=disk, force=0)
+            proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).unlink.put(idlist=disk, force=0)
             module.exit_json(changed=True, vmid=vmid, msg="Disk %s detached from VM %s" % (disk, vmid))
         except Exception as e:
             module.fail_json(msg="Failed to detach disk %s from VM %s with exception: %s" % (disk, vmid, str(e)))
@@ -734,7 +757,7 @@ def main():
         try:
             if disk not in vm_config:
                 module.exit_json(changed=False, vmid=vmid, msg="Disk %s is already absent in VM %s" % (disk, vmid))
-            proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).unlink.put(vmid=vmid, idlist=disk, force=1)
+            proxmox.proxmox_api.nodes(vm['node']).qemu(vmid).unlink.put(idlist=disk, force=1)
             module.exit_json(changed=True, vmid=vmid, msg="Disk %s removed from VM %s" % (disk, vmid))
         except Exception as e:
             module.fail_json(vmid=vmid, msg='Unable to remove disk %s from VM %s: %s' % (disk, vmid, str(e)))

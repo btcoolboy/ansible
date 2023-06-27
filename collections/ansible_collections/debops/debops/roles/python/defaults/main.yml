@@ -39,8 +39,13 @@ python__raw_apt_cache_valid_time: '-{{ 60 * 60 * 12 }}'
 
 # .. envvar:: python__v3 [[[
 #
-# Enable or disable support for Python 3 management.
-python__v3: True
+# Enable or disable support for Python 3 management. Python 3 will be
+# automatically disabled on some OS releases due to missing or outdated Python
+# 3 packages.
+python__v3: '{{ False
+                if (ansible_distribution_release|d() in
+                    [ "wheezy", "precise" ])
+                else True }}'
 
                                                                    # ]]]
 # .. envvar:: python__core_packages3 [[[
@@ -57,7 +62,7 @@ python__core_packages3:
 # List of base Python 3 packages to install via APT. These packages should allow
 # creation of Python 3 virtual environments and installation of Python packages
 # via the :command:`pip3` command from the PyPI repository, as well as Ansible
-# opration on the remote host.
+# operation on the remote host.
 python__base_packages3:
   - 'python3-httplib2'
   - 'python3-pip'
@@ -118,11 +123,12 @@ python__v2: '{{ ansible_local.python.installed2
                 if (ansible_local | d() and ansible_local.python | d() and
                     ansible_local.python.installed2 is defined)
                 else (True
-                      if ((ansible_python_interpreter | d("")).endswith("python") or
-                          (discovered_interpreter_python | d("")).endswith("python") or
-                           (python__register_raw_release | d() and
-                            (python__register_raw_release.stdout | d("")).strip() in
-                            ["stretch", "trusty", "xenial"]))
+                      if ((ansible_python_interpreter|d("")).endswith("python") or
+                          (discovered_interpreter_python|d("")).endswith("python") or
+                           (python__register_raw_release|d() and
+                            (python__register_raw_release.stdout|d("")).strip() in
+                            [ "wheezy", "jessie", "stretch",
+                              "precise", "trusty", "xenial" ]))
                       else False) }}'
 
                                                                    # ]]]
@@ -137,22 +143,24 @@ python__core_packages2:
                                                                    # ]]]
 # .. envvar:: python__base_packages2 [[[
 #
-# List of base Python 2 packges to install via APT. These packages should allow
+# List of base Python 2 packages to install via APT. These packages should allow
 # creation of Python 2 virtual environments and installation of Python packages
 # via the :command:`pip` command from the PyPI repository, as well as Ansible
-# opration on the remote host.
+# operation on the remote host.
 python__base_packages2:
   - 'python-httplib2'
   - '{{ "python-pip"
         if (ansible_distribution_release in
-            ["stretch", "buster",
-             "trusty", "xenial", "bionic"])
+            [ "wheezy", "jessie", "stretch", "buster",
+              "precise", "trusty", "xenial", "bionic" ])
            else [] }}'
   - 'python-setuptools'
   - 'python-pycurl'
   - 'python-future'
   - 'python-virtualenv'
-  - 'python-wheel'
+  - '{{ [] if (ansible_distribution_release in
+               [ "wheezy", "precise" ])
+           else "python-wheel" }}'
 
                                                                    # ]]]
 # .. envvar:: python__packages2 [[[
@@ -192,9 +200,9 @@ python__dependent_packages2: []
 # for installation. These packages will be installed in the "raw" mode as well
 # as during normal operation. This variable is used in the role tasks.
 python__core_packages: '{{ (python__core_packages3
-                            if (python__v3 | bool) else [])
+                            if (python__v3|bool) else [])
                            + (python__core_packages2
-                              if (python__v2 | bool) else []) }}'
+                              if (python__v2|bool) else []) }}'
 
                                                                    # ]]]
 # .. envvar:: python__combined_packages [[[
@@ -207,13 +215,13 @@ python__combined_packages: '{{ python__core_packages
                                    + python__group_packages3
                                    + python__host_packages3
                                    + python__dependent_packages3)
-                                  if python__v3 | bool else [])
+                                  if python__v3|bool else [])
                                + ((python__base_packages2
                                    + python__packages2
                                    + python__group_packages2
                                    + python__host_packages2
                                    + python__dependent_packages2)
-                                  if python__v2 | bool else []) }}'
+                                  if python__v2|bool else []) }}'
                                                                    # ]]]
                                                                    # ]]]
 # Python 2 package purging [[[
@@ -230,7 +238,7 @@ python__combined_packages: '{{ python__core_packages
 # The packages will not be purged if the role detects the presence of the
 # :file:`/etc/ansible/facts.d/python.fact` script.
 python__raw_purge_v2: '{{ False
-                          if (python__v2 | bool)
+                          if (python__v2|bool)
                           else True }}'
 
                                                                    # ]]]

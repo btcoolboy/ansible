@@ -15,10 +15,17 @@ module: github_release
 short_description: Interact with GitHub Releases
 description:
     - Fetch metadata about GitHub Releases
+extends_documentation_fragment:
+    - community.general.attributes
+attributes:
+    check_mode:
+        support: full
+    diff_mode:
+        support: none
 options:
     token:
         description:
-            - GitHub Personal Access Token for authenticating. Mutually exclusive with C(password).
+            - GitHub Personal Access Token for authenticating. Mutually exclusive with O(password).
         type: str
     user:
         description:
@@ -27,7 +34,7 @@ options:
         required: true
     password:
         description:
-            - The GitHub account password for the user. Mutually exclusive with C(token).
+            - The GitHub account password for the user. Mutually exclusive with O(token).
         type: str
     repo:
         description:
@@ -42,7 +49,7 @@ options:
         choices: [ 'latest_release', 'create_release' ]
     tag:
         description:
-            - Tag name when creating a release. Required when using action is set to C(create_release).
+            - Tag name when creating a release. Required when using O(action=create_release).
         type: str
     target:
         description:
@@ -108,17 +115,8 @@ EXAMPLES = '''
 '''
 
 RETURN = '''
-create_release:
-    description:
-    - Version of the created release
-    - "For Ansible version 2.5 and later, if specified release version already exists, then State is unchanged"
-    - "For Ansible versions prior to 2.5, if specified release version already exists, then State is skipped"
-    type: str
-    returned: success
-    sample: 1.1.0
-
-latest_release:
-    description: Version of the latest release
+tag:
+    description: Version of the created/latest release.
     type: str
     returned: success
     sample: 1.1.0

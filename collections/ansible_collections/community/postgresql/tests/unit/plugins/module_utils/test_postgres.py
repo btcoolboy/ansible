@@ -3,6 +3,7 @@
 
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
+from os import environ
 
 import pytest
 
@@ -21,6 +22,8 @@ INPUT_DICT = dict(
         choices=['allow', 'disable', 'prefer', 'require', 'verify-ca', 'verify-full']
     ),
     ca_cert=dict(aliases=['ssl_rootcert']),
+    ssl_cert=dict(type='path'),
+    ssl_key=dict(type='path'),
 )
 
 EXPECTED_DICT = dict(
@@ -33,6 +36,8 @@ EXPECTED_DICT = dict(
         choices=['allow', 'disable', 'prefer', 'require', 'verify-ca', 'verify-full']
     ),
     sslrootcert=dict(aliases=['ssl_rootcert']),
+    sslcert=dict(type='path'),
+    sslkey=dict(type='path'),
 )
 
 
@@ -51,18 +56,29 @@ class TestPostgresCommonArgSpec():
         The return and expected dictionaries must be compared.
         """
         expected_dict = dict(
-            login_user=dict(default='postgres'),
+            login_user=dict(default='postgres', aliases=['login']),
             login_password=dict(default='', no_log=True),
-            login_host=dict(default=''),
-            login_unix_socket=dict(default=''),
+            login_host=dict(default='', aliases=['host']),
+            login_unix_socket=dict(default='', aliases=['unix_socket']),
             port=dict(type='int', default=5432, aliases=['login_port']),
             ssl_mode=dict(
                 default='prefer',
                 choices=['allow', 'disable', 'prefer', 'require', 'verify-ca', 'verify-full']
             ),
             ca_cert=dict(aliases=['ssl_rootcert']),
+            ssl_cert=dict(type='path'),
+            ssl_key=dict(type='path'),
             connect_params=dict(default={}, type='dict'),
         )
+        assert pg.postgres_common_argument_spec() == expected_dict
+
+        # Setting new values for checking environment variables
+        expected_dict['port']['default'] = 5435
+        expected_dict['login_user']['default'] = 'test_user'
+
+        # Setting environment variables
+        environ['PGUSER'] = 'test_user'
+        environ['PGPORT'] = '5435'
         assert pg.postgres_common_argument_spec() == expected_dict
 
 

@@ -5,10 +5,10 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Test and restart dnsmasq
-  ansible.builtin.command: dnsmasq --test
+  command: dnsmasq --test
   notify: [ 'Restart dnsmasq' ]
 
 - name: Restart dnsmasq
-  ansible.builtin.service:
+  service:
     name: 'dnsmasq'
     state: 'restarted'

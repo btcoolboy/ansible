@@ -12,7 +12,7 @@
 dns-loop-detect
 
 # Mark the LXC domain as local and generate PTR resource records automatically
-domain = {{ lxc__net_domain + ',' + (lxc__net_address | ipaddr('subnet')) + (',local' if (lxc__net_address | ipaddr('prefix') in [ 8, 16, 24 ]) else '') }}
+domain = {{ lxc__net_domain + ',' + (lxc__net_address | ansible.utils.ipaddr('subnet')) + (',local' if (lxc__net_address | ansible.utils.ipaddr('prefix') in [ 8, 16, 24 ]) else '') }}
 
 # Set the FQDN name of the bridge interface in the DNS
 interface-name = {{ lxc__net_fqdn }},{{ lxc__net_bridge }}
@@ -22,12 +22,12 @@ interface-name = {{ lxc__net_fqdn }},{{ lxc__net_bridge }}
 dhcp-option = tag:{{ lxc__net_bridge }},option:domain-search,{{ lxc__net_domain }},{{ lxc__net_domain.split('.')[1:] | join('.') }}
 dhcp-option = tag:{{ lxc__net_bridge }},option6:domain-search,{{ lxc__net_domain }},{{ lxc__net_domain.split('.')[1:] | join('.') }}
 {% endif %}
-{% if not lxc__net_router | bool %}
+{% if not lxc__net_router|bool %}
 
 # Disable default route advertisement via the {{ lxc__net_bridge }} interface
 dhcp-option = tag:{{ lxc__net_bridge }},option:router
 {% endif %}
-{% if lxc__net_dnsmasq_options | d() %}
+{% if lxc__net_dnsmasq_options|d() %}
 
 # Additional dnsmasq options
 {{ lxc__net_dnsmasq_options | regex_replace('\n$','') }}

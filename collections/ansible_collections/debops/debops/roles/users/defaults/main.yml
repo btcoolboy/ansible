@@ -34,7 +34,7 @@ users__acl_enabled: '{{ True if ("acl" in users__base_packages) else False }}'
 # .. envvar:: users__default_shell [[[
 #
 # Specify absolute path of the shell which should be configured on all user
-# accounts managed by this role, if not overriden by the user configuration. If
+# accounts managed by this role, if not overridden by the user configuration. If
 # not specified, the shell won't be changed, but new accounts will not have
 # a defined shell either.
 users__default_shell: ''
@@ -119,7 +119,7 @@ users__dotfiles_enabled: False
 # An URL or an absolute path on the remote host to the :command:`git` dotfiles
 # repository. The repository will be used by default if the dotfiles management
 # is enabled without specifying a custom repository for the user.
-users__dotfiles_repo: '{{ ansible_local.yadm.dotfiles | d("") }}'
+users__dotfiles_repo: '{{ ansible_local.yadm.dotfiles|d("") }}'
                                                                    # ]]]
                                                                    # ]]]
 # Lists of managed UNIX groups and accounts [[[

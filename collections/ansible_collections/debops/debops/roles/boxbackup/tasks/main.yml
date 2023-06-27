@@ -4,13 +4,11 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Import DebOps secret role
-  ansible.builtin.import_role:
+  import_role:
     name: 'secret'
 
-- name: Configure server-side
-  ansible.builtin.include_tasks: configure_servers.yml
+- include: configure_servers.yml
   when: boxbackup_server is defined and boxbackup_server == ansible_fqdn
 
-- name: Configure client-side
-  ansible.builtin.include_tasks: configure_clients.yml
+- include: configure_clients.yml
   when: boxbackup_server is defined and boxbackup_server != ansible_fqdn

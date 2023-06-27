@@ -2,7 +2,7 @@
  "collection_info": {
   "namespace": "community",
   "name": "postgresql",
-  "version": "2.3.1",
+  "version": "3.0.0",
   "authors": [
    "Ansible PostgreSQL community"
   ],
@@ -25,7 +25,7 @@
   "name": "FILES.json",
   "ftype": "file",
   "chksum_type": "sha256",
-  "chksum_sha256": "29f702f3d765951000aa5a0dbd846fb509ac5b587f47ef74bc6325f9a59c12c3",
+  "chksum_sha256": "ed316dac4becab4dc83019930d1fce9ead79ffebf1e6427be18ade2a63dda1b6",
   "format": 1
  },
  "format": 1

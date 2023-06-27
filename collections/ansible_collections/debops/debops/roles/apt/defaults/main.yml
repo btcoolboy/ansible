@@ -3,7 +3,7 @@
 
 # .. Copyright (C) 2013-2018 Maciej Delmanowski <drybjed@gmail.com>
 # .. Copyright (C) 2015-2017 Robin Schneider <ypid@riseup.net>
-# .. Copyright (C) 2014-2022 DebOps <https://debops.org/>
+# .. Copyright (C) 2014-2018 DebOps <https://debops.org/>
 # .. SPDX-License-Identifier: GPL-3.0-only
 
 # .. _apt__ref_defaults:
@@ -56,7 +56,7 @@ apt__host_extra_architectures: []
 # Enable (if ``present``) or disable (if ``absent``) management of
 # :file:`/etc/apt/sources.list` file by the role.
 apt__sources_deploy_state: '{{ "present"
-                               if (apt__distribution in ["Debian", "Raspbian", "Ubuntu", "Devuan"])
+                               if (apt__distribution in [ "Debian", "Raspbian", "Ubuntu", "Devuan" ])
                                else "absent" }}'
 
                                                                    # ]]]
@@ -76,7 +76,7 @@ apt__sources_filter_duplicates: True
 # By default non-free repositories are enabled on hardware-based hosts due to
 # a possible requirement for non-free firmware packages.
 apt__nonfree: '{{ True if (ansible_virtualization_role is undefined or
-                           ansible_virtualization_role not in ["guest"])
+                           ansible_virtualization_role not in [ "guest" ])
                        else False }}'
 
                                                                    # ]]]
@@ -100,7 +100,7 @@ apt__remove_default_configuration: True
 #
 # Update APT cache early in the playbook if it's older than 24h
 # Set to False to disable update (useful when changing APT mirrors)
-apt__cache_valid_time: '{{ ansible_local.core.cache_valid_time | d(60 * 60 * 24) }}'
+apt__cache_valid_time: '{{ ansible_local.core.cache_valid_time|d(60 * 60 * 24) }}'
 
                                                                    # ]]]
 # .. envvar:: apt__install_recommends [[[
@@ -126,7 +126,8 @@ apt__base_packages:
   - 'ca-certificates'
   - '{{ "apt-transport-https"
         if (ansible_distribution_release in
-            ["stretch", "trusty", "xenial"])
+            [ "wheezy", "jessie", "stretch",
+              "precise", "trusty", "xenial" ])
         else [] }}'
   - 'gnupg'
 
@@ -300,7 +301,7 @@ apt__architecture_map:
 # because this local fact is set by the 'core' role, which runs later in the
 # common playbook.
 # Ref: https://github.com/debops/debops/issues/2046#issuecomment-1086702657
-apt__distribution: '{{ ansible_lsb.id | d(ansible_distribution) }}'
+apt__distribution: '{{ ansible_lsb.id|d(ansible_distribution) }}'
 
                                                                    # ]]]
 # .. envvar:: apt__distribution_release [[[
@@ -311,7 +312,7 @@ apt__distribution: '{{ ansible_lsb.id | d(ansible_distribution) }}'
 # 'core' role, which runs later in the common playbook.
 # Ref: https://github.com/debops/debops/issues/2046#issuecomment-1086702657
 apt__distribution_release: '{{ ansible_lsb.codename
-                               | d(ansible_distribution_release) }}'
+                               |d(ansible_distribution_release) }}'
 
                                                                    # ]]]
 # .. envvar:: apt__distribution_release_map [[[
@@ -320,9 +321,9 @@ apt__distribution_release: '{{ ansible_lsb.codename
 # map is used to configure security repositories only on the OS releases that
 # have them available.
 apt__distribution_release_map:
-  'Debian': [ 'stretch', 'buster', 'bullseye', 'bookworm' ]
-  'Ubuntu': [ 'trusty', 'xenial', 'bionic' ]
-  'Devuan': [ 'ascii', 'beowulf' ]
+  'Debian': [ 'wheezy', 'jessie', 'stretch', 'buster', 'bullseye', 'bookworm' ]
+  'Ubuntu': [ 'precise', 'trusty', 'xenial', 'bionic' ]
+  'Devuan': [ 'jessie', 'ascii', 'beowulf' ]
 
                                                                    # ]]]
 # .. envvar:: apt__distribution_suite_map [[[
@@ -332,15 +333,20 @@ apt__distribution_release_map:
 # repository suffixes should be configured on the current host in case the role
 # is used on a Debian Testing system.
 apt__distribution_suite_map:
+  'Debian_wheezy':      'archive'
+  'Debian_jessie':      'archive'
   'Debian_stretch':     'lts'
   'Debian_buster':      'oldstable'
   'Debian_bullseye':    'stable'
   'Debian_bookworm':    'testing'
   'Debian_sid':         'unstable'
+  'Raspbian_wheezy':    'archive'
+  'Raspbian_jessie':    'lts'
   'Raspbian_stretch':   'oldstable'
   'Raspbian_buster':    'stable'
   'Raspbian_bullseye':  'testing'
   'Raspbian_sid':       'unstable'
+  'Devuan_jessie':      'oldstable'
   'Devuan_ascii':       'stable'
   'Devuan_beowulf':     'testing'
   'Devuan_ceres':       'unstable'
@@ -350,8 +356,8 @@ apt__distribution_suite_map:
 #
 # The variable that specifies the "suite" or an alias of the current
 # distribution release.
-apt__distribution_suite: '{{ apt__distribution_suite_map[apt__distribution + "_"
-                                                         + apt__distribution_release] | d() }}'
+apt__distribution_suite: '{{ apt__distribution_suite_map[apt__distribution + "_" +
+                                                         apt__distribution_release]|d() }}'
 
                                                                    # ]]]
 # .. envvar:: apt__distribution_suffix_map [[[
@@ -378,11 +384,11 @@ apt__distribution_suffix_map:
 # .. envvar:: apt__distribution_suffixes [[[
 #
 # List of repository suffixes to use in the generated APT sources.
-apt__distribution_suffixes: '{{ apt__distribution_suffix_map[apt__distribution + "_"
-                                                             + apt__distribution_suite_map[apt__distribution + "_"
-                                                             + apt__distribution_release] | d()]
-                                | d(apt__distribution_suffix_map[apt__distribution]
-                                | d(apt__distribution_suffix_map["default"])) }}'
+apt__distribution_suffixes: '{{ apt__distribution_suffix_map[apt__distribution + "_" +
+                                apt__distribution_suite_map[apt__distribution + "_" +
+                                apt__distribution_release]|d()] |
+                                d(apt__distribution_suffix_map[apt__distribution] |
+                                  d(apt__distribution_suffix_map["default"])) }}'
 
                                                                    # ]]]
 # .. envvar:: apt__distribution_components_free [[[
@@ -414,9 +420,9 @@ apt__distribution_components_nonfree:
 #
 # List of APT repository components which should be enabled in the distribution
 # package sources.
-apt__distribution_components: '{{ apt__distribution_components_free[apt__distribution] | d([]) +
-                                  (apt__distribution_components_nonfree[apt__distribution] | d([])
-                                   if apt__nonfree | bool else []) }}'
+apt__distribution_components: '{{ apt__distribution_components_free[apt__distribution]|d([]) +
+                                  (apt__distribution_components_nonfree[apt__distribution]|d([])
+                                   if apt__nonfree|bool else []) }}'
                                                                    # ]]]
                                                                    # ]]]
 # Archived distribution releases [[[
@@ -438,7 +444,7 @@ apt__archive_source_map:
 #
 # The URL of the archive APT repository configured by default when the current
 # OS release is migrated to the archive.
-apt__archive_source: '{{ apt__archive_source_map[apt__distribution] | d() }}'
+apt__archive_source: '{{ apt__archive_source_map[apt__distribution]|d() }}'
                                                                    # ]]]
                                                                    # ]]]
 # Default APT package sources [[[
@@ -472,8 +478,8 @@ apt__host_sources: []
 # using Ansible local facts.
 apt__original_sources:
   - comment: 'Original APT package sources gathered by Ansible'
-    uris: '{{ ansible_local.apt.original_mirrors_deb | d([]) }}'
-    state: '{{ "present" if (ansible_local.apt.original_mirrors_deb | d() and
+    uris: '{{ ansible_local.apt.original_mirrors_deb|d([]) }}'
+    state: '{{ "present" if (ansible_local.apt.original_mirrors_deb|d() and
                              apt__distribution_suite != "archive")
                          else "absent" }}'
 
@@ -582,18 +588,21 @@ apt__host_security_sources: []
 # from normal repositories.
 apt__security_sources:
 
-  - uri:          'http://security.debian.org/'
+  - uri:          '{{ "http://security.debian.org/"
+                      if apt__distribution_release in ["stretch"]
+                      else "http://deb.debian.org/debian-security/" }}'
     comment:      'Debian Security repository'
     type:         '{{ apt__source_types }}'
     suite:        '{{ apt__distribution_release
                       + ("/updates"
-                         if apt__distribution_release in ["stretch", "buster"]
+                         if apt__distribution_release in
+                            [ "jessie", "stretch", "buster" ]
                          else "-security") }}'
     components:   '{{ apt__distribution_components }}'
     distribution: 'Debian'
     state:        '{{ apt__security_sources_state
-                      if (apt__distribution_release | d("unknown")
-                          in apt__distribution_release_map[apt__distribution] | d([]))
+                      if (apt__distribution_release|d("unknown")
+                          in apt__distribution_release_map[apt__distribution]|d([]))
                       else "absent" }}'
 
     # This version may be present on some installations. It's here so that the
@@ -655,8 +664,8 @@ apt__security_sources:
     components:   '{{ apt__distribution_components }}'
     distribution: 'Devuan'
     state:        '{{ apt__security_sources_state
-                      if (apt__distribution_release | d("unknown")
-                          in apt__distribution_release_map[apt__distribution] | d([]))
+                      if (apt__distribution_release|d("unknown")
+                          in apt__distribution_release_map[apt__distribution]|d([]))
                       else "absent" }}'
 
                                                                    # ]]]

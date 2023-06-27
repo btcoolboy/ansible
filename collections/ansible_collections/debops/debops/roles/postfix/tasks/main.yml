@@ -4,19 +4,19 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Import custom Ansible plugins
-  ansible.builtin.import_role:
+  import_role:
     name: 'ansible_plugins'
 
 - name: Import DebOps global handlers
-  ansible.builtin.import_role:
+  import_role:
     name: 'global_handlers'
 
 - name: Import DebOps secret role
-  ansible.builtin.import_role:
+  import_role:
     name: 'secret'
 
 - name: Install Postfix APT packages
-  ansible.builtin.apt:
+  apt:
     name: '{{ (postfix__base_packages
              + postfix__dependent_packages
              + postfix__host_packages
@@ -31,15 +31,15 @@
   tags: [ 'meta::provision' ]
 
 - name: Purge other SMTP servers
-  ansible.builtin.apt:
+  apt:
     name: '{{ postfix__purge_packages | flatten }}'
     state: 'absent'
     purge: True
-  when: postfix__purge_packages | d() and ansible_pkg_mgr == 'apt'
+  when: postfix__purge_packages|d() and ansible_pkg_mgr == 'apt'
   tags: [ 'meta::provision' ]
 
 - name: Disable Postfix configuration in debconf
-  ansible.builtin.debconf:
+  debconf:
     name: 'postfix'
     question: 'postfix/main_mailer_type'
     vtype: 'select'
@@ -47,7 +47,7 @@
   when: ansible_pkg_mgr == 'apt'
 
 - name: Make sure Ansible local facts directory exists
-  ansible.builtin.file:
+  file:
     dest: '/etc/ansible/facts.d'
     state: 'directory'
     owner: 'root'
@@ -55,7 +55,7 @@
     mode: '0755'
 
 - name: Configure Postfix local facts
-  ansible.builtin.template:
+  template:
     src: 'etc/ansible/facts.d/postfix.fact.j2'
     dest: '/etc/ansible/facts.d/postfix.fact'
     owner: 'root'
@@ -65,10 +65,10 @@
   tags: [ 'meta::facts' ]
 
 - name: Re-read local facts if they have been modified
-  ansible.builtin.meta: 'flush_handlers'
+  meta: 'flush_handlers'
 
 - name: Configure /etc/mailname
-  ansible.builtin.copy:
+  copy:
     content: "{{ postfix__mailname + '\n' }}"
     dest: '/etc/mailname'
     owner: 'root'
@@ -77,7 +77,7 @@
   notify: [ 'Check postfix and reload' ]
 
 - name: Install /etc/postfix/Makefile
-  ansible.builtin.template:
+  template:
     src: 'etc/postfix/Makefile.j2'
     dest: '/etc/postfix/Makefile'
     owner: 'root'
@@ -85,7 +85,7 @@
     mode: '0644'
 
 - name: Generate Postfix 'main.cf' configuration
-  ansible.builtin.template:
+  template:
     src: 'etc/postfix/main.cf.j2'
     dest: '/etc/postfix/main.cf'
     owner: 'root'
@@ -94,7 +94,7 @@
   notify: [ 'Check postfix and reload' ]
 
 - name: Generate Postfix 'master.cf' configuration
-  ansible.builtin.template:
+  template:
     src: 'etc/postfix/master.cf.j2'
     dest: '/etc/postfix/master.cf'
     owner: 'root'
@@ -103,31 +103,33 @@
   notify: [ 'Check postfix and reload' ]
 
 - name: Remove Postfix lookup tables
-  ansible.builtin.file:
+  file:
     path: '/etc/postfix/{{ item.name }}'
     state: 'absent'
-  loop: '{{ postfix__combined_lookup_tables | debops.debops.parse_kv_items }}'
-  when: item.name | d() and item.state | d('present') == 'absent'
+  with_flattened:
+    - '{{ postfix__combined_lookup_tables | debops.debops.parse_kv_items }}'
+  when: item.name|d() and item.state|d('present') == 'absent'
   notify: [ 'Process Postfix Makefile', 'Check postfix and reload' ]
   no_log: '{{ debops__no_log | d(item.no_log)
-              | d(True if (item.mode | d("0644") == "0600") else False) }}'
+              | d(True if (item.mode|d("0644") == "0600") else False) }}'
 
 - name: Generate Postfix lookup tables
-  ansible.builtin.template:
+  template:
     src:   'etc/postfix/lookup_table.j2'
     dest:  '/etc/postfix/{{ item.name }}'
     owner: '{{ item.owner | d("root") }}'
     group: '{{ item.group | d("postfix") }}'
-    mode:  '{{ item.mode | d("0640") }}'
-  loop: '{{ postfix__combined_lookup_tables | debops.debops.parse_kv_items }}'
+    mode:  '{{ item.mode  | d("0640") }}'
+  with_flattened:
+    - '{{ postfix__combined_lookup_tables | debops.debops.parse_kv_items }}'
   notify: [ 'Process Postfix Makefile', 'Check postfix and reload' ]
-  when: item.name | d() and item.state | d('present') != 'absent'
+  when: item.name|d() and item.state|d('present') != 'absent'
   no_log: '{{ debops__no_log | d(item.no_log)
-              | d(True if (item.mode | d("0640") in ["0640", "0600"])
+              | d(True if (item.mode|d("0640") in ["0640","0600"])
                   else False) }}'
 
 - name: Save dependent configuration on Ansible Controller
-  ansible.builtin.template:
+  template:
     src: '{{ "secret/postfix/dependent_config/inventory_hostname/" + item + ".j2" }}'
     dest: '{{ secret + "/postfix/dependent_config/" + inventory_hostname + "/" + item }}'
     mode: '0644'
@@ -136,25 +138,25 @@
   with_items: [ 'maincf.json', 'mastercf.json' ]
 
 - name: Make sure that PKI hook directory exists
-  ansible.builtin.file:
+  file:
     path: '{{ postfix__pki_hook_path }}'
     state: 'directory'
     owner: 'root'
     group: 'root'
     mode: '0755'
-  when: postfix__pki | bool
+  when: postfix__pki|bool
 
 - name: Manage PKI postfix hook
-  ansible.builtin.template:
+  template:
     src: 'etc/pki/hooks/postfix.j2'
     dest: '{{ postfix__pki_hook_path + "/" + postfix__pki_hook_name }}'
     owner: 'root'
     group: 'root'
     mode: '0755'
-  when: postfix__pki | bool
+  when: postfix__pki|bool
 
 - name: Ensure the PKI postfix hook is absent
-  ansible.builtin.file:
+  file:
     path: '{{ postfix__pki_hook_path + "/" + postfix__pki_hook_name }}'
     state: 'absent'
-  when: not (postfix__pki | bool)
+  when: not (postfix__pki|bool)

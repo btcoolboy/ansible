@@ -6,12 +6,12 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Start elasticsearch
-  ansible.builtin.service:
+  service:
     name: 'elasticsearch'
     state: 'started'
     enabled: True
 
 - name: Restart elasticsearch
-  ansible.builtin.service:
+  service:
     name: 'elasticsearch'
     state: 'restarted'

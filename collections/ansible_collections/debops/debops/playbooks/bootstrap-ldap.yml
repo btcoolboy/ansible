@@ -36,7 +36,7 @@
   tasks:
 
     - name: Initialize Ansible support via raw tasks
-      ansible.builtin.import_role:
+      import_role:
         name: 'python'
         tasks_from: 'main_raw'
       tags: [ 'role::python_raw', 'skip::python_raw', 'role::python' ]
@@ -61,8 +61,7 @@
       tags: [ 'role::apt', 'skip::apt' ]
 
 
-- name: Apply core configuration
-  import_playbook: 'service/core.yml'
+- import_playbook: 'service/core.yml'
 
 
 - name: Bootstrap host for Ansible management with LDAP
@@ -83,13 +82,13 @@
   pre_tasks:
 
     - name: Prepare pki environment
-      ansible.builtin.import_role:
+      import_role:
         name: 'pki'
         tasks_from: 'main_env'
       tags: [ 'role::pki', 'role::pki:secret', 'role::secret' ]
 
     - name: Prepare sshd environment
-      ansible.builtin.import_role:
+      import_role:
         name: 'sshd'
         tasks_from: 'main_env'
       tags: [ 'role::sshd', 'role::ldap' ]
@@ -123,6 +122,7 @@
       tags: [ 'role::apt_preferences', 'skip::apt_preferences' ]
       apt_preferences__dependent_list:
         - '{{ etckeeper__apt_preferences__dependent_list }}'
+        - '{{ sshd__apt_preferences__dependent_list }}'
         - '{{ yadm__apt_preferences__dependent_list }}'
 
     - role: etckeeper
@@ -157,11 +157,11 @@
 
     - role: nslcd
       tags: [ 'role::nslcd', 'skip::nslcd' ]
-      when: (ansible_local.ldap.posix_enabled | d()) | bool
+      when: (ansible_local.ldap.posix_enabled|d())|bool
 
     - role: nscd
       tags: [ 'role::nscd', 'skip::nscd' ]
-      when: (ansible_local.ldap.posix_enabled | d()) | bool
+      when: (ansible_local.ldap.posix_enabled|d())|bool
 
     - role: keyring
       tags: [ 'role::keyring', 'skip::keyring', 'role::yadm' ]

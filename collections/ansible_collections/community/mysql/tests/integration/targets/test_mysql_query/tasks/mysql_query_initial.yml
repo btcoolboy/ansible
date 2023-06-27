@@ -1,3 +1,4 @@
+---
 # Test code for mysql_query module
 # Copyright: (c) 2020, Andrew Klychkov (@Andersson007) <aaklychkov@mail.ru>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
@@ -5,7 +6,7 @@
     mysql_parameters: &mysql_params
       login_user: '{{ mysql_user }}'
       login_password: '{{ mysql_password }}'
-      login_host: 127.0.0.1
+      login_host: '{{ mysql_host }}'
       login_port: '{{ mysql_primary_port }}'
 
   block:
@@ -16,7 +17,8 @@
       query: 'CREATE DATABASE {{ test_db }}'
     register: result
 
-  - assert:
+  - name: Assert that create db test_db is changed and returns expected query
+    assert:
       that:
         - result is changed
         - result.executed_queries == ['CREATE DATABASE {{ test_db }}']
@@ -28,7 +30,8 @@
       query: 'CREATE TABLE {{ test_table1 }} (id int)'
     register: result
 
-  - assert:
+  - name: Assert that create table test_table1 is changed and returns expected query
+    assert:
       that:
         - result is changed
         - result.executed_queries == ['CREATE TABLE {{ test_table1 }} (id int)']
@@ -38,12 +41,13 @@
       <<: *mysql_params
       login_db: '{{ test_db }}'
       query:
-      - 'INSERT INTO {{ test_table1 }} VALUES (1), (2)'
-      - 'INSERT INTO {{ test_table1 }} VALUES (3)'
+        - 'INSERT INTO {{ test_table1 }} VALUES (1), (2)'
+        - 'INSERT INTO {{ test_table1 }} VALUES (3)'
       single_transaction: yes
     register: result
 
-  - assert:
+  - name: Assert that inserting test data is changed and returns expected query and results
+    assert:
       that:
         - result is changed
         - result.rowcount == [2, 1]
@@ -56,7 +60,8 @@
       query: 'SELECT * FROM {{ test_table1 }}'
     register: result
 
-  - assert:
+  - name: Assert that query data in test_table1 is not changed and returns expected query and results
+    assert:
       that:
         - result is not changed
         - result.executed_queries == ['SELECT * FROM {{ test_table1 }}']
@@ -74,7 +79,8 @@
       - 1
     register: result
 
-  - assert:
+  - name: Assert that query data in test_table1 using positional args is not changed and returns expected query and results
+    assert:
       that:
         - result is not changed
         - result.executed_queries == ["SELECT * FROM {{ test_table1 }} WHERE id = 1"]
@@ -90,7 +96,8 @@
         some_id: 1
     register: result
 
-  - assert:
+  - name: Assert that query data in test_table1 using named args is not changed and returns expected query and results
+    assert:
       that:
         - result is not changed
         - result.executed_queries == ["SELECT * FROM {{ test_table1 }} WHERE id = 1"]
@@ -107,7 +114,8 @@
         new_id: 0
     register: result
 
-  - assert:
+  - name: Assert that update data in test_table1 is changed and returns the expected query
+    assert:
       that:
         - result is changed
         - result.executed_queries == ['UPDATE {{ test_table1 }} SET id = 0 WHERE id = 1']
@@ -122,7 +130,8 @@
         some_id: 1
     register: result
 
-  - assert:
+  - name: Assert that query that check the prev update is not changed and returns the expected query with id = 1
+    assert:
       that:
         - result is not changed
         - result.executed_queries == ['SELECT * FROM {{ test_table1 }} WHERE id = 1']
@@ -137,7 +146,8 @@
         some_id: 0
     register: result
 
-  - assert:
+  - name: Assert that query that check the prev update is not changed and returns the expected query with id = 0
+    assert:
       that:
         - result is not changed
         - result.executed_queries == ['SELECT * FROM {{ test_table1 }} WHERE id = 0']
@@ -153,7 +163,8 @@
         new_id: 0
     register: result
 
-  - assert:
+  - name: Assert that update data in test_table1 again is not changed and returns expected query
+    assert:
       that:
         - result is not changed
         - result.executed_queries == ['UPDATE {{ test_table1 }} SET id = 0 WHERE id = 1']
@@ -168,7 +179,8 @@
       - 'SELECT * FROM {{ test_table1 }} WHERE id = 0'
     register: result
 
-  - assert:
+  - name: Assert that delete data from test_table1 is changed an returns expected query
+    assert:
       that:
         - result is changed
         - result.executed_queries == ['DELETE FROM {{ test_table1 }} WHERE id = 0', 'SELECT * FROM {{ test_table1 }} WHERE id = 0']
@@ -181,7 +193,8 @@
       query: 'DELETE FROM {{ test_table1 }} WHERE id = 0'
     register: result
 
-  - assert:
+  - name: Assert that delete data from test_table1 again is not changed and returns expected query
+    assert:
       that:
         - result is not changed
         - result.executed_queries == ['DELETE FROM {{ test_table1 }} WHERE id = 0']
@@ -192,11 +205,12 @@
       <<: *mysql_params
       login_db: '{{ test_db }}'
       query:
-      - 'TRUNCATE {{ test_table1 }}'
-      - 'SELECT * FROM {{ test_table1 }}'
+        - 'TRUNCATE {{ test_table1 }}'
+        - 'SELECT * FROM {{ test_table1 }}'
     register: result
 
-  - assert:
+  - name: Assert that truncate test_table1 is changed and returns expected query
+    assert:
       that:
         - result is changed
         - result.executed_queries == ['TRUNCATE {{ test_table1 }}', 'SELECT * FROM {{ test_table1 }}']
@@ -209,7 +223,8 @@
       query: 'RENAME TABLE {{ test_table1 }} TO {{ test_table2 }}'
     register: result
 
-  - assert:
+  - name: Assert that rename table test_table1 is changed and returns expected query
+    assert:
       that:
         - result is changed
         - result.executed_queries == ['RENAME TABLE {{ test_table1 }} TO {{ test_table2 }}']
@@ -223,7 +238,8 @@
     register: result
     ignore_errors: yes
 
-  - assert:
+  - name: Assert that query old table is failed
+    assert:
       that:
         - result is failed
 
@@ -234,7 +250,8 @@
       query: 'SELECT * FROM {{ test_table2 }}'
     register: result
 
-  - assert:
+  - name: Assert that query new table succeed and returns 0 row
+    assert:
       that:
         - result.rowcount == [0]
 
@@ -257,7 +274,8 @@
       query: 'SELECT id, story FROM {{ test_table3 }}'
     register: result
 
-  - assert:
+  - name: Assert that select from test_table3 returns 2 rows
+    assert:
       that:
         - result.rowcount == [2]
 
@@ -269,7 +287,8 @@
     register: result
     ignore_errors: yes
 
-  - assert:
+  - name: Assert that pass wrong query type is failed
+    assert:
       that:
         - result is failed
         - result.msg is search('the query option value must be a string or list')
@@ -284,7 +303,8 @@
     register: result
     ignore_errors: yes
 
-  - assert:
+  - name: Assert that pass wrong query element is failed
+    assert:
       that:
         - result is failed
         - result.msg is search('the elements in query list must be strings')
@@ -303,7 +323,8 @@
       single_transaction: yes
     register: result
 
-  - assert:
+  - name: Assert that insert test data using replace statement is changed
+    assert:
       that:
         - result is changed
         - result.rowcount == [1]
@@ -339,20 +360,30 @@
     register: result
 
   # Issue https://github.com/ansible-collections/community.mysql/issues/268
-  - assert:
+  - name: Assert that create table IF NOT EXISTS is not changed with pymysql
+    assert:
       that:
-        # PyMySQL driver throws a warning, so the following is correct
+        # PyMySQL driver throws a warning for version before 0.10.0
         - result is not changed
-    when: connector_name is search('pymysql')
+    when:
+      - connector_name == 'pymysql'
+      - connector_version is version('0.10.0', '<')
 
   # Issue https://github.com/ansible-collections/community.mysql/issues/268
-  - assert:
+  - name: Assert that create table IF NOT EXISTS is changed with mysqlclient
+    assert:
       that:
-        # mysqlclient driver throws nothing, so it's impossible to figure out
-        # if the state was changed or not.
-        # We assume that it was for DDL queryes by default in the code
+        # Mysqlclient 2.0.1 and pymysql 0.10.0+ drivers throws no warning,
+        # so it's impossible to figure out if the state was changed or not.
+        # We assume that it was for DDL queries by default in the code
         - result is changed
-    when: connector_name is search('mysqlclient')
+    when:
+      - >
+        connector_name == 'mysqlclient'
+        or (
+          connector_name == 'pymysql'
+          and connector_version is version('0.10.0', '>')
+        )
 
   - name: Drop db {{ test_db }}
     mysql_query:
@@ -360,7 +391,15 @@
       query: 'DROP DATABASE {{ test_db }}'
     register: result
 
-  - assert:
+  - name: Assert that drop database is changed and returns expected query
+    assert:
       that:
         - result is changed
         - result.executed_queries == ['DROP DATABASE {{ test_db }}']
+
+  always:
+
+    - name: Clean up test_db
+      mysql_query:
+        <<: *mysql_params
+        query: 'DROP DATABASE IF EXISTS {{ test_db }}'

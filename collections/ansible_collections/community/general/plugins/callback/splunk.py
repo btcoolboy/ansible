@@ -8,27 +8,27 @@ __metaclass__ = type
 
 DOCUMENTATION = '''
     name: splunk
-    type: aggregate
+    type: notification
     short_description: Sends task result events to Splunk HTTP Event Collector
     author: "Stuart Hirst (!UNKNOWN) <support@convergingdata.com>"
     description:
       - This callback plugin will send task results as JSON formatted events to a Splunk HTTP collector.
-      - The companion Splunk Monitoring & Diagnostics App is available here "https://splunkbase.splunk.com/app/4023/"
+      - The companion Splunk Monitoring & Diagnostics App is available here U(https://splunkbase.splunk.com/app/4023/).
       - Credit to "Ryan Currah (@ryancurrah)" for original source upon which this is based.
     requirements:
       - Whitelisting this callback plugin
       - 'Create a HTTP Event Collector in Splunk'
-      - 'Define the url and token in ansible.cfg'
+      - 'Define the URL and token in C(ansible.cfg)'
     options:
       url:
-        description: URL to the Splunk HTTP collector source
+        description: URL to the Splunk HTTP collector source.
         env:
           - name: SPLUNK_URL
         ini:
           - section: callback_splunk
             key: url
       authtoken:
-        description: Token to authenticate the connection to the Splunk HTTP collector
+        description: Token to authenticate the connection to the Splunk HTTP collector.
         env:
           - name: SPLUNK_AUTHTOKEN
         ini:
@@ -36,8 +36,8 @@ DOCUMENTATION = '''
             key: authtoken
       validate_certs:
         description: Whether to validate certificates for connections to HEC. It is not recommended to set to
-                     C(false) except when you are sure that nobody can intercept the connection
-                     between this plugin and HEC, as setting it to C(false) allows man-in-the-middle attacks!
+                     V(false) except when you are sure that nobody can intercept the connection
+                     between this plugin and HEC, as setting it to V(false) allows man-in-the-middle attacks!
         env:
           - name: SPLUNK_VALIDATE_CERTS
         ini:
@@ -48,7 +48,7 @@ DOCUMENTATION = '''
         version_added: '1.0.0'
       include_milliseconds:
         description: Whether to include milliseconds as part of the generated timestamp field in the event
-                     sent to the Splunk HTTP collector
+                     sent to the Splunk HTTP collector.
         env:
           - name: SPLUNK_INCLUDE_MILLISECONDS
         ini:
@@ -165,7 +165,7 @@ class SplunkHTTPCollectorSource(object):
 
 class CallbackModule(CallbackBase):
     CALLBACK_VERSION = 2.0
-    CALLBACK_TYPE = 'aggregate'
+    CALLBACK_TYPE = 'notification'
     CALLBACK_NAME = 'community.general.splunk'
     CALLBACK_NEEDS_WHITELIST = True
 

@@ -87,7 +87,7 @@ upstream {{ item.name }} {
         server 127.0.0.1{% if item.port is defined and item.port %}:{{ item.port }}{% endif %}{% if item.enabled is defined and not item.enabled %} down{% endif %};
 {%             else                                                               %}
 {%                 if host in play_hosts and hostvars[host].ansible_all_ipv4_addresses is defined %}
-{%                     for address in hostvars[host].ansible_all_ipv4_addresses | unique %}
+{%                     for address in hostvars[host].ansible_all_ipv4_addresses | unique | sort %}
         server {{ address }}{% if item.port is defined and item.port %}:{{ item.port }}{% endif %}{% if item.enabled is defined and not item.enabled %} down{% endif %};
 {%                     endfor                                                     %}
 {%                 else                                                           %}
@@ -96,7 +96,7 @@ upstream {{ item.name }} {
 {%             endif                                                              %}
 {%         endfor                                                                 %}
 {%     endif                                                                      %}
-{%     if item.options | d()                                                        %}
+{%     if item.options|d()                                                        %}
 {{ item.options | indent(8, true) | regex_replace("(?m)^\s*$", "") }}
 {%     endif                                                                      %}
 {%     block nginx_tpl_block_custom_upstreams                                     %}
@@ -104,4 +104,3 @@ upstream {{ item.name }} {
 }
 {% endif                                                                          %}
 {% endblock                                                                       %}
-

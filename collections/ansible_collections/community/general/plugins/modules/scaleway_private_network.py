@@ -18,11 +18,16 @@ short_description: Scaleway private network management
 version_added: 4.5.0
 author: Pascal MANGIN (@pastral)
 description:
-    - This module manages private network on Scaleway account
-      (U(https://developer.scaleway.com)).
+    - "This module manages private network on Scaleway account (U(https://developer.scaleway.com))."
 extends_documentation_fragment:
-- community.general.scaleway
+    - community.general.scaleway
+    - community.general.attributes
 
+attributes:
+  check_mode:
+    support: full
+  diff_mode:
+    support: none
 
 options:
   state:
@@ -43,7 +48,7 @@ options:
   region:
     type: str
     description:
-     - Scaleway region to use (for example C(par1)).
+     - Scaleway region to use (for example V(par1)).
     required: true
     choices:
       - ams1
@@ -88,7 +93,7 @@ EXAMPLES = '''
 RETURN = '''
 scaleway_private_network:
     description: Information on the VPC.
-    returned: success when C(state=present)
+    returned: success when O(state=present)
     type: dict
     sample:
         {
