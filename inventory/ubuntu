@@ -1,2 +1,8 @@
 [ubuntu]
 ubuntu-template ansible_host=10.200.101.160
+ubuntu-docker
+vm-data-30
+ceph-[01:03]
+k8s-master[01:03]
+k8s-worker[01:05]
+k8s-adm
