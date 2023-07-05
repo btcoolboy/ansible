@@ -1,5 +1,0 @@
-[debian12:children]
-debian12_k8s
-
-[debian12_k8s]
-10.200.101.182

@@ -1,5 +1,5 @@
 ---
-- hosts: debian12
+- hosts: debian
   tasks:
     - name: Add Ceph apt key.
       ansible.builtin.get_url:
@@ -41,6 +41,17 @@
           - src: ca.crt
             dest: cloud.lab/ca.crt
     - role: vim
+    - role: user
+      vars:
+        user_groups:
+          - name: ansible
+            gid: 2000
+        user_users:
+          - name: ansible
+            gid: 2000
+            group: ansible
+            groups:
+              - sudo
     - role: sudoers
       vars:
         sudoers_sudoers:
@@ -66,6 +77,8 @@
             src: files/id_rsa.pub
         ssh_keys_authorized_keys:
           - owner: debian
+            src: files/id_rsa.pub
+          - owner: ansible
             src: files/id_rsa.pub
     - role: timezone
       vars:

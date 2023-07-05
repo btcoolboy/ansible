@@ -1,5 +1,0 @@
-[ubuntu_docker:children]
-ubuntu_docker_ceph
-
-[ubuntu_docker_ceph]
-ceph-[01:03]

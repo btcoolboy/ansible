@@ -1,6 +1,0 @@
-[ubuntu:children]
-ubuntu_k8s
-
-[ubuntu_k8s]
-k8s-master[01:03]
-k8s-worker[01:05]

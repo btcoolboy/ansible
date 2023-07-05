@@ -1,5 +1,5 @@
 ---
-- hosts: debian12_k8s
+- hosts: containerd
   tasks:
     - name: Install packages
       apt:
@@ -31,7 +31,7 @@
               - https://registry-docker.cloud.lab
           - name: quay.io
             endpoint:
-              - https://registry-quay.cloud.lab
+              - https://registry-quay.cloud.lab 
           - name: gcr.io
             endpoint:
               - https://registry-k8s.cloud.lab

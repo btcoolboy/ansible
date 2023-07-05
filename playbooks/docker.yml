@@ -1,5 +1,5 @@
 ---
-- hosts: debian12_docker
+- hosts: docker
   roles:
     - role: docker
       vars:
