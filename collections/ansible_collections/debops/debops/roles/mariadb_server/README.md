@@ -10,4 +10,4 @@ MariaDB server and / or access it remotely from other hosts.
 from local `root` account. After that, you can use `debops.mariadb` role
 to manage databases and user accounts on the server.
 
-Read the [mariadb_server role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/mariadb_server/) for more details.
+Read the [mariadb_server role documentation](https://docs.debops.org/en/HEAD/ansible/roles/mariadb_server/) for more details.

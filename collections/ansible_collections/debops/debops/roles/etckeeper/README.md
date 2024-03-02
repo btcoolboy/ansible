@@ -12,4 +12,4 @@ The role will install a special Ansible local fact which will commit any
 changes in the `/etc` directory as well, usually at the moment the
 Ansible facts are gathered.
 
-Read the [etckeeper role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/etckeeper/) for more details.
+Read the [etckeeper role documentation](https://docs.debops.org/en/HEAD/ansible/roles/etckeeper/) for more details.

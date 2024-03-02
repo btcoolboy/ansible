@@ -4,57 +4,47 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Import DebOps global handlers
-  import_role:
+  ansible.builtin.import_role:
     name: 'global_handlers'
 
 - name: Install atd
-  apt:
+  ansible.builtin.apt:
     name: 'at'
-    state: '{{ "present" if atd_enabled|bool else "absent" }}'
+    state: '{{ "present" if atd_enabled | bool else "absent" }}'
     purge: True
     install_recommends: False
   register: atd__register_packages
   until: atd__register_packages is succeeded
 
 - name: Generate consistent atd variables
-  set_fact:
+  ansible.builtin.set_fact:
     atd_fact_batch_interval: '{{ atd_batch_interval }}'
     atd_fact_batch_load: '{{ atd_batch_load }}'
-  when: atd_enabled|bool
+  when: atd_enabled | bool
   tags: [ 'meta::facts' ]
 
 - name: Configure atd and batch
-  template:
+  ansible.builtin.template:
     src: 'etc/default/atd.j2'
     dest: '/etc/default/atd'
     owner: 'root'
     group: 'root'
     mode: '0644'
   notify: [ 'Restart atd' ]
-  when: atd_enabled|bool
-
-- name: Install custom atd init script
-  template:
-    src: 'etc/init.d/atd.j2'
-    dest: '/etc/init.d/atd'
-    owner: 'root'
-    group: 'root'
-    mode: '0755'
-  notify: [ 'Restart atd' ]
-  when: atd_enabled|bool and ansible_distribution_release in [ 'wheezy', 'precise' ]
+  when: atd_enabled | bool
 
 - name: Install custom atd.service unit
-  template:
+  ansible.builtin.template:
     src: 'etc/systemd/system/atd.service.j2'
     dest: '/etc/systemd/system/atd.service'
     owner: 'root'
     group: 'root'
     mode: '0644'
-  when: atd_enabled|bool
+  when: atd_enabled | bool
   notify: [ 'Reload systemd units', 'Restart atd' ]
 
 - name: Configure /etc/at.allow
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: '/etc/at.allow'
     regexp: '^{{ item }}$'
     line: '{{ item }}'
@@ -63,28 +53,27 @@
     owner: 'root'
     group: 'daemon'
     mode: '0640'
-  with_flattened:
-    - '{{ atd_default_allow }}'
-    - '{{ atd_allow }}'
-    - '{{ atd_group_allow }}'
-    - '{{ atd_host_allow }}'
-  when: (atd_enabled|bool and
-         (atd_default_allow|d() or atd_allow|d() or
-          atd_group_allow|d() or atd_host_allow|d()) and
-          item|d())
+  loop: '{{ q("flattened", atd_default_allow
+                           + atd_allow
+                           + atd_group_allow
+                           + atd_host_allow) }}'
+  when: (atd_enabled | bool and
+         (atd_default_allow | d() or atd_allow | d() or
+          atd_group_allow | d() or atd_host_allow | d()) and
+          item | d())
   tags: [ 'role::atd:users' ]
 
 - name: Remove /etc/at.allow if list is empty
-  file:
+  ansible.builtin.file:
     path: '/etc/at.allow'
     state: 'absent'
-  when: (atd_enabled|bool and
-         (not atd_default_allow|d() and not atd_allow|d() and
-          not atd_group_allow|d() and not atd_host_allow|d()))
+  when: (atd_enabled | bool and
+         (not atd_default_allow | d() and not atd_allow | d() and
+          not atd_group_allow | d() and not atd_host_allow | d()))
   tags: [ 'role::atd:users' ]
 
 - name: Configure /etc/at.deny
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: '/etc/at.deny'
     regexp: '^{{ item }}$'
     line: '{{ item }}'
@@ -93,16 +82,15 @@
     owner: 'root'
     group: 'daemon'
     mode: '0640'
-  with_flattened:
-    - '{{ atd_default_deny }}'
-    - '{{ atd_deny }}'
-  when: (atd_enabled|bool and
-         (atd_default_deny|d() or atd_deny|d()) and
-          item|d())
+  loop: '{{ q("flattened", atd_default_deny
+                           + atd_deny) }}'
+  when: (atd_enabled | bool and
+         (atd_default_deny | d() or atd_deny | d()) and
+          item | d())
   tags: [ 'role::atd:users' ]
 
 - name: Make sure that Ansible local facts directory exists
-  file:
+  ansible.builtin.file:
     path: '/etc/ansible/facts.d'
     state: 'directory'
     owner: 'root'
@@ -110,7 +98,7 @@
     mode: '0755'
 
 - name: Save atd facts
-  template:
+  ansible.builtin.template:
     src: 'etc/ansible/facts.d/atd.fact.j2'
     dest: '/etc/ansible/facts.d/atd.fact'
     owner: 'root'
@@ -120,4 +108,4 @@
   tags: [ 'meta::facts' ]
 
 - name: Gather Ansible facts if needed
-  meta: 'flush_handlers'
+  ansible.builtin.meta: 'flush_handlers'

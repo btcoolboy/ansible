@@ -14,4 +14,4 @@ The `debops.influxdb_server` role is the "server" part - it installs
 `root` admin account. After that, you can use `debops.influxdb` role to
 manage databases and user accounts on the server.
 
-Read the [influxdb_server role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/influxdb_server/) for more details.
+Read the [influxdb_server role documentation](https://docs.debops.org/en/HEAD/ansible/roles/influxdb_server/) for more details.

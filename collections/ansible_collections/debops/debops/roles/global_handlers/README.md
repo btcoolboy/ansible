@@ -7,4 +7,4 @@ them to be used in different Ansible roles without the need to add
 dependent roles to the playbook, making execution faster and the
 codebase easier to modify and maintain.
 
-Read the [global_handlers role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/global_handlers/) for more details.
+Read the [global_handlers role documentation](https://docs.debops.org/en/HEAD/ansible/roles/global_handlers/) for more details.

@@ -31,7 +31,7 @@
 # in the LDAP directory, but may require additional changes in existing
 # databases. See :ref:`the rfc2307bis schema <slapd__ref_rfc2307bis>` for more
 # details.
-slapd__rfc2307bis_enabled: '{{ ansible_local.slapd.rfc2307bis|d(True)|bool }}'
+slapd__rfc2307bis_enabled: '{{ ansible_local.slapd.rfc2307bis | d(True) | bool }}'
 
                                                                    # ]]]
 # .. envvar:: slapd__debops_schema_path [[[
@@ -279,7 +279,7 @@ slapd__superuser_data_password: '{{ "{CRYPT}" + lookup("password", secret
 # .. envvar:: slapd__data_rootdn [[[
 #
 # The Distinguished Name of the main database root account.
-slapd__data_rootdn: '{{ ([ "cn=admin" ] + slapd__base_dn) | join(",") }}'
+slapd__data_rootdn: '{{ (["cn=admin"] + slapd__base_dn) | join(",") }}'
 
                                                                    # ]]]
 # .. envvar:: slapd__data_rootpw [[[
@@ -320,14 +320,14 @@ slapd__groupid_min: '{{ slapd__uid_gid_min }}'
 # matching User Private Groups. Default: 2001999999
 #
 # Ref: https://wiki.debian.org/UserPrivateGroups
-slapd__groupid_max: '{{ slapd__uid_gid_min|int + 1999999 }}'
+slapd__groupid_max: '{{ slapd__uid_gid_min | int + 1999999 }}'
 
                                                                    # ]]]
 # .. envvar:: slapd__uid_gid_max [[[
 #
 # Last UID/GID which is considered to be managed by the LDAP directory and not
 # by the local NSS database. Default: 2099999999
-slapd__uid_gid_max: '{{ slapd__uid_gid_min|int + 99999999 }}'
+slapd__uid_gid_max: '{{ slapd__uid_gid_min | int + 99999999 }}'
                                                                    # ]]]
                                                                    # ]]]
 # LDAP database tuning [[[
@@ -354,13 +354,13 @@ slapd__data_max_size: '{{ (1024 * 1024 * 1024) * 10 }}'
 #
 # Enable or disable support for X.509 certificates using the :ref:`debops.pki`
 # Ansible role.
-slapd__pki: '{{ ansible_local.pki.enabled|d(False) | bool }}'
+slapd__pki: '{{ ansible_local.pki.enabled | d(False) | bool }}'
 
                                                                    # ]]]
 # .. envvar:: slapd__pki_path [[[
 #
 # Absolute path to the directory that contains PKI realms.
-slapd__pki_path: '{{ ansible_local.pki.base_path|d("/etc/pki/realms") }}'
+slapd__pki_path: '{{ ansible_local.pki.base_path | d("/etc/pki/realms") }}'
 
                                                                    # ]]]
 # .. envvar:: slapd__pki_realm [[[
@@ -369,8 +369,8 @@ slapd__pki_path: '{{ ansible_local.pki.base_path|d("/etc/pki/realms") }}'
 # setup the configuration is shared, therefore all cluster nodes should use the
 # same PKI realm name.
 slapd__pki_realm: '{{ slapd__domain
-                      if (slapd__domain in ansible_local.pki.known_realms|d([]))
-                      else ansible_local.pki.realm|d("domain") }}'
+                      if (slapd__domain in ansible_local.pki.known_realms | d([]))
+                      else ansible_local.pki.realm | d("domain") }}'
 
                                                                    # ]]]
 # .. envvar:: slapd__pki_ca [[[
@@ -406,7 +406,7 @@ slapd__dhparam_set: 'default'
 # Absolute path to the file with Diffie-Hellman parameters used by the OpenLDAP
 # server. If it's empty, the custom Diffie-Hellman parameters will not be
 # configured.
-slapd__dhparam_file: '{{ ansible_local.dhparam[slapd__dhparam_set]|d("") }}'
+slapd__dhparam_file: '{{ ansible_local.dhparam[slapd__dhparam_set] | d("") }}'
 
                                                                    # ]]]
 # .. envvar:: slapd__tls_ca_certificate [[[
@@ -720,31 +720,31 @@ slapd__default_tasks:
       olcTLSCACertificateFile:  '{{ slapd__tls_ca_certificate }}'
       olcTLSCertificateFile:    '{{ slapd__tls_certificate }}'
       olcTLSCertificateKeyFile: '{{ slapd__tls_private_key }}'
-    state: '{{ "exact" if slapd__pki|bool else "init" }}'
+    state: '{{ "exact" if slapd__pki | bool else "init" }}'
 
   - name: 'Configure Diffie-Hellman parameters'
     dn: 'cn=config'
     attributes:
       olcTLSDHParamFile: '{{ slapd__dhparam_file }}'
-    state: '{{ "exact" if (slapd__pki|bool and slapd__dhparam_file|d()) else "init" }}'
+    state: '{{ "exact" if (slapd__pki | bool and slapd__dhparam_file | d()) else "init" }}'
 
   - name: 'Configure TLS cipher suites'
     dn: 'cn=config'
     attributes:
       olcTLSCipherSuite: '{{ slapd__tls_cipher_suite }}'
-    state: '{{ "exact" if slapd__pki|bool else "init" }}'
+    state: '{{ "exact" if slapd__pki | bool else "init" }}'
 
   - name: 'Set default Security Strength Factors enforced by the server'
     dn: 'cn=config'
     attributes:
       olcLocalSSF: '128'
       olcSecurity: 'ssf=128 update_ssf=128 simple_bind=128'
-    state: '{{ "exact" if slapd__pki|bool else "init" }}'
+    state: '{{ "exact" if slapd__pki | bool else "init" }}'
 
   - name: 'Configure supported SASL authentication methods'
     dn: 'cn=config'
     attributes:
-      olcSaslSecProps: 'noanonymous,minssf={{ "128" if slapd__pki|bool else "0" }}'
+      olcSaslSecProps: 'noanonymous,minssf={{ "128" if slapd__pki | bool else "0" }}'
     state: 'exact'
 
     # Warning: OpenLDAP v2.4.x requires a restart when this attribute is changed
@@ -877,7 +877,7 @@ slapd__acl_tasks:
           by anonymous auth
           by *         none
 
-        - |-
+        - |-  # noqa jinja[spacing]
           to dn.regex="^cn=(LDAP Administrator|LDAP Replicator), ou=Roles,{{ slapd__basedn }}$"
           by group/organizationalRole/roleOccupant.exact="cn=LDAP Editor,           ou=Roles,{{ slapd__basedn }}" read
           by group/organizationalRole/roleOccupant.exact="cn=Account Administrator, ou=Roles,{{ slapd__basedn }}" read
@@ -905,20 +905,20 @@ slapd__acl_tasks:
           by group/groupOfNames/member.exact="cn=LDAP Editors, ou=System Groups,{{ slapd__basedn }}" write
           by * break
 
-        - |-
+        - |-  # noqa jinja[spacing]
           to dn.regex="^cn=[^,]+,ou=(System Groups|Groups),{{ slapd__basedn }}$"
              attrs="member"
           by dnattr="owner" write
           by * break
 
-        - |-
+        - |-  # noqa jinja[spacing]
           to dn.regex="^([^,]+,)?ou=(People|Groups|Machines),{{ slapd__basedn }}$"
              attrs="children,entry"
           by group/organizationalRole/roleOccupant.exact="cn=Account Administrator, ou=Roles,{{ slapd__basedn }}" write
           by group/groupOfNames/member.exact="cn=Account Administrators, ou=System Groups,{{ slapd__basedn }}" write
           by * break
 
-        - |-
+        - |-  # noqa jinja[spacing]
           to dn.regex="^[^,]+,ou=(People|Groups|Machines),{{ slapd__basedn }}$"
           by group/organizationalRole/roleOccupant.exact="cn=Account Administrator, ou=Roles,{{ slapd__basedn }}" write
           by group/groupOfNames/member.exact="cn=Account Administrators, ou=System Groups,{{ slapd__basedn }}" write
@@ -957,45 +957,45 @@ slapd__cluster_tasks: []
 slapd__structure_tasks:
 
   - name: 'Remove the default cn=admin object'
-    dn: '{{ [ "cn=admin" ] + slapd__base_dn }}'
+    dn: '{{ ["cn=admin"] + slapd__base_dn }}'
     state: 'absent'
     entry_state: 'absent'
 
   - name: 'Create the ou=Groups object'
-    dn: '{{ [ "ou=Groups" ] + slapd__base_dn }}'
+    dn: '{{ ["ou=Groups"] + slapd__base_dn }}'
     objectClass: 'organizationalStructure'
 
   - name: 'Create the ou=Machines object'
-    dn: '{{ [ "ou=Machines" ] + slapd__base_dn }}'
+    dn: '{{ ["ou=Machines"] + slapd__base_dn }}'
     objectClass: 'organizationalStructure'
 
   - name: 'Create the ou=Hosts object'
-    dn: '{{ [ "ou=Hosts" ] + slapd__base_dn }}'
+    dn: '{{ ["ou=Hosts"] + slapd__base_dn }}'
     objectClass: 'organizationalStructure'
 
   - name: 'Create the ou=People object'
-    dn: '{{ [ "ou=People" ] + slapd__base_dn }}'
+    dn: '{{ ["ou=People"] + slapd__base_dn }}'
     objectClass: 'organizationalStructure'
 
   - name: 'Create the ou=Roles object'
-    dn: '{{ [ "ou=Roles" ] + slapd__base_dn }}'
+    dn: '{{ ["ou=Roles"] + slapd__base_dn }}'
     objectClass: 'organizationalStructure'
 
   - name: 'Create the ou=Services object'
-    dn: '{{ [ "ou=Services" ] + slapd__base_dn }}'
+    dn: '{{ ["ou=Services"] + slapd__base_dn }}'
     objectClass: 'organizationalStructure'
 
   - name: 'Create the ou=Password Policies object'
-    dn: '{{ [ "ou=Password Policies" ] + slapd__base_dn }}'
+    dn: '{{ ["ou=Password Policies"] + slapd__base_dn }}'
     objectClass: 'organizationalStructure'
 
   - name: 'Create the ou=System object'
-    dn: '{{ [ "ou=System" ] + slapd__base_dn }}'
+    dn: '{{ ["ou=System"] + slapd__base_dn }}'
     objectClass: 'organizationalStructure'
 
     # Refer to slapo-ppolicy(5) for details
   - name: 'Create the cn=Default Password Policy object'
-    dn: '{{ [ "cn=Default Password Policy", "ou=Password Policies" ] + slapd__base_dn }}'
+    dn: '{{ ["cn=Default Password Policy", "ou=Password Policies"] + slapd__base_dn }}'
     objectClass: [ 'namedObject', 'pwdPolicy' ]
     attributes:
       cn: 'Default Password Policy'
@@ -1015,35 +1015,35 @@ slapd__structure_tasks:
       pwdSafeModify: 'FALSE'
 
   - name: 'Create cn=LDAP Administrator role'
-    dn: '{{ [ "cn=LDAP Administrator", "ou=Roles" ] + slapd__base_dn }}'
+    dn: '{{ ["cn=LDAP Administrator", "ou=Roles"] + slapd__base_dn }}'
     objectClass: 'organizationalRole'
     attributes:
       cn: 'LDAP Administrator'
       description: 'People responsible for LDAP infrastructure'
 
   - name: 'Create cn=LDAP Replicator role'
-    dn: '{{ [ "cn=LDAP Replicator", "ou=Roles" ] + slapd__base_dn }}'
+    dn: '{{ ["cn=LDAP Replicator", "ou=Roles"] + slapd__base_dn }}'
     objectClass: 'organizationalRole'
     attributes:
       cn: 'LDAP Replicator'
       description: 'Service accounts used for LDAP replication'
 
   - name: 'Create cn=LDAP Monitor role'
-    dn: '{{ [ "cn=LDAP Monitor", "ou=Roles" ] + slapd__base_dn }}'
+    dn: '{{ ["cn=LDAP Monitor", "ou=Roles"] + slapd__base_dn }}'
     objectClass: 'organizationalRole'
     attributes:
       cn: 'LDAP Monitor'
       description: 'Accounts which can read cn=Monitor information'
 
   - name: 'Create cn=LDAP Editor role'
-    dn: '{{ [ "cn=LDAP Editor", "ou=Roles" ] + slapd__base_dn }}'
+    dn: '{{ ["cn=LDAP Editor", "ou=Roles"] + slapd__base_dn }}'
     objectClass: 'organizationalRole'
     attributes:
       cn: 'LDAP Editor'
       description: 'People responsible for LDAP contents'
 
   - name: 'Create cn=UNIX Administrators group'
-    dn: '{{ [ "cn=UNIX Administrators", "ou=Groups" ] + slapd__base_dn }}'
+    dn: '{{ ["cn=UNIX Administrators", "ou=Groups"] + slapd__base_dn }}'
     objectClass: [ 'groupOfEntries', 'posixGroup', 'posixGroupId',
                    'authorizedServiceObject', 'hostObject' ]
     attributes:
@@ -1054,88 +1054,88 @@ slapd__structure_tasks:
       host: 'posix:all'
 
   - name: 'Create cn=Account Administrator role'
-    dn: '{{ [ "cn=Account Administrator", "ou=Roles" ] + slapd__base_dn }}'
+    dn: '{{ ["cn=Account Administrator", "ou=Roles"] + slapd__base_dn }}'
     objectClass: 'organizationalRole'
     attributes:
       cn: 'Account Administrator'
       description: 'People responsible for personal accounts'
 
   - name: 'Create cn=Password Reset Agent role'
-    dn: '{{ [ "cn=Password Reset Agent", "ou=Roles" ] + slapd__base_dn }}'
+    dn: '{{ ["cn=Password Reset Agent", "ou=Roles"] + slapd__base_dn }}'
     objectClass: 'organizationalRole'
     attributes:
       cn: 'Password Reset Agent'
       description: 'Services that can perform password changes on behalf of users'
 
   - name: 'Create cn=SMS Gateway role'
-    dn: '{{ [ "cn=SMS Gateway", "ou=Roles" ] + slapd__base_dn }}'
+    dn: '{{ ["cn=SMS Gateway", "ou=Roles"] + slapd__base_dn }}'
     objectClass: 'organizationalRole'
     attributes:
       cn: 'SMS Gateway'
       description: 'Devices which send SMS messages to mobile numbers'
 
   - name: 'Create cn=Hidden Object Viewer role'
-    dn: '{{ [ "cn=Hidden Object Viewer", "ou=Roles" ] + slapd__base_dn }}'
+    dn: '{{ ["cn=Hidden Object Viewer", "ou=Roles"] + slapd__base_dn }}'
     objectClass: 'organizationalRole'
     attributes:
       cn: 'Hidden Object Viewer'
-      memberOf: '{{ ([ "cn=Hidden Objects", "ou=Groups" ] + slapd__base_dn) | join(",") }}'
+      memberOf: '{{ (["cn=Hidden Objects", "ou=Groups"] + slapd__base_dn) | join(",") }}'
       description: 'LDAP objects which can see hidden objects'
 
   - name: 'Create cn=Hidden Objects group'
-    dn: '{{ [ "cn=Hidden Objects", "ou=Groups" ] + slapd__base_dn }}'
+    dn: '{{ ["cn=Hidden Objects", "ou=Groups"] + slapd__base_dn }}'
     objectClass: 'groupOfNames'
     attributes:
       cn: 'Hidden Objects'
       member:
-        - '{{ ([ "cn=Hidden Objects", "ou=Groups" ] + slapd__base_dn) | join(",") }}'
-        - '{{ ([ "cn=Hidden Object Viewer", "ou=Roles" ] + slapd__base_dn) | join(",") }}'
-      memberOf: '{{ ([ "cn=Hidden Objects", "ou=Groups" ] + slapd__base_dn) | join(",") }}'
+        - '{{ (["cn=Hidden Objects", "ou=Groups"] + slapd__base_dn) | join(",") }}'
+        - '{{ (["cn=Hidden Object Viewer", "ou=Roles"] + slapd__base_dn) | join(",") }}'
+      memberOf: '{{ (["cn=Hidden Objects", "ou=Groups"] + slapd__base_dn) | join(",") }}'
       description: 'LDAP objects which are accessible only by privileged accounts'
 
   - name: 'Create cn=UNIX SSH users group'
-    dn: '{{ [ "cn=UNIX SSH users", "ou=Groups" ] + slapd__base_dn }}'
+    dn: '{{ ["cn=UNIX SSH users", "ou=Groups"] + slapd__base_dn }}'
     objectClass: [ 'groupOfEntries', 'posixGroup', 'posixGroupId',
                    'authorizedServiceObject', 'hostObject' ]
     attributes:
       cn: 'UNIX SSH users'
       gid: 'sshusers'
-      gidNumber: '{{ slapd__groupid_min|int + 1 }}'
+      gidNumber: '{{ slapd__groupid_min | int + 1 }}'
       description: 'People who can connect to UNIX-like infrastructure via SSH'
       host: 'posix:all'
 
   - name: 'Create cn=Next POSIX UID object'
-    dn: '{{ [ "cn=Next POSIX UID", "ou=System" ] + slapd__base_dn }}'
+    dn: '{{ ["cn=Next POSIX UID", "ou=System"] + slapd__base_dn }}'
     objectClass: 'uidNext'
     attributes:
       cn: 'Next POSIX UID'
-      uidNumber: '{{ slapd__groupid_max|int + 2 }}'
+      uidNumber: '{{ slapd__groupid_max | int + 2 }}'
       description: 'The next available uidNumber value'
 
   - name: 'Create cn=Next POSIX GID object'
-    dn: '{{ [ "cn=Next POSIX GID", "ou=System" ] + slapd__base_dn }}'
+    dn: '{{ ["cn=Next POSIX GID", "ou=System"] + slapd__base_dn }}'
     objectClass: 'gidNext'
     attributes:
       cn: 'Next POSIX GID'
-      gidNumber: '{{ slapd__groupid_min|int + 2 }}'
+      gidNumber: '{{ slapd__groupid_min | int + 2 }}'
       description: 'The next available gidNumber value'
 
   - name: 'Create SUDOers container'
-    dn: '{{ [ "ou=SUDOers" ] + slapd__base_dn }}'
+    dn: '{{ ["ou=SUDOers"] + slapd__base_dn }}'
     objectClass: 'organizationalStructure'
     attributes:
       ou: 'SUDOers'
       description: 'Container for sudoers.ldap(5) configuration'
 
   - name: 'Create sudoer defaults LDAP entry'
-    dn: '{{ [ "cn=defaults", "ou=SUDOers" ] + slapd__base_dn }}'
+    dn: '{{ ["cn=defaults", "ou=SUDOers"] + slapd__base_dn }}'
     objectClass: 'sudoRole'
     attributes:
       cn: 'defaults'
       description: 'Object which contains default options for all sudo roles'
 
   - name: 'Allow admins to gain root privileges via sudo'
-    dn: '{{ [ "cn=%admins", "ou=SUDOers" ] + slapd__base_dn }}'
+    dn: '{{ ["cn=%admins", "ou=SUDOers"] + slapd__base_dn }}'
     objectClass: 'sudoRole'
     attributes:
       cn: '%admins'
@@ -1220,7 +1220,7 @@ slapd__services:
   - 'ldap:///'
 
   # Listen for encrypted SSL connections (deprecated)
-  - '{{ "ldaps:///" if slapd__pki|bool else [] }}'
+  - '{{ "ldaps:///" if slapd__pki | bool else [] }}'
 
   # Listen for connections on local UNIX domain socket
   - 'ldapi:///'
@@ -1237,7 +1237,7 @@ slapd__ports:
   - 'ldap'
 
   # Encrypted SSL connections on port 636/tcp (deprecated)
-  - '{{ "ldaps" if slapd__pki|bool else [] }}'
+  - '{{ "ldaps" if slapd__pki | bool else [] }}'
 
                                                                    # ]]]
 # .. envvar:: slapd__accept_any [[[
@@ -1637,8 +1637,7 @@ slapd__python__dependent_packages3:
 
   - '{{ []
         if (ansible_distribution_release in
-            ([ "wheezy", "jessie", "stretch",
-               "precise", "trusty", "xenial" ]))
+            ["stretch", "trusty", "xenial"])
         else "python3-ldap" }}'
 
                                                                    # ]]]

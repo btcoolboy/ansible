@@ -11,4 +11,4 @@ accounts. In a LDAP-enabled environment, it might be better to configure
 these using LDAP directory, and manage local system administrator
 accounts using the `debops.system_users` Ansible role.
 
-Read the [users role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/users/) for more details.
+Read the [users role documentation](https://docs.debops.org/en/HEAD/ansible/roles/users/) for more details.

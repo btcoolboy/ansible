@@ -13,4 +13,4 @@ functionality, but is designed to manage regular user accounts and
 application accounts, without special modifications related to LDAP
 support.
 
-Read the [system_users role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/system_users/) for more details.
+Read the [system_users role documentation](https://docs.debops.org/en/HEAD/ansible/roles/system_users/) for more details.

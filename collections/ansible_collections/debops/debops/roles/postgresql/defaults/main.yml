@@ -78,7 +78,7 @@ postgresql__user: 'postgres'
 # FQDN hostname of the remote PostgreSQL server to use. Role detects if a local
 # server is available and uses it automatically.
 postgresql__server: '{{ ansible_local.postgresql.server
-                        if (ansible_local.postgresql.server|d() and
+                        if (ansible_local.postgresql.server | d() and
                             ansible_local.postgresql.server != "localhost")
                         else "" }}'
 
@@ -95,7 +95,7 @@ postgresql__port: '5432'
 # PostgreSQL database and role management. If PostgreSQL server is available
 # locally, host will delegate the tasks to itself automatically.
 postgresql__delegate_to: '{{ postgresql__server
-                             if (postgresql__server|d() and
+                             if (postgresql__server | d() and
                                  postgresql__server != "localhost")
                              else inventory_hostname }}'
 
@@ -144,7 +144,7 @@ postgresql__default_user_clusters:
   - user: '*'
     group: '*'
     cluster: '{{ (postgresql__server + ":" + postgresql__port)
-                  if (postgresql__server|d() and postgresql__server)
+                  if (postgresql__server | d() and postgresql__server)
                   else "main" }}'
     database: '{{ postgresql__default_database }}'
 
@@ -203,6 +203,21 @@ postgresql__databases: []
 postgresql__dependent_databases: []
 
                                                                    # ]]]
+# .. envvar:: postgresql__privileges [[[
+#
+# List of PostgreSQL privileges, specified as YAML dicts. See
+# :ref:`postgresql__ref_privileges` for more details.
+postgresql__privileges: []
+
+                                                                   # ]]]
+# .. envvar:: postgresql__dependent_privileges [[[
+#
+# List of PostgreSQL privileges, specified as a YAML dicts, defined by other
+# roles via dependency variables. See :ref:`postgresql__ref_privileges` for
+# more details.
+postgresql__dependent_privileges: []
+
+                                                                   # ]]]
 # .. envvar:: postgresql__extensions [[[
 #
 # List of PostgreSQL extensions enabled in specific databases, each extension
@@ -234,21 +249,6 @@ postgresql__pgpass: []
 postgresql__dependent_pgpass: []
                                                                    # ]]]
                                                                    # ]]]
-# Role-dependent configuration [[[
-# --------------------------------
-
-# .. envvar:: postgresql__apt_preferences__dependent_list [[[
-#
-# Configuration for :ref:`debops.apt_preferences` role. PostgreSQL from backports
-# will be preferred on specified Debian releases.
-postgresql__apt_preferences__dependent_list:
-
-  - package: 'postgresql postgresql-* libpq5'
-    backports: [ 'wheezy' ]
-    reason: 'Version parity with Debian Jessie'
-    role: 'debops.postgresql'
-                                                                   # ]]]
-                                                                   # ]]]
                                                                    # ]]]
 # Configuration for other Ansible roles [[[
 # ----------------------------------------
@@ -260,7 +260,7 @@ postgresql__keyring__dependent_apt_keys:
 
   - id: '{{ postgresql__upstream_key_id }}'
     repo: '{{ postgresql__upstream_apt_repo }}'
-    state: '{{ "present" if postgresql__upstream|bool else "absent" }}'
+    state: '{{ "present" if postgresql__upstream | bool else "absent" }}'
 
                                                                    # ]]]
 # .. envvar:: postgresql__python__dependent_packages3 [[[

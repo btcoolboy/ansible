@@ -5,4 +5,4 @@ This Ansible role can configure a standalone TFTP server using the
 embedded devices or serve iPXE files from `debops.ipxe` role to other
 hosts on the network, allowing for network boot and OS installation.
 
-Read the [tftpd role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/tftpd/) for more details.
+Read the [tftpd role documentation](https://docs.debops.org/en/HEAD/ansible/roles/tftpd/) for more details.

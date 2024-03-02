@@ -6,4 +6,4 @@ applications. This role allows you to setup separate instances of
 `fcgiwrap` on different user accounts, each one accessible through its
 own UNIX socket.
 
-Read the [fcgiwrap role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/fcgiwrap/) for more details.
+Read the [fcgiwrap role documentation](https://docs.debops.org/en/HEAD/ansible/roles/fcgiwrap/) for more details.

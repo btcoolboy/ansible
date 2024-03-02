@@ -6,4 +6,4 @@ programming language environment. This role can be used to enable the
 upstream CRAN APT repositories and install R packages, both via APT and
 via R itself.
 
-Read the [cran role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/cran/) for more details.
+Read the [cran role documentation](https://docs.debops.org/en/HEAD/ansible/roles/cran/) for more details.

@@ -3,8 +3,8 @@
 
 # .. Copyright (C) 2015-2016 Maciej Delmanowski <drybjed@gmail.com>
 # .. Copyright (C) 2015      Hartmut Goebel <h.goebel@crazy-compilers.com>
-# .. Copyright (C) 2015-2021 Robin Schneider <ypid@riseup.net>
-# .. Copyright (C) 2015-2021 DebOps <https://debops.org/>
+# .. Copyright (C) 2015-2023 Robin Schneider <ypid@riseup.net>
+# .. Copyright (C) 2015-2023 DebOps <https://debops.org/>
 # .. SPDX-License-Identifier: GPL-3.0-only
 
 # .. _owncloud__ref_defaults:
@@ -34,10 +34,10 @@
 #
 # List of base packages required by ownCloud.
 owncloud__base_packages:
-  - '{{ [ "owncloud-complete-files" ]
+  - '{{ ["owncloud-complete-files"]
         if (owncloud__variant == "owncloud")
         else [] }}'
-  - '{{ [ "curl", "unzip" ]
+  - '{{ ["curl", "unzip"]
         if (owncloud__variant == "nextcloud")
         else [] }}'
 
@@ -47,11 +47,11 @@ owncloud__base_packages:
   ## FIXME: Collaborative document editing in ownCloud is now done with Collabora Online.
   ## FIXME: Is it necessary to install all LibreOffice packages? https://github.com/owncloud/documents#known-issues
   ## Upstream documentation does not specify it more clearly. Installing ``libreoffice`` just to be sure.
-  - '{{ [ "libreoffice" ] if (owncloud__app_documents_libreoffice_enabled|bool) else [] }}'
+  - '{{ ["libreoffice"] if (owncloud__app_documents_libreoffice_enabled | bool) else [] }}'
 
   ## Useful for debugging. Refer to `owncloud__base_php_packages` for the PHP packages
-  - '{{ [ "smbclient" ] if (owncloud__smb_support|bool) else [] }}'
-  - '{{ [ "libsmbclient" ] if (owncloud__smb_support|bool and owncloud__release is version_compare("9.0", ">=")) else [] }}'
+  - '{{ ["smbclient"] if (owncloud__smb_support | bool) else [] }}'
+  - '{{ ["libsmbclient"] if (owncloud__smb_support | bool and owncloud__release is version_compare("9.0", ">=")) else [] }}'
 
 
 # .. envvar:: owncloud__required_php_packages
@@ -108,19 +108,19 @@ owncloud__base_php_packages:
   - 'ldap'
   - 'soap'
 
-  - '{{ [ "apcu" ] if (owncloud__apcu_enabled|bool) else [] }}'
-  - '{{ [ "mysql" ] if (owncloud__database in [ "mariadb", "mysql" ]) else [] }}'
-  - '{{ [ "pgsql" ] if (owncloud__database in [ "postgresql" ]) else [] }}'
-  - '{{ [ "redis" ] if (owncloud__redis_enabled | bool) else [] }}'
+  - '{{ ["apcu"] if (owncloud__apcu_enabled | bool) else [] }}'
+  - '{{ ["mysql"] if (owncloud__database in ["mariadb", "mysql"]) else [] }}'
+  - '{{ ["pgsql"] if (owncloud__database in ["postgresql"]) else [] }}'
+  - '{{ ["redis"] if (owncloud__redis_enabled | bool) else [] }}'
 
   ## Seems to be required at least for PHP7.0 to fix:
   ## PHP Warning: PHP Startup: Unable to load dynamic library '/usr/lib/php/20151012/redis.so'
   ## - /usr/lib/php/20151012/redis.so: undefined symbol: igbinary_serialize in Unknown on line 0
-  - '{{ [ "igbinary" ]
+  - '{{ ["igbinary"]
         if (not (ansible_distribution == "Ubuntu" and (ansible_distribution_version is version_compare("15.10", "<"))))
         else [] }}'
 
-  - '{{ [ "libsmbclient" ] if (owncloud__smb_support|bool and owncloud__release is version_compare("8.9.9", "<=")) else [] }}'
+  - '{{ ["libsmbclient"] if (owncloud__smb_support | bool and owncloud__release is version_compare("8.9.9", "<=")) else [] }}'
 
   ## Included in normal PHP installations but require it here because it is
   ## used internally by the role:
@@ -251,7 +251,7 @@ owncloud__upstream_key_fingerprint: '2880 6A87 8AE4 23A2 8372 792E D758 99B9 A72
 # .. envvar:: owncloud__keyserver [[[
 #
 # URL of the OpenPGP keyserver used to obtain OpenPGP keys.
-owncloud__keyserver: '{{ ansible_local.keyring.keyserver|d("hkp://keyserver.ubuntu.com") }}'
+owncloud__keyserver: '{{ ansible_local.keyring.keyserver | d("hkp://keyserver.ubuntu.com") }}'
                                                                    # ]]]
                                                                    # ]]]
 # .. ownCloud upgrades [[[1
@@ -259,109 +259,9 @@ owncloud__keyserver: '{{ ansible_local.keyring.keyserver|d("hkp://keyserver.ubun
 # ---------------------
 #   ownCloud upgrades
 # ---------------------
-
-# .. envvar:: owncloud__auto_database_upgrade_enabled
 #
-# On each update of ownCloud, a database update must be performed before
-# ownCloud can be used again.
-# The ownCloud package maintainers have not automated this setup so that even
-# security upgrades can not be installed unattended.
-#
-# Refer to the `official ownCloud documentation <https://doc.owncloud.org/server/10.3/admin_manual/maintenance/package_upgrade.html#upgrade-quickstart>`__ for details.
-#
-# When this option is set to ``True``, the role enables a hook script for
-# :command:`dpkg` so that when :command:`dpkg` upgrades ownCloud, the database upgrade is
-# automatically performed.
-#
-# Change to ``False`` when you want to do database upgrades manually after upgrading the ownCloud packages.
-#
-# .. note:: :envvar:`owncloud__auto_database_upgrade_enabled` depends on
-#    automatic database upgrades to be enabled.
-#
-owncloud__auto_database_upgrade_enabled: '{{ True if (owncloud__variant == "owncloud") else False }}'
-
-
-# .. envvar:: owncloud__dpkg_hook_script
-#
-# File path where the package manager hook script is stored.
-owncloud__dpkg_hook_script: '{{
-  (ansible_local.fhs.lib | d("/usr/local/lib"))
-  + "/owncloud_dpkg_hook" }}'
-
-
-# .. envvar:: owncloud__auto_database_upgrade_migration_test
-#
-# Whether database schema migration should be simulated before upgrading the production database.
-# For Nextcloud it cannot be configured and this variable is ignored.
-# Refer to the `official ownCloud documentation <https://doc.owncloud.org/server/10.3/admin_manual/maintenance/upgrade.html#migration-test>`__ for details.
-owncloud__auto_database_upgrade_migration_test: True
-
-
-# .. envvar:: owncloud__auto_database_upgrade_3party_app_disable
-#
-# Should third party apps by disabled during/after upgrades? The upstream default as of ownCloud 9.0
-# is ``True``. For Nextcloud it cannot be configured and this variable is ignored.
-owncloud__auto_database_upgrade_3party_app_disable: True
-
-
-# .. envvar:: owncloud__auto_database_upgrade_hook_script_packages_trigger
-#
-# List of packages for which the package manager hook script should attempt to
-# do a database upgrade when :envvar:`owncloud__auto_database_upgrade_enabled`
-# is ``True``.
-#
-# This variable is currently not being used.
-# The check if ownCloud needs an upgrade is performed for each
-# installed/upgraded package but in an very efficient way.
-owncloud__auto_database_upgrade_hook_script_packages_trigger:
-  - 'owncloud'
-
-
-# .. envvar:: owncloud__auto_security_updates_enabled
-#
-# Whether automatic ownCloud upgrades should be performed by
-# ``unattended_upgrades``.
-#
-# FIXME: Needs more testing before the role maintainers feel confident to enable this by default.
-# Refer to: https://github.com/debops/ansible-owncloud/issues/28
-owncloud__auto_security_updates_enabled: False
-
-
-# .. envvar:: owncloud__post_upgrade_hook_role_list
-#
-# List of script file paths which should be executed after every ownCloud
-# update.
-# For more information refer to :ref:`owncloud__ref_post_upgrade_hook`.
-# This variable is used internally, controlled by other variables of this role.
-owncloud__post_upgrade_hook_role_list: []
-
-
-# .. envvar:: owncloud__post_upgrade_hook_list
-#
-# List of script file paths which should be executed after every ownCloud
-# update.
-# For more information refer to :ref:`owncloud__ref_post_upgrade_hook`.
-# This variable is intended to be used in Ansible’s global inventory.
-owncloud__post_upgrade_hook_list: []
-
-
-# .. envvar:: owncloud__post_upgrade_hook_group_list
-#
-# List of script file paths which should be executed after every ownCloud
-# update.
-# For more information refer to :ref:`owncloud__ref_post_upgrade_hook`.
-# This variable is intended to be used in a host inventory group of Ansible
-# (only one host group is supported).
-owncloud__post_upgrade_hook_group_list: []
-
-
-# .. envvar:: owncloud__post_upgrade_hook_host_list
-#
-# List of script file paths which should be executed after every ownCloud
-# update.
-# For more information refer to :ref:`owncloud__ref_post_upgrade_hook`.
-# This variable is intended to be used in the inventory of hosts.
-owncloud__post_upgrade_hook_host_list: []
+# .. warning:: Auto upgrading is deprecated. If you want this, add support for
+#    https://github.com/nextcloud/docker to this Ansible role.
 
 
 # .. ownCloud source and deployment [[[1
@@ -379,7 +279,7 @@ owncloud__post_upgrade_hook_host_list: []
 # * ``owncloud`` (legacy variant, not recommended for new deployments, not well tested)
 # * ``nextcloud`` (Main supported variant in the future. Currently supported on Debian stretch, refer to `issue 45 <https://github.com/debops/ansible-owncloud/issues/45>`_ for details)
 #
-owncloud__variant: '{{ ansible_local.owncloud.variant|d("nextcloud") }}'
+owncloud__variant: '{{ ansible_local.owncloud.variant | d("nextcloud") }}'
 
 
 # .. envvar:: owncloud__variant_download_url_map
@@ -415,11 +315,11 @@ owncloud__variant_name_map:
 #
 # Supported releases:
 #
-# * Nextcloud ``22.0``
+# * Nextcloud ``24.0``
 #
 # Upcoming:
 #
-# * Nextcloud ``23.0`` (Implemented based on documentation changes but untested).
+# * Nextcloud ``25.0`` (Implemented based on documentation changes but untested).
 #
 # Unsupported:
 #
@@ -432,7 +332,7 @@ owncloud__variant_name_map:
 # and the `package index <https://download.owncloud.org/download/repositories/>`_ for more details.
 owncloud__release: '{{ "10"
                        if (owncloud__variant == "owncloud")
-                       else "22.0" }}'
+                       else "24.0" }}'
 
 
 # .. envvar:: owncloud__distribution
@@ -497,7 +397,7 @@ owncloud__apt_repo_source: '{{ "deb https://" + owncloud__apt_repo_base + "/" +
 # .. envvar:: owncloud__app_user
 #
 # User that will be used for the ownCloud instance.
-owncloud__app_user: '{{ ansible_local.nginx.user|d("www-data") }}'
+owncloud__app_user: '{{ ansible_local.nginx.user | d("www-data") }}'
 
 
 # .. envvar:: owncloud__app_group
@@ -511,11 +411,9 @@ owncloud__app_group: '{{ owncloud__app_user }}'
 # Directory under which ownCloud will be installed.
 owncloud__app_home: '{{ "/var/www/owncloud"
                         if (owncloud__variant == "owncloud")
-                        else (
-                          (ansible_local.nginx.www
-                          if (ansible_local.nginx.www|d())
-                          else "/srv/www") + "/" + owncloud__system_user
-                        ) }}'
+                        else ((ansible_local.nginx.www
+                              if (ansible_local.nginx.www | d())
+                              else "/srv/www") + "/" + owncloud__system_user) }}'
 
 
 # .. envvar:: owncloud__data_path
@@ -574,26 +472,26 @@ owncloud__apcu_enabled: True
 # requirement is not meet for Ubuntu trusty (neither in the release repos nor
 # in backports) thus Redis will not be enabled automatically by the role.
 # Refer to the `official ownCloud documentation <https://doc.owncloud.org/server/10.3/admin_manual/configuration/server/caching_configuration.html#redis-configuration>`__ for details.
-owncloud__redis_enabled: '{{ ansible_local.redis_server.installed|d() | bool and
+owncloud__redis_enabled: '{{ ansible_local.redis_server.installed | d() | bool and
                              (not (ansible_distribution == "Ubuntu" and ansible_distribution_release == "trusty")) }}'
 
 
 # .. envvar:: owncloud__redis_host
 #
 # Redis server to use when :envvar:`owncloud__redis_enabled` is ``True``.
-owncloud__redis_host: '{{ ansible_local.redis_server.host|d("localhost") }}'
+owncloud__redis_host: '{{ ansible_local.redis_server.host | d("localhost") }}'
 
 
 # .. envvar:: owncloud__redis_port
 #
 # Network port on which the Redis server is listening on.
-owncloud__redis_port: '{{ ansible_local.redis_server.port|d("6379") }}'
+owncloud__redis_port: '{{ ansible_local.redis_server.port | d("6379") }}'
 
 
 # .. envvar:: owncloud__redis_password
 #
 # Redis server authentication password.
-owncloud__redis_password: '{{ ansible_local.redis_server.password|d(omit) }}'
+owncloud__redis_password: '{{ ansible_local.redis_server.password | d(omit) }}'
 
 # .. Database configuration [[[1
 #
@@ -659,19 +557,19 @@ owncloud__database_map:
   # MySQL/MariaDB database.
   mariadb:
     dbtype: 'mysql'
-    dbname: '{{ owncloud__database_name|d(owncloud__app_user) }}'
-    dbuser: '{{ owncloud__database_user|d(owncloud__app_user) }}'
+    dbname: '{{ owncloud__database_name | d(owncloud__app_user) }}'
+    dbuser: '{{ owncloud__database_user | d(owncloud__app_user) }}'
     dbpass: '{{ owncloud__database_password }}'
-    dbhost: '{{ owncloud__database_server|d("localhost") }}'
+    dbhost: '{{ owncloud__database_server | d("localhost") }}'
     dbtableprefix: ''
 
   # PostgreSQL database on localhost, connection through Unix socket, no default password.
   postgresql:
     dbtype: 'pgsql'
-    dbname: '{{ owncloud__database_name|d(owncloud__app_user) }}'
-    dbuser: '{{ owncloud__database_user|d(owncloud__app_user) }}'
+    dbname: '{{ owncloud__database_name | d(owncloud__app_user) }}'
+    dbuser: '{{ owncloud__database_user | d(owncloud__app_user) }}'
     dbpass: ''
-    dbhost: '{{ owncloud__database_server|d("/var/run/postgresql") }}'
+    dbhost: '{{ owncloud__database_server | d("/var/run/postgresql") }}'
     dbtableprefix: ''
 
   sqlite:
@@ -688,7 +586,7 @@ owncloud__database_map:
 #
 # Default admin username, in the form 'admin-$USER'.
 # Set to ``False`` to disable automatic username and password.
-owncloud__admin_username: 'admin-{{ lookup("env","USER") }}'
+owncloud__admin_username: 'admin-{{ lookup("env", "USER") }}'
 
 
 # .. envvar:: owncloud__admin_password_path
@@ -710,7 +608,7 @@ owncloud__password_length: 20
 # Default admin password.
 # A random password will be generate by default as documented by the :ref:`debops.secret` role.
 owncloud__admin_password: '{{ lookup("password", owncloud__admin_password_path
-                              + " length=" + (owncloud__password_length|string)) }}'
+                              + " length=" + (owncloud__password_length | string)) }}'
 
 
 # .. envvar:: owncloud__autosetup
@@ -799,7 +697,7 @@ owncloud__app_user_webfinger_support: False
 # This variable is used internally, controlled by other variables of this role.
 owncloud__role_config:
 
-  trusted_domains: '{{ [ owncloud__fqdn ] if owncloud__fqdn is string else owncloud__fqdn }}'
+  trusted_domains: '{{ [owncloud__fqdn] if owncloud__fqdn is string else owncloud__fqdn }}'
 
   ## https://github.com/owncloud/core/issues/22257
   ## TODO: Temporary workaround until all package maintainers have caught up.
@@ -808,22 +706,22 @@ owncloud__role_config:
   'updatechecker': '{{ True if (owncloud__variant in ["nextcloud"]) else False }}'
 
   'memcache.local':
-    state: '{{ "present" if (owncloud__apcu_enabled|bool or owncloud__redis_enabled|bool) else "absent" }}'
-    value: '{{ "\\OC\\Memcache\\Redis" if (owncloud__redis_enabled|bool) else "\\OC\\Memcache\\APCu" }}'
+    state: '{{ "present" if (owncloud__apcu_enabled | bool or owncloud__redis_enabled | bool) else "absent" }}'
+    value: '{{ "\\OC\\Memcache\\Redis" if (owncloud__redis_enabled | bool) else "\\OC\\Memcache\\APCu" }}'
 
   'memcache.locking':
-    state: '{{ "present" if (owncloud__redis_enabled|bool) else "absent" }}'
+    state: '{{ "present" if (owncloud__redis_enabled | bool) else "absent" }}'
     value: '\\OC\\Memcache\\Redis'
 
   'redis':
-    state: '{{ "present" if (owncloud__redis_enabled|bool) else "absent" }}'
+    state: '{{ "present" if (owncloud__redis_enabled | bool) else "absent" }}'
     value:
       host: '{{ owncloud__redis_host }}'
-      port: '{{ owncloud__redis_port|int }}'
+      port: '{{ owncloud__redis_port | int }}'
       password: '{{ owncloud__redis_password }}'
 
   'tempdirectory':
-    state: '{{ "present" if (owncloud__temp_path|d()) else "absent" }}'
+    state: '{{ "present" if (owncloud__temp_path | d()) else "absent" }}'
     value: '{{ owncloud__temp_path }}'
 
 # .. envvar:: owncloud__release_channel
@@ -1086,13 +984,13 @@ owncloud__role_occ_cmd_list:
   ## is setup by this role using packages.
   ## Since ownCloud 9 it is called `updatenotification`.
   - command: 'app:disable updater'
-    when: '{{ owncloud__release is version_compare("8.2", "<=") }}'
+    when: '{{ owncloud__release is version_compare("8.2", "<=") }}'  # noqa jinja[spacing]
 
   - command: 'app:enable user_ldap'
-    when: '{{ owncloud__ldap_enabled|bool }}'
+    when: '{{ owncloud__ldap_enabled | bool }}'  # noqa jinja[spacing]
 
   - command: 'app:enable files_external'
-    when: '{{ owncloud__smb_support|bool }}'
+    when: '{{ owncloud__smb_support | bool }}'  # noqa jinja[spacing]
 
 
 # .. envvar:: owncloud__occ_cmd_list
@@ -1181,8 +1079,8 @@ owncloud__user_files_host: []
 # configures only default one. If you need something more complex you can
 # use :envvar:`owncloud__occ_cmd_list`.
 owncloud__ldap_enabled: '{{ True
-                            if (ansible_local|d() and ansible_local.ldap|d() and
-                                (ansible_local.ldap.enabled|d())|bool)
+                            if (ansible_local | d() and ansible_local.ldap | d() and
+                                (ansible_local.ldap.enabled | d()) | bool)
                             else False }}'
 
 
@@ -1200,7 +1098,7 @@ owncloud_ldap_update_settings: True
 # The base Distinguished Name which should be used to create Distinguished
 # Names of the LDAP directory objects, defined as a YAML list. If this variable
 # is empty, automated Nextcloud LDAP configuration will not be performed.
-owncloud__ldap_base_dn: '{{ ansible_local.ldap.base_dn|d([]) }}'
+owncloud__ldap_base_dn: '{{ ansible_local.ldap.base_dn | d([]) }}'
 
                                                                    # ]]]
 
@@ -1222,7 +1120,7 @@ owncloud__ldap_base_users_dn: '{{ owncloud__ldap_base_dn | join(",") }}'
 # list. It will be used as a base for the Nextcloud service account LDAP
 # object. If the list is empty, the role will not create the account LDAP
 # object automatically.
-owncloud__ldap_device_dn: '{{ ansible_local.ldap.device_dn|d([]) }}'
+owncloud__ldap_device_dn: '{{ ansible_local.ldap.device_dn | d([]) }}'
 
                                                                    # ]]]
 # .. envvar:: owncloud__ldap_self_rdn [[[
@@ -1246,7 +1144,7 @@ owncloud__ldap_self_object_classes: [ 'account', 'simpleSecurityObject' ]
 owncloud__ldap_self_attributes:
   uid: '{{ owncloud__ldap_self_rdn.split("=")[1] }}'
   userPassword: '{{ owncloud__ldap_bindpw }}'
-  host: '{{ [ ansible_fqdn, ansible_hostname ] | unique }}'
+  host: '{{ [ansible_fqdn, ansible_hostname] | unique }}'
   description: 'Account used by the "Nextcloud" service to access the LDAP directory'
 
                                                                    # ]]]
@@ -1254,7 +1152,7 @@ owncloud__ldap_self_attributes:
 #
 # The Distinguished Name of the account LDAP object used by the
 # Nextcloud service to bind to the LDAP directory.
-owncloud__ldap_binddn: '{{ ([ owncloud__ldap_self_rdn ] + owncloud__ldap_device_dn) | join(",") }}'
+owncloud__ldap_binddn: '{{ ([owncloud__ldap_self_rdn] + owncloud__ldap_device_dn) | join(",") }}'
 
                                                                    # ]]]
 # .. envvar:: owncloud__ldap_bindpw [[[
@@ -1264,7 +1162,7 @@ owncloud__ldap_binddn: '{{ ([ owncloud__ldap_self_rdn ] + owncloud__ldap_device_
 owncloud__ldap_bindpw: '{{ (lookup("password", secret + "/ldap/credentials/"
                                    + owncloud__ldap_binddn | to_uuid + ".password length=32 "
                                    + "chars=ascii_letters,digits,!@_#$%^&*"))
-                           if owncloud__ldap_enabled|bool
+                           if owncloud__ldap_enabled | bool
                            else "" }}'
 
                                                                    # ]]]
@@ -1272,7 +1170,7 @@ owncloud__ldap_bindpw: '{{ (lookup("password", secret + "/ldap/credentials/"
 #
 # List of LDAP URIs that point to the directory servers which should be used by
 # Nextcloud.
-owncloud__ldap_uri: '{{ ansible_local.ldap.uri|d([]) }}'
+owncloud__ldap_uri: '{{ ansible_local.ldap.uri | d([]) }}'
 
                                                                    # ]]]
 # .. envvar:: owncloud__ldap_primary_server [[[
@@ -1460,10 +1358,10 @@ owncloud__ldap_expert_username_attr: ''
 # The configuration database configID to use for the LDAP configuration managed
 # by the role.
 owncloud__ldap_config_id: '{{ ansible_local.owncloud.ldap_config_id
-                              if (ansible_local.owncloud.ldap_config_id|d())
+                              if (ansible_local.owncloud.ldap_config_id | d())
                               else (owncloud__register_ldap_config_id.stdout
-                                    if (owncloud__register_ldap_config_id|d() and
-                                        owncloud__register_ldap_config_id.stdout|d())
+                                    if (owncloud__register_ldap_config_id | d() and
+                                        owncloud__register_ldap_config_id.stdout | d())
                                     else "") }}'
 
 
@@ -1565,7 +1463,7 @@ owncloud__ldap_default_config:
     value: '1'
 
   - name: 'ldapDefaultPPolicyDN'
-    value: '{{ ([ "cn=Default Password Policy", "ou=Password Policies" ]
+    value: '{{ (["cn=Default Password Policy", "ou=Password Policies"]
                 + owncloud__ldap_base_dn) | join(",") }}'
 
                                                                    # ]]]
@@ -1666,7 +1564,7 @@ owncloud__mail_smtpport: '25'
 # if you want to be able to configure/change this via the admin web interface.
 owncloud__mail_conf_map:
   mail_domain: '{{ owncloud__mail_domain }}'
-  mail_from_address: '{{ owncloud__mail_from_address  }}'
+  mail_from_address: '{{ owncloud__mail_from_address }}'
   mail_smtpmode: '{{ owncloud__mail_smtpmode }}'
   mail_smtphost: '{{ owncloud__mail_smtphost }}'
   mail_smtpport: '{{ owncloud__mail_smtpport }}'
@@ -1851,17 +1749,63 @@ owncloud__theme_conf_map:
 #   Webserver
 # -------------
 
+# .. envvar:: owncloud__http_psk_subpath_enabled [[[
+#
+# Whether the application should be deployed on a random subpath that acts as a
+# protection of the web app/API from people not knowing this PSK.
+# For a discussion in which scenarios this can make sense, refer to
+# `RFC: Support subpath/subdir hosting for additional security`__.
+#
+# .. __: https://github.com/debops/debops/issues/1233
+#
+# .. warning:: This breaks the ``/.well-known`` URIs intentionally.
+#
+# Hint for migration: Nextcloud is able to auto detect the webroot that it is
+# being accessed. This means that it can be accessed by subpath and without, with
+# the same Nginx config. This allows soft migration of all users to the subpath
+# and then disabling ``/`` when all are migrated.
+# The role does not support generating such a Webserver config but it is easy
+# to run the role without and with subpath enabled and than merging the
+# rendered Nginx site configuration.
+owncloud__http_psk_subpath_enabled: False
+
+                                                                   # ]]]
+# .. envvar:: owncloud__http_psk_subpath [[[
+#
+# PSK used as subpath that acts as the first layer of defense in a security in
+# depth concept if enabled.
+owncloud__http_psk_subpath: '{{ lookup("password", secret + "/credentials/" +
+                                  inventory_hostname + "/owncloud/config/subpath chars=ascii_letters,digits length=10")
+                                if owncloud__http_psk_subpath_enabled | bool
+                                else "" }}'
+
+                                                                   # ]]]
+# .. envvar:: owncloud__http_psk_subpath_begin_slash [[[
+#
+# slash at the begin plus Subpath. Used to simplify the webserver config below.
+owncloud__http_psk_subpath_begin_slash: '{{ ("/" + owncloud__http_psk_subpath)
+                                          if owncloud__http_psk_subpath_enabled | bool
+                                          else "" }}'
+
+                                                                   # ]]]
+# .. envvar:: owncloud__http_psk_subpath_end_slash [[[
+#
+# Subpath plus a slash at the end. Used to simplify the webserver config below.
+owncloud__http_psk_subpath_end_slash: '{{ (owncloud__http_psk_subpath + "/")
+                                          if owncloud__http_psk_subpath_enabled | bool
+                                          else "" }}'
+
+                                                                   # ]]]
 # .. envvar:: owncloud__webserver [[[
 #
 # Variable containing the webserver which should be used.
 # Refer to :ref:`owncloud__ref_getting_started` for how to switch webservers.
 owncloud__webserver: '{{ ansible_local.owncloud.webserver
-                         if (ansible_local.owncloud.webserver|d())
-                         else ("apache"
-                               if (ansible_local.apache.enabled|d()|bool)
-                               else ("nginx"
-                                     if (ansible_local.nginx.enabled|d()|bool)
-                                     else "no-webserver-detected")) }}'
+                         | d("apache"
+                             if (ansible_local.apache.enabled | d() | bool)
+                             else ("nginx"
+                                   if (ansible_local.nginx.enabled | d() | bool)
+                                   else "no-webserver-detected")) }}'
 
                                                                    # ]]]
 # .. envvar:: owncloud__apache_modules [[[
@@ -2005,13 +1949,13 @@ owncloud__ldap__dependent_tasks:
     objectClass: '{{ owncloud__ldap_self_object_classes }}'
     attributes: '{{ owncloud__ldap_self_attributes }}'
     no_log: '{{ debops__no_log | d(True) }}'
-    state: '{{ "present" if owncloud__ldap_device_dn|d() else "ignore" }}'
+    state: '{{ "present" if owncloud__ldap_device_dn | d() else "ignore" }}'
 
   - name: 'Enable password management by {{ owncloud__ldap_binddn }}'
-    dn: '{{ ([ "cn=Password Reset Agent", "ou=Roles" ] + owncloud__ldap_base_dn) | join(",") }}'
+    dn: '{{ (["cn=Password Reset Agent", "ou=Roles"] + owncloud__ldap_base_dn) | join(",") }}'
     attributes:
       roleOccupant: '{{ owncloud__ldap_binddn }}'
-    state: '{{ "present" if owncloud__ldap_device_dn|d() else "ignore" }}'
+    state: '{{ "present" if owncloud__ldap_device_dn | d() else "ignore" }}'
 
                                                                    # ]]]
 # .. envvar:: owncloud__mariadb__dependent_databases [[[
@@ -2104,7 +2048,7 @@ owncloud__apache__dependent_vhosts:
     root: '{{ owncloud__app_home }}'
     options: '+FollowSymLinks'
     allow_override: 'All'
-    root_directives: |
+    root_directives: |  # noqa jinja[spacing]
       <IfModule mod_dav.c>
             Dav off
       </IfModule>
@@ -2116,7 +2060,7 @@ owncloud__apache__dependent_vhosts:
       ## Tested while uploading with:
       ## while true; do df -h /tmp|tail -n 1; sleep 0.1; done
       ## Currently configured in PHP Apache scope: owncloud__php__dependent_configuration
-      {% if owncloud__php_temp_path|d() %}
+      {% if owncloud__php_temp_path | d() %}
       <IfModule mod_php5.c>
         php_value sys_temp_dir '{{ owncloud__php_temp_path }}'
       </IfModule>
@@ -2141,13 +2085,97 @@ owncloud__apache__dependent_vhosts:
     http_sec_headers_directive_options: 'set'
 
 
+# .. envvar:: owncloud__nginx__dependent_maps
+#
+# :program:`nginx` maps managed by the :ref:`debops.nginx` role.
+owncloud__nginx__dependent_maps:
+
+  - name: 'asset_immutable'
+    map: '$arg_v $asset_immutable'
+    mapping: '"" "";'
+    default: 'immutable'
+
+
+# .. envvar:: owncloud__nginx_options
+#
+# Nginx main config block for the application.
+owncloud__nginx_options: |-
+  add_header X-Download-Options noopen;
+
+  # Remove X-Powered-By, which is an information leak
+  fastcgi_hide_header X-Powered-By;
+
+  # Specify how to handle directories -- specifying `/index.php$request_uri`
+  # here as the fallback means that Nginx always exhibits the desired behaviour
+  # when a client requests a path that corresponds to a directory that exists
+  # on the server. In particular, if that directory contains an index.php file,
+  # that file is correctly served; if it doesn't, then the request is passed to
+  # the front-end controller. This consistent behaviour means that we don't need
+  # to specify custom rules for certain paths (e.g. images and other assets,
+  # `/updater`, `/ocm-provider`, `/ocs-provider`), and thus
+  # `try_files $uri $uri/ /index.php$request_uri`
+  # always provides the desired behaviour.
+  index index.php index.html /index.php$request_uri;
+
+  # Set max upload size and increase upload timeout:
+  client_max_body_size {{ owncloud__upload_size }};
+  client_body_timeout 300s;
+  {% if owncloud__nginx_client_body_temp_path %}
+  client_body_temp_path '{{ owncloud__nginx_client_body_temp_path }}';
+  {% endif %}
+  fastcgi_buffers 64 4K;
+
+  {% if owncloud__app_user_webfinger_support | bool %}
+  rewrite ^/.well-known/host-meta /public.php?service=host-meta last;
+  rewrite ^/.well-known/host-meta.json /public.php?service=host-meta-json last;
+  {% endif %}
+
+  {% if owncloud__variant == "nextcloud" %}
+  # Enable gzip but do not remove ETag headers
+  gzip on;
+  gzip_vary on;
+  gzip_comp_level 4;
+  gzip_min_length 256;
+  gzip_proxied expired no-cache no-store private no_last_modified no_etag auth;
+  gzip_types application/atom+xml application/javascript application/json application/ld+json application/manifest+json application/rss+xml application/vnd.geo+json application/vnd.ms-fontobject application/wasm application/x-font-ttf application/x-web-app-manifest+json application/xhtml+xml application/xml font/opentype image/bmp image/svg+xml image/x-icon text/cache-manifest text/css text/plain text/vcard text/vnd.rim.location.xloc text/vtt text/x-component text/x-cross-domain-policy;
+  {% else %}
+  # Disable gzip to avoid the removal of the ETag header
+  gzip off;
+  {% endif %}
+
+  # Uncomment if your server is build with the ngx_pagespeed module
+  # This module is currently not supported.
+  #pagespeed off;
+
+  # The settings allows you to optimize the HTTP2 bandwitdth.
+  # See https://blog.cloudflare.com/delivering-http-2-upload-speed-improvements/
+  # for tuning hints
+  # TODO(ypid): Nginx will be able to autotune this value when the patch gets accepted.
+  # DebOps will drop this manual tuning based on Nextcloud recommendation
+  # when the Nginx release is available in Debian oldstable.
+  client_body_buffer_size 512k;
+
+  {% if not (owncloud__variant == "nextcloud" and
+             owncloud__release is version("18.0", ">=")) %}
+  error_page            403             /core/templates/403.php;
+  error_page            404             /core/templates/404.php;
+  {% endif %}
+
+  # Default Cache-Control policy
+  expires 1m;
+
+
+  # Avoid to send the security headers twice as ownCloud
+  # also adds the X-* HTTP headers.
+  fastcgi_param modHeadersAvailable true;
+
 # .. envvar:: owncloud__nginx__dependent_servers
 #
 # :program:`nginx` server configuration managed by the :ref:`debops.nginx` role.
 owncloud__nginx__dependent_servers:
 
   ## https://docs.nextcloud.com/server/17/admin_manual/installation/nginx.html
-  ## Corresponds to 65ff129d27a912a27c0b4ebe42b2c59df262b72a
+  ## Corresponds to 5527a8c1ffc18d614e51ab18b61daccbbb047af9
   ## from https://github.com/nextcloud/documentation.git
   - type: 'default'
     enabled: True
@@ -2157,6 +2185,7 @@ owncloud__nginx__dependent_servers:
     root: '{{ owncloud__deploy_path }}'
     webroot_create: False
     deny_hidden: False
+    favicon: False
 
     ## Nextcloud has its own maintenance page
     maintenance: '{{ False if (owncloud__variant == "nextcloud") else True }}'
@@ -2172,83 +2201,32 @@ owncloud__nginx__dependent_servers:
                             else "SAMEORIGIN" }}'
 
     options: |
-      add_header X-Download-Options noopen;
-
-      # Remove X-Powered-By, which is an information leak
-      fastcgi_hide_header X-Powered-By;
-
-      # Specify how to handle directories -- specifying `/index.php$request_uri`
-      # here as the fallback means that Nginx always exhibits the desired behaviour
-      # when a client requests a path that corresponds to a directory that exists
-      # on the server. In particular, if that directory contains an index.php file,
-      # that file is correctly served; if it doesn't, then the request is passed to
-      # the front-end controller. This consistent behaviour means that we don't need
-      # to specify custom rules for certain paths (e.g. images and other assets,
-      # `/updater`, `/ocm-provider`, `/ocs-provider`), and thus
-      # `try_files $uri $uri/ /index.php$request_uri`
-      # always provides the desired behaviour.
-      index index.php index.html /index.php$request_uri;
-
-      # Set max upload size and increase upload timeout:
-      client_max_body_size {{ owncloud__upload_size }};
-      client_body_timeout 300s;
-      {% if owncloud__nginx_client_body_temp_path %}
-      client_body_temp_path '{{ owncloud__nginx_client_body_temp_path }}';
+      {% if not (owncloud__http_psk_subpath_enabled | bool) %}
+      {{ owncloud__nginx_options }}
       {% endif %}
-      fastcgi_buffers 64 4K;
-
-      {% if owncloud__app_user_webfinger_support | bool %}
-      rewrite ^/.well-known/host-meta /public.php?service=host-meta last;
-      rewrite ^/.well-known/host-meta.json /public.php?service=host-meta-json last;
-      {% endif %}
-
-      {% if owncloud__variant == "nextcloud" %}
-      # Enable gzip but do not remove ETag headers
-      gzip on;
-      gzip_vary on;
-      gzip_comp_level 4;
-      gzip_min_length 256;
-      gzip_proxied expired no-cache no-store private no_last_modified no_etag auth;
-      gzip_types application/atom+xml application/javascript application/json application/ld+json application/manifest+json application/rss+xml application/vnd.geo+json application/vnd.ms-fontobject application/wasm application/x-font-ttf application/x-web-app-manifest+json application/xhtml+xml application/xml font/opentype image/bmp image/svg+xml image/x-icon text/cache-manifest text/css text/plain text/vcard text/vnd.rim.location.xloc text/vtt text/x-component text/x-cross-domain-policy;
-      {% else %}
-      # Disable gzip to avoid the removal of the ETag header
-      gzip off;
-      {% endif %}
-
-      # Uncomment if your server is build with the ngx_pagespeed module
-      # This module is currently not supported.
-      #pagespeed off;
-
-      {% if not (owncloud__variant == "nextcloud" and
-                 owncloud__release is version("18.0", ">=")) %}
-      error_page            403             /core/templates/403.php;
-      error_page            404             /core/templates/404.php;
-      {% endif %}
-
-      # Default Cache-Control policy
-      expires 1m;
-
-
-      # Avoid to send the security headers twice as ownCloud
-      # also adds the X-* HTTP headers.
-      fastcgi_param modHeadersAvailable true;
 
     location_list:
-      - pattern: '= /'
+      - pattern: '/'
+        options: |-
+          deny all;
+        enabled: '{{ owncloud__http_psk_subpath_enabled | bool }}'
+
+      - pattern: '= /{{ owncloud__http_psk_subpath }}'
         options: |
           # Rule borrowed from `.htaccess` to handle Microsoft DAV clients
           if ( $http_user_agent ~ ^DavClnt ) {
-              return 302 /remote.php/webdav/$is_args$args;
+              return 302 /{{ owncloud__http_psk_subpath_end_slash }}remote.php/webdav/$is_args$args;
           }
 
           # Not used in the Nginx configuration example of Nextcloud/ownCloud.
           # Needed because `security.limit_extensions` defaults to `.php` in DebOps.
-          rewrite ^ /index.php;
+          rewrite ^ /{{ owncloud__http_psk_subpath_end_slash }}index.php;
 
       - pattern: '= /robots.txt'
         options: |
           allow all;
           log_not_found off;
+        enabled: '{{ not (owncloud__http_psk_subpath_enabled | bool) }}'
 
       - pattern: '^~ /.well-known'
         options: |
@@ -2263,17 +2241,18 @@ owncloud__nginx__dependent_servers:
           location ^~ /.well-known            { return 301 /index.php$uri; }
 
           try_files $uri $uri/ =404;
+        enabled: '{{ not (owncloud__http_psk_subpath_enabled | bool) }}'
 
-      - pattern: '~ ^\/(?:build|tests|config|lib|3rdparty|templates|data)\/'
+      - pattern: '~ ^/{{ owncloud__http_psk_subpath_end_slash }}(?:build|tests|config|lib|3rdparty|templates|data)\/'
         options: |
           return 404;
 
-      - pattern: '~ ^\/(?:\.|autotest|occ|issue|indie|db_|console)'
+      - pattern: '~ ^/{{ owncloud__http_psk_subpath_end_slash }}(?:\.|autotest|occ|issue|indie|db_|console)'
         options: |
           return 404;
 
-      - pattern: '~ \.php(?:$|/)'
-        options: |
+      - pattern: '~ ^/{{ owncloud__http_psk_subpath_end_slash }}.*\.php(?:$|/)'
+        options: |  # noqa jinja[spacing]
           # Ensure this block, which passes PHP files to the PHP process, is above the blocks
           # which handle static assets (as seen below). If this block is not declared first,
           # then Nginx will encounter an infinite rewriting loop when it prepends `/index.php`
@@ -2281,15 +2260,24 @@ owncloud__nginx__dependent_servers:
 
           # Required for legacy support
           # https://github.com/nextcloud/documentation/pull/2197#issuecomment-721432337
-          rewrite ^/(?!index|remote|public|cron|core\/ajax\/update|status|ocs\/v[12]|updater\/.+|oc[ms]-provider\/.+|.+\/richdocumentscode\/proxy) /index.php$request_uri;
+          rewrite ^/{{ owncloud__http_psk_subpath_end_slash }}(?!index|remote|public|cron|core\/ajax\/update|status|ocs\/v[12]|updater\/.+|oc[ms]-provider\/.+|.+\/richdocumentscode\/proxy) /{{ owncloud__http_psk_subpath_end_slash }}index.php$request_uri;
 
-          fastcgi_split_path_info ^(.+?\.php)(\/.*|)$;
+          # (/.*|): The "or empty" regex alternative is needed for custom
+          # subpath because otherwise the whole regex would not match and would
+          # not update ${fastcgi_script_name}.
+          fastcgi_split_path_info ^{{ owncloud__http_psk_subpath_begin_slash }}(.+?\.php)(/.*|)$;
           set $path_info $fastcgi_path_info;
+          {% if owncloud__http_psk_subpath_enabled | bool %}
+          set $script_name "{{ owncloud__http_psk_subpath_begin_slash }}${fastcgi_script_name}";
+          {% endif %}
 
           try_files $fastcgi_script_name =404;
 
           include fastcgi_params;
           fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+          {% if owncloud__http_psk_subpath_enabled | bool %}
+          fastcgi_param SCRIPT_NAME $script_name;
+          {% endif %}
           fastcgi_param PATH_INFO $path_info;
           fastcgi_param HTTPS on;
 
@@ -2298,49 +2286,51 @@ owncloud__nginx__dependent_servers:
           fastcgi_pass php_owncloud;
 
           fastcgi_intercept_errors on;
-          {% if (ansible_local.nginx.version
-                 if (ansible_local.nginx.version|d())
-                 else "0.0")
-                is version_compare("1.7.11",'>=') %}
+          {% if (ansible_local.nginx.version | d("0.0")) is version_compare("1.7.11", '>=') %}
           fastcgi_request_buffering off;
           {% endif %}
 
           fastcgi_read_timeout {{ owncloud__timeout }};
 
-      - pattern: '~ \.(?:css|js|svg|gif|png|jpg|ico|wasm|tflite)$'
+      - pattern: '~ {{ owncloud__http_psk_subpath_begin_slash }}(/.*\.(?:css|js|svg|gif|png|jpg|ico|wasm|tflite))$'
         options: |
-          try_files $uri /index.php$request_uri;
-          expires 6M;         # Cache-Control policy borrowed from `.htaccess`
-          access_log off;     # Optional: Don't log access to assets
+          try_files {{ "$1" if (owncloud__http_psk_subpath_enabled | bool) else "$uri" }} /{{ owncloud__http_psk_subpath_end_slash }}index.php$request_uri;
+          add_header Cache-Control "public, max-age=15778463, $asset_immutable";
 
-          {% if not (owncloud__nginx_access_log_assets|bool) %}
+          {% if not (owncloud__nginx_access_log_assets | bool) %}
           access_log off;
           {% endif %}
 
           location ~ \.wasm$ {
-          default_type application/wasm;
+              default_type application/wasm;
           }
 
-      - pattern: '~ \.woff2?$'
+      - pattern: '~ {{ owncloud__http_psk_subpath_begin_slash }}(/.*\.woff2?)$'
         options: |
-          try_files $uri /index.php$request_uri;
+          try_files {{ "$1" if (owncloud__http_psk_subpath_enabled | bool) else "$uri" }} /{{ owncloud__http_psk_subpath_end_slash }}index.php$request_uri;
           expires 7d;         # Cache-Control policy borrowed from `.htaccess`
 
-          {% if not (owncloud__nginx_access_log_assets|bool) %}
+          {% if not (owncloud__nginx_access_log_assets | bool) %}
           access_log off;
           {% endif %}
 
-      - pattern: '/'
+      - pattern: '^~ /{{ owncloud__http_psk_subpath }}'
         options: |
-          try_files $uri $uri/ /index.php$request_uri;
+          {{ owncloud__nginx_options }}
+        enabled: '{{ owncloud__http_psk_subpath_enabled | bool }}'
 
-    ## Not used so that the exact order of locations from the upstream nginx example can be used.
+      - pattern: '/{{ owncloud__http_psk_subpath_end_slash }}remote'
+        options: |
+          # Rule borrowed from `.htaccess`
+          return 301 /{{ owncloud__http_psk_subpath_end_slash }}remote.php$request_uri;
+
+      - pattern: '/{{ owncloud__http_psk_subpath_end_slash }}'
+        options: |
+          try_files $uri $uri/ /{{ owncloud__http_psk_subpath_end_slash }}index.php$request_uri;
+
+    ## Not used so that the exact order of locations from the upstream nginx
+    ## example can be used.
     # type: 'php'
-    # php_upstream: 'php_owncloud'
-    # php_limit_except: False
-    # php5_location: '^/(?:index|remote|public|cron|core/ajax/update|status|ocs/v[12]|updater/.+|ocs-provider/.+|core/templates/40[34])\.php(?:$|/)'
-    # php_options: |
-    #   fastcgi_read_timeout {{ owncloud__timeout }};
 
 
 # .. envvar:: owncloud__nginx__dependent_upstreams
@@ -2373,7 +2363,7 @@ owncloud__php__dependent_configuration:
 
   - filename: '10-owncloud'
     by_role: 'debops.owncloud'
-    state: '{{ "present" if (((owncloud__apcu_enabled|bool) and (owncloud__release is match("8\.1"))) or
+    state: '{{ "present" if (((owncloud__apcu_enabled | bool) and (owncloud__release is match("8\.1"))) or
             ((owncloud__variant in ["nextcloud"]) and
             (owncloud__release is version_compare("21.0", ">="))))
             else "absent" }}'
@@ -2387,22 +2377,23 @@ owncloud__php__dependent_configuration:
                if (owncloud__variant in ["nextcloud"] and owncloud__release is version_compare("12.0", ">="))
                else "absent" }}'
     options: |
-      ; https://docs.nextcloud.com/server/17/admin_manual/installation/server_tuning.html#enable-php-opcache
+      ; https://docs.nextcloud.com/server/25/admin_manual/installation/server_tuning.html#enable-php-opcache
+      ; https://github.com/nextcloud/docker/blob/master/25/fpm/Dockerfile
 
       [opcache]
 
       opcache.enable=1
       opcache.enable_cli=1
-      opcache.interned_strings_buffer=8
+      opcache.interned_strings_buffer=16
       opcache.max_accelerated_files=10000
       opcache.memory_consumption=128
       opcache.save_comments=1
-      opcache.revalidate_freq=1
+      opcache.revalidate_freq=60
 
   - filename: 'debops.owncloud'
     path: 'apache2/conf.d/'
     by_role: 'debops.owncloud'
-    state: '{{ (owncloud__php_temp_path|d() and owncloud__webserver == "apache") | ternary("present", "absent") }}'
+    state: '{{ (owncloud__php_temp_path | d() and owncloud__webserver == "apache") | ternary("present", "absent") }}'
     sections:
 
       - options: |
@@ -2470,7 +2461,4 @@ owncloud__unattended_upgrades__dependent_origins:
 
   - origin: 'site=download.owncloud.org'
     by_role: 'debops.owncloud'
-    state: '{{ "present"
-               if (owncloud__variant in ["owncloud"] and
-                   owncloud__auto_security_updates_enabled | bool)
-               else "absent" }}'
+    state: 'absent'

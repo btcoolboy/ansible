@@ -4,25 +4,25 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Import DebOps global handlers
-  import_role:
+  ansible.builtin.import_role:
     name: 'global_handlers'
 
 - name: Import DebOps secret role
-  import_role:
+  ansible.builtin.import_role:
     name: 'secret'
 
 - name: Configure Green Unicorn on older OS releases
-  include_tasks: 'older_releases.yml'
+  ansible.builtin.include_tasks: 'older_releases.yml'
   when: ansible_distribution_release in
-        [ 'wheezy', 'jessie', 'precise', 'trusty', 'xenial' ]
+        [ 'trusty', 'xenial' ]
 
 - name: Configure Green Unicorn on newer OS releases
-  include_tasks: 'newer_releases.yml'
+  ansible.builtin.include_tasks: 'newer_releases.yml'
   when: ansible_distribution_release not in
-        [ 'wheezy', 'jessie', 'precise', 'trusty', 'xenial' ]
+        [ 'trusty', 'xenial' ]
 
 - name: Make sure that Ansible local facts directory exists
-  file:
+  ansible.builtin.file:
     path: '/etc/ansible/facts.d'
     state: 'directory'
     owner: 'root'
@@ -30,7 +30,7 @@
     mode: '0755'
 
 - name: Save gunicorn local facts
-  template:
+  ansible.builtin.template:
     src: 'etc/ansible/facts.d/gunicorn.fact.j2'
     dest: '/etc/ansible/facts.d/gunicorn.fact'
     owner: 'root'
@@ -40,4 +40,4 @@
   tags: [ 'meta::facts' ]
 
 - name: Update Ansible facts if they were modified
-  meta: 'flush_handlers'
+  ansible.builtin.meta: 'flush_handlers'

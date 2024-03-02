@@ -8,4 +8,4 @@ database backend, using jQuery libraries, ajax and HTML5/CSS3 features.
 The `debops.phpipam` role installs this ipam on a specified host with
 nginx as a webserver (using `debops.nginx`).
 
-Read the [phpipam role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/phpipam/) for more details.
+Read the [phpipam role documentation](https://docs.debops.org/en/HEAD/ansible/roles/phpipam/) for more details.

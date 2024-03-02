@@ -4,21 +4,25 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 - name: Check zabbix-agent and restart
-  command: '/usr/sbin/zabbix_agentd --print'
+  ansible.builtin.command: '/usr/sbin/zabbix_agentd --print'
+  register: zabbix_agent__register_config_test_c
+  changed_when: zabbix_agent__register_config_test_c.changed | bool
   when: zabbix_agent__flavor == 'C'
   notify: [ 'Restart zabbix-agent' ]
 
 - name: Check zabbix-agent2 and restart
-  command: '/usr/sbin/zabbix_agent2 --print'
+  ansible.builtin.command: '/usr/sbin/zabbix_agent2 --print'
+  register: zabbix_agent__register_config_test_go
+  changed_when: zabbix_agent__register_config_test_go.changed | bool
   when: zabbix_agent__flavor == 'Go'
   notify: [ 'Restart zabbix-agent2' ]
 
 - name: Restart zabbix-agent
-  service:
+  ansible.builtin.service:
     name: 'zabbix-agent'
     state: 'restarted'
 
 - name: Restart zabbix-agent2
-  service:
+  ansible.builtin.service:
     name: 'zabbix-agent2'
     state: 'restarted'

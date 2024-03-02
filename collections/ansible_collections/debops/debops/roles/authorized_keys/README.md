@@ -6,4 +6,4 @@ manages the keys themselves, you should configure the `sshd` service to
 use them separately, for example by using the `debops.sshd` Ansible
 role.
 
-Read the [authorized_keys role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/authorized_keys/) for more details.
+Read the [authorized_keys role documentation](https://docs.debops.org/en/HEAD/ansible/roles/authorized_keys/) for more details.

@@ -13,4 +13,4 @@ configure the `keepalived` service on Debian and Ubuntu hosts. The role
 allows Jinja expressions to be used in the `keepalived.conf(5)`
 configuration file to augment generated configuration files as needed.
 
-Read the [keepalived role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/keepalived/) for more details.
+Read the [keepalived role documentation](https://docs.debops.org/en/HEAD/ansible/roles/keepalived/) for more details.

@@ -13,4 +13,4 @@ The `debops.sssd` Ansible role can be used to configure the `sssd`
 service on a host and, via `debops.ldap` role, create a bind account in
 the LDAP directory used by `sssd` to perform LDAP lookups.
 
-Read the [sssd role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/sssd/) for more details.
+Read the [sssd role documentation](https://docs.debops.org/en/HEAD/ansible/roles/sssd/) for more details.

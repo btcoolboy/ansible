@@ -8,4 +8,4 @@ The role also provides the `ansible_local.tzdata.timezone` Ansible local
 fact with the host time zone specified in the `Area/Zone` format
 required in some configuration files.
 
-Read the [tzdata role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/tzdata/) for more details.
+Read the [tzdata role documentation](https://docs.debops.org/en/HEAD/ansible/roles/tzdata/) for more details.

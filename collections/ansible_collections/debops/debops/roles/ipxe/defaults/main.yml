@@ -38,7 +38,7 @@ ipxe__packages: []
 # .. envvar:: ipxe__tftp_root [[[
 #
 # Absolute path to the TFTP root directory.
-ipxe__tftp_root: '{{ ansible_local.tftpd.directory|d(ansible_local.dnsmasq.boot_tftp_root|d("/srv/tftp")) }}'
+ipxe__tftp_root: '{{ ansible_local.tftpd.directory | d(ansible_local.dnsmasq.boot_tftp_root | d("/srv/tftp")) }}'
 
                                                                    # ]]]
 # .. envvar:: ipxe__bootloaders [[[
@@ -67,7 +67,7 @@ ipxe__debian_netboot_enabled: True
 # Enable or disable inclusion of the non-free firmware packages in the Debian
 # Installer images. The non-free firmware might be required to use certain
 # hardware (network cards, storage drivers, etc.).
-ipxe__debian_netboot_firmware: '{{ ansible_local.apt.nonfree|d()|bool }}'
+ipxe__debian_netboot_firmware: '{{ ansible_local.apt.nonfree | d() | bool }}'
 
                                                                    # ]]]
 # .. envvar:: ipxe__debian_netboot_src [[[
@@ -103,7 +103,7 @@ ipxe__debian_netboot_firmware_mirror: 'https://cdimage.debian.org/cdimage/unoffi
 #
 # Specify which Debian releases will be prepared for iPXE boot on a given host.
 # The releases need to be defined in the OS release map below.
-ipxe__debian_netboot_releases: [ 'jessie', 'stretch', 'buster', 'bullseye' ]
+ipxe__debian_netboot_releases: [ 'stretch', 'buster', 'bullseye', 'bookworm' ]
 
                                                                    # ]]]
 # .. envvar:: ipxe__debian_netboot_architectures [[[
@@ -124,23 +124,6 @@ ipxe__debian_netboot_architectures: [ 'amd64', 'i386', 'arm64' ]
 #
 # The list of the default Debian Installer releases defined by the role.
 ipxe__debian_netboot_default_release_map:
-
-  - name: 'jessie-amd64'
-    release: 'jessie'
-    architecture: 'amd64'
-    netboot_version: '20150422+deb8u5'
-    netboot_checksum: 'sha256:f52fa82a53cc2a2912765396e2adfd715234c9e1137ac5112ebc10f50a69b525'  # netboot.tar.gz
-    firmware_version: '20190211'
-    firmware_checksum: 'sha256:085f8a68b196955c984515849314fdccf6d5ba5b6b8bbef157dcb50f2cb8c0cf'  # firmware.cpio.gz
-
-  - name: 'jessie-amd64-gtk'
-    release: 'jessie'
-    architecture: 'amd64'
-    netboot_subdir: '/gtk'
-    netboot_version: '20150422+deb8u5'
-    netboot_checksum: 'sha256:60214b3a902da49cb2f8379df1502057e6d13522526a98db489f5830c60f8014'  # netboot.tar.gz
-    firmware_version: '20190211'
-    firmware_checksum: 'sha256:085f8a68b196955c984515849314fdccf6d5ba5b6b8bbef157dcb50f2cb8c0cf'  # firmware.cpio.gz
 
   - name: 'stretch-amd64'
     release: 'stretch'
@@ -193,6 +176,23 @@ ipxe__debian_netboot_default_release_map:
     firmware_version: '20230429'
     firmware_checksum: 'sha256:af07b888fb8d5153b3448fa84c3a25307a7de9ec643196031dde975d6d8d9bce'  # firmware.cpio.gz
 
+  - name: 'bookworm-amd64'
+    release: 'bookworm'
+    architecture: 'amd64'
+    netboot_version: '20230607+deb12u2'
+    netboot_checksum: 'sha256:9cadfcc3ed0e75b91ebb19306f19f83132ec76c4d115995296d55f4b59241c7b'  # netboot.tar.gz
+    firmware_version: '20231007'
+    firmware_checksum: 'sha256:35ab001226f7256b6b5a952eda92ac54291313a9bdc1d09258345177b64d4df8'  # firmware.cpio.gz
+
+  - name: 'bookworm-amd64-gtk'
+    release: 'bookworm'
+    architecture: 'amd64'
+    netboot_subdir: '/gtk'
+    netboot_version: '20230607+deb12u2'
+    netboot_checksum: 'sha256:cae6ae3b6b6f86d4c02408beb16f2b15517ef46bbcc8b4282e792d33538f170c'  # netboot.tar.gz
+    firmware_version: '20231007'
+    firmware_checksum: 'sha256:35ab001226f7256b6b5a952eda92ac54291313a9bdc1d09258345177b64d4df8'  # firmware.cpio.gz
+
                                                                    # ]]]
 # .. envvar:: ipxe__debian_netboot_release_map [[[
 #
@@ -226,7 +226,7 @@ ipxe__default_scripts:
 
       - name: 'main_menu_title'
         comment: 'The main menu title'
-        value: '{{ ansible_local.machine.organization|d("DebOps") + " Boot Menu" }}'
+        value: '{{ ansible_local.machine.organization | d("DebOps") + " Boot Menu" }}'
 
       - name: 'debian_installer_mirror'
         comment: 'Debian mirror used during automated installation'
@@ -432,15 +432,15 @@ ipxe__default_scripts:
 
       menu Install Debian GNU/Linux / ${arch_a}
       item --gap Select suite:
-      item --key e bullseye ${space} Debian Stable (Bullseye) [e]
-      # Enable this when Debian Bookworm gets an installer
-      #item bookworm ${space} Debian Testing (Bookworm)
+      item --key e bookworm ${space} Debian Stable (Bookworm) [e]
+      # Enable this when Debian Trixie gets an installer
+      #item trixie ${space} Debian Testing (Trixie)
       item
       item --gap Select release:
+      item bookworm ${space} Debian GNU/Linux 12 (Bookworm)
       item bullseye ${space} Debian GNU/Linux 11 (bullseye)
       item buster ${space} Debian GNU/Linux 10 (buster)
       item stretch ${space} Debian GNU/Linux 9 (stretch)
-      item jessie ${space} Debian GNU/Linux 8 (jessie)
       choose --default ${debian-installer-cursor} version || goto debian_exit
       set debian-installer-cursor ${version}
 

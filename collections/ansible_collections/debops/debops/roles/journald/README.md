@@ -12,4 +12,4 @@ The `debops.journald` Ansible role can be used to manage the Journal
 configuration, enable or disable persistent log storage and configure
 Forward Secure Sealing on the managed hosts.
 
-Read the [journald role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/journald/) for more details.
+Read the [journald role documentation](https://docs.debops.org/en/HEAD/ansible/roles/journald/) for more details.

@@ -3,7 +3,7 @@
 
 # .. Copyright (C) 2014-2020 Maciej Delmanowski <drybjed@gmail.com>
 # .. Copyright (C) 2015-2017 Robin Schneider <ypid@riseup.net>
-# .. Copyright (C) 2014-2020 DebOps <https://debops.org/>
+# .. Copyright (C) 2014-2022 DebOps <https://debops.org/>
 # .. SPDX-License-Identifier: GPL-3.0-only
 
 # .. _ntp__ref_defaults:
@@ -25,11 +25,14 @@
 # If ``True``, role will install and configure an NTP daemon. The daemon is not
 # required in containerized environments, where the host takes care for setting
 # time accurately.
-ntp__daemon_enabled: '{{ "True" if (ntp__daemon|d() and
-                                    ((ansible_system_capabilities_enforced|d())|bool and
-                                      "cap_sys_time" in ansible_system_capabilities) or
-                                     not (ansible_system_capabilities_enforced|d(True))|bool)
-                                else "False" }}'
+ntp__daemon_enabled: '{{ "True"
+                         if (ntp__daemon | d(False) and
+                             not (ansible_virtualization_role | d("") == "guest" and
+                                  ansible_virtualization_type | d("")
+                                    in ["container", "lxc"]) and
+                             not (ansible_system_capabilities_enforced | d(True) and
+                                  "cap_sys_time" not in ansible_system_capabilities))
+                         else "False" }}'
 
                                                                    # ]]]
 # .. envvar:: ntp__daemon [[[
@@ -46,10 +49,9 @@ ntp__daemon_enabled: '{{ "True" if (ntp__daemon|d() and
 #
 # Set to ``False`` to disable clock management.
 ntp__daemon: '{{ (ansible_local.ntp.daemon
-                  if (ansible_local.ntp.daemon|d())
+                  if (ansible_local.ntp.daemon | d())
                   else ("systemd-timesyncd"
-                        if (ansible_distribution == "Ubuntu" and
-                            ansible_service_mgr == "systemd")
+                        if (ansible_service_mgr == "systemd")
                         else "openntpd")) }}'
 
                                                                    # ]]]
@@ -118,9 +120,7 @@ ntp__fudge: True
 # to resolve to multiple IP addresses which might change over time. This is
 # currently only supported by :program:`chrony`. Other NTP servers will
 # ignore this setting.
-ntp__servers_as_pool: '{{ False if ansible_distribution == "Debian"
-                                   and ansible_distribution_release == "jessie"
-                          else True }}'
+ntp__servers_as_pool: True
                                                                    # ]]]
                                                                    # ]]]
 # APT packages [[[
@@ -130,10 +130,13 @@ ntp__servers_as_pool: '{{ False if ansible_distribution == "Debian"
 #
 # List of APT packages to install for NTP support.
 ntp__base_packages:
-  - '{{ "chrony"   if (ntp__daemon == "chrony")   else [] }}'
-  - '{{ "ntp"      if (ntp__daemon == "ntpd")     else [] }}'
+  - '{{ "chrony" if (ntp__daemon == "chrony") else [] }}'
+  - '{{ "ntp" if (ntp__daemon == "ntpd") else [] }}'
   - '{{ "openntpd" if (ntp__daemon == "openntpd") else [] }}'
-  - '{{ "ntpdate"  if (ntp__daemon == "ntpdate")  else [] }}'
+  - '{{ "systemd-timesyncd" if (ntp__daemon == "systemd-timesyncd" and
+                                ansible_distribution_release
+                                not in ["stretch", "buster"]) else [] }}'
+  - '{{ "ntpdate" if (ntp__daemon == "ntpdate") else [] }}'
 
 
                                                                    # ]]]
@@ -148,11 +151,12 @@ ntp__packages: []
 # List of APT packages to purge during NTP configuration to avoid issues with
 # conflicting services.
 ntp__purge_packages:
-  - '{{ "chrony"   if (ntp__daemon != "chrony")                  else [] }}'
-  - '{{ "ntp"      if (ntp__daemon not in [ "ntpd", "openntpd"]) else [] }}'
-  - '{{ "openntpd" if (ntp__daemon != "openntpd")                else [] }}'
-  - '{{ "ntpdate"  if (ntp__daemon != "ntpdate" and
-                       not ntp__ignore_ntpdate|bool)             else [] }}'
+  - '{{ "chrony" if (ntp__daemon != "chrony") else [] }}'
+  - '{{ "ntp" if (ntp__daemon not in ["ntpd", "openntpd"]) else [] }}'
+  - '{{ "openntpd" if (ntp__daemon != "openntpd") else [] }}'
+  - '{{ "systemd-timesyncd" if (ntp__daemon != "systemd-timesyncd") else [] }}'
+  - '{{ "ntpdate" if (ntp__daemon != "ntpdate" and
+                      not ntp__ignore_ntpdate | bool) else [] }}'
                                                                    # ]]]
                                                                    # ]]]
 # OpenNTPd configuration [[[
@@ -254,9 +258,9 @@ ntp__ferm__dependent_rules:
     role_weight: '10'
     name: 'jump-filter-ntp'
     target: '{{ ntp__ferm_chain }}'
-    rule_state: '{{ "present" if (
-                      ntp__daemon in [ "openntpd", "ntpd", "chrony" ] and
-                      ntp__firewall_access|bool)
+    rule_state: '{{ "present"
+                    if (ntp__daemon in ["openntpd", "ntpd", "chrony"] and
+                        ntp__firewall_access | bool)
                     else "absent" }}'
 
   - chain: '{{ ntp__ferm_chain }}'
@@ -271,9 +275,9 @@ ntp__ferm__dependent_rules:
     subchain: False
     recent_set_name: 'ntp-new'
     recent_log: False
-    rule_state: '{{ "present" if (
-                      ntp__daemon in [ "openntpd", "ntpd", "chrony" ] and
-                      ntp__firewall_access|bool)
+    rule_state: '{{ "present"
+                    if (ntp__daemon in ["openntpd", "ntpd", "chrony"] and
+                        ntp__firewall_access | bool)
                     else "absent" }}'
 
   - chain: '{{ ntp__ferm_chain }}'
@@ -291,9 +295,9 @@ ntp__ferm__dependent_rules:
     recent_hitcount: '{{ ntp__ferm_recent_hitcount }}'
     recent_target: '{{ ntp__ferm_recent_target }}'
     recent_log_prefix: 'ipt-recent-ntp: '
-    rule_state: '{{ "present" if (
-                      ntp__daemon in [ "openntpd", "ntpd", "chrony" ] and
-                      ntp__firewall_access|bool)
+    rule_state: '{{ "present"
+                    if (ntp__daemon in ["openntpd", "ntpd", "chrony"] and
+                        ntp__firewall_access | bool)
                     else "absent" }}'
 
   - chain: '{{ ntp__ferm_chain }}'
@@ -305,9 +309,9 @@ ntp__ferm__dependent_rules:
     weight: '{{ ntp__ferm_weight }}'
     role: 'ntp'
     role_weight: '40'
-    rule_state: '{{ "present" if (
-                      ntp__daemon in [ "openntpd", "ntpd", "chrony" ] and
-                      ntp__firewall_access|bool)
+    rule_state: '{{ "present"
+                    if (ntp__daemon in ["openntpd", "ntpd", "chrony"] and
+                        ntp__firewall_access | bool)
                     else "absent" }}'
                                                                    # ]]]
                                                                    # ]]]

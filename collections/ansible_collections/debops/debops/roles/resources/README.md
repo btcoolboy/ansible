@@ -6,4 +6,4 @@ role. You can use inventory lists to define what files to copy, what
 directories should exist on a remote host, what online resources to
 download, and so on.
 
-Read the [resources role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/resources/) for more details.
+Read the [resources role documentation](https://docs.debops.org/en/HEAD/ansible/roles/resources/) for more details.

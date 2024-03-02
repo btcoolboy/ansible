@@ -31,7 +31,7 @@ apt_install__enabled: True
 # The variable that indicates host operating system distribution, used to
 # conditionally select packages for installation.
 apt_install__distribution: '{{ ansible_local.core.distribution
-                               |d(ansible_lsb.id|d(ansible_distribution)) }}'
+                                | d(ansible_lsb.id | d(ansible_distribution)) }}'
 
                                                                    # ]]]
 # .. envvar:: apt_install__distribution_release [[[
@@ -39,7 +39,7 @@ apt_install__distribution: '{{ ansible_local.core.distribution
 # The variable that indicates host distribution release, used to conditionally
 # select packages for installation.
 apt_install__distribution_release: '{{ ansible_local.core.distribution_release
-                                       |d(ansible_lsb.codename|d(ansible_distribution_release)) }}'
+                                        | d(ansible_lsb.codename | d(ansible_distribution_release)) }}'
 
                                                                    # ]]]
 # .. envvar:: apt_install__archive_areas_map [[[
@@ -57,7 +57,7 @@ apt_install__archive_areas_map:
 # used to conditionally enable packages for installation, depending on
 # availability of a given archive area.
 apt_install__archive_areas: '{{ ansible_local.apt.components
-                                |d(apt_install__archive_areas_map[apt_install__distribution] | d([])) }}'
+                                 | d(apt_install__archive_areas_map[apt_install__distribution] | d([])) }}'
 
                                                                    # ]]]
 # .. envvar:: apt_install__condition_map [[[
@@ -85,8 +85,8 @@ apt_install__condition_map:
 # By default role will make sure to update the packages to their latest version
 # on first run, and just keep the current version on subsequent runs.
 apt_install__state: '{{ "present"
-                        if (ansible_local|d() and ansible_local.apt_install|d() and
-                            (ansible_local.apt_install.configured|d(True))|bool)
+                        if (ansible_local | d() and ansible_local.apt_install | d() and
+                            (ansible_local.apt_install.configured | d(True)) | bool)
                         else "latest" }}'
 
                                                                    # ]]]
@@ -116,7 +116,7 @@ apt_install__update_cache: True
 # .. envvar:: apt_install__cache_valid_time [[[
 #
 # Amount of time between APT cache updates in seconds.
-apt_install__cache_valid_time: '{{ ansible_local.core.cache_valid_time|d(60 * 60 * 24 * 7) }}'
+apt_install__cache_valid_time: '{{ ansible_local.core.cache_valid_time | d(60 * 60 * 24 * 7) }}'
                                                                    # ]]]
                                                                    # ]]]
 # Debconf package configuration [[[
@@ -252,14 +252,14 @@ apt_install__conditional_packages:
     state: '{{ "present"
                if (ansible_processor_cores >= 2 and
                    (ansible_virtualization_role is undefined or
-                    ansible_virtualization_role not in [ "guest" ]))
+                    ansible_virtualization_role not in ["guest"]))
                else "absent" }}'
 
   - name: 'uptimed'
     whitelist: '{{ apt_install__conditional_whitelist_packages }}'
     state: '{{ "present"
                if (ansible_virtualization_role is undefined or
-                   ansible_virtualization_role not in [ "guest" ])
+                   ansible_virtualization_role not in ["guest"])
                else "absent" }}'
 
   - name: 'libpam-systemd'
@@ -272,11 +272,10 @@ apt_install__conditional_packages:
     # only controls a guest.
     whitelist: '{{ apt_install__conditional_whitelist_packages }}'
     state: '{{ "present"
-               if (ansible_virtualization_role|d("guest") in [ "guest" ] and
-                   ansible_virtualization_type|d("unknown") not in ["lxc", "openvz"] and
-                   not (ansible_local|d() and ansible_local.apt_install|d() and
-                        ansible_local.apt_install.have_virtual_rng|d(False)|bool)
-               )
+               if (ansible_virtualization_role | d("guest") in ["guest"] and
+                   ansible_virtualization_type | d("unknown") not in ["lxc", "openvz"] and
+                   not (ansible_local | d() and ansible_local.apt_install | d() and
+                        ansible_local.apt_install.have_virtual_rng | d(False) | bool))
                else "absent" }}'
 
   - name: 'gnupg-curl'
@@ -284,21 +283,18 @@ apt_install__conditional_packages:
     whitelist: '{{ apt_install__conditional_whitelist_packages }}'
     state: '{{ "present"
                if ansible_distribution_release in
-                  [ "wheezy", "jessie", "precise", "trusty", "xenial" ]
+                  ["trusty", "xenial"]
                else "absent" }}'
 
   - name: 'needrestart'
-    # Install the package on newer OS releases.
     whitelist: '{{ apt_install__conditional_whitelist_packages }}'
-    state: '{{ "present"
-               if ansible_distribution_release not in [ "precise" ]
-               else "absent" }}'
+    state: 'present'
 
   - name: 'open-vm-tools'
     whitelist: '{{ apt_install__conditional_whitelist_packages }}'
     state: '{{ "present"
-               if (ansible_virtualization_role|d("guest") in [ "guest" ] and
-                   ansible_virtualization_type|d("unknown") in [ "VMware" ])
+               if (ansible_virtualization_role | d("guest") in ["guest"] and
+                   ansible_virtualization_type | d("unknown") in ["VMware"])
                else "absent" }}'
 
                                                                    # ]]]
@@ -315,9 +311,9 @@ apt_install__firmware_packages:
     # virtual machines, be sure to set the correct CPU flags in QEMU:
     # https://www.qemu.org/docs/master/system/target-i386.html#important-cpu-features-for-intel-x86-hosts
     distribution: [ 'Debian', 'Devuan', 'Ubuntu' ]
-    areas: '{{ [ "main" ]
-               if ansible_distribution in [ "Ubuntu" ]
-               else [ "non-free" ] }}'
+    areas: '{{ ["main"]
+               if ansible_distribution in ["Ubuntu"]
+               else ["non-free"] }}'
     state: '{{ "present"
                if ansible_virtualization_role == "host" and
                   "AuthenticAMD" in ansible_processor
@@ -325,45 +321,45 @@ apt_install__firmware_packages:
 
   - name: 'firmware-linux-free'
     distribution: [ 'Debian' ]
-    state: '{{ "present" if (ansible_form_factor in [ "Rack Mount Chassis" ])
+    state: '{{ "present" if (ansible_form_factor in ["Rack Mount Chassis"])
                          and (ansible_virtualization_role is undefined or
-                              ansible_virtualization_role not in [ "guest" ])
-                         and (ansible_kernel.find("-pve") == -1)
+                              ansible_virtualization_role not in ["guest"])
+                         and (ansible_kernel.find("-pve") == "-1")
                          else "absent" }}'
 
   - name: 'firmware-linux-nonfree'
     distribution: [ 'Debian' ]
     areas: [ 'non-free' ]
-    state: '{{ "present" if (ansible_form_factor in [ "Rack Mount Chassis" ])
+    state: '{{ "present" if (ansible_form_factor in ["Rack Mount Chassis"])
                          and (ansible_virtualization_role is undefined or
-                              ansible_virtualization_role not in [ "guest" ])
-                         and (ansible_kernel.find("-pve") == -1)
+                              ansible_virtualization_role not in ["guest"])
+                         and (ansible_kernel.find("-pve") == "-1")
                          else "absent" }}'
 
   - name: 'intel-microcode'
     # Same as amd64-microcode, but for Intel CPUs.
     distribution: [ 'Debian', 'Devuan', 'Ubuntu' ]
-    areas: '{{ [ "main" ]
-               if ansible_distribution in [ "Ubuntu" ]
-               else [ "non-free" ] }}'
+    areas: '{{ ["main"]
+               if ansible_distribution in ["Ubuntu"]
+               else ["non-free"] }}'
     state: '{{ "present" if ansible_virtualization_role == "host" and
                             "GenuineIntel" in ansible_processor
                          else "absent" }}'
 
   - name: 'linux-firmware'
     distribution: [ 'Ubuntu' ]
-    state: '{{ "present" if (ansible_form_factor in [ "Rack Mount Chassis" ])
+    state: '{{ "present" if (ansible_form_factor in ["Rack Mount Chassis"])
                              and (ansible_virtualization_role is undefined or
-                              ansible_virtualization_role not in [ "guest" ])
+                              ansible_virtualization_role not in ["guest"])
                          else "absent" }}'
 
   - name: 'linux-firmware-nonfree'
     distribution: [ 'Ubuntu' ]
     release: [ 'precise', 'trusty', 'wily' ]
     areas: [ 'multiverse' ]
-    state: '{{ "present" if (ansible_form_factor in [ "Rack Mount Chassis" ])
+    state: '{{ "present" if (ansible_form_factor in ["Rack Mount Chassis"])
                              and (ansible_virtualization_role is undefined or
-                              ansible_virtualization_role not in [ "guest" ])
+                              ansible_virtualization_role not in ["guest"])
                          else "absent" }}'
 
                                                                    # ]]]
@@ -430,23 +426,8 @@ apt_install__host_alternatives: []
 # Configuration for the :ref:`debops.apt_preferences` role.
 apt_install__apt_preferences__dependent_list:
 
-  - package: 'git git-*'
-    backports: [ 'wheezy' ]
-    reason:  'Better support for git submodules - https://stackoverflow.com/a/7593496'
-    by_role: 'debops.apt_install'
-
-  - package: 'irqbalance'
-    backports: [ 'wheezy' ]
-    reason:  'Issues in wheezy package - http://debian.distrosfaqs.org/debian-user/wheezy-irqbalance/'
-    by_role: 'debops.apt_install'
-
-  - package: 'irqbalance'
-    backports: [ 'jessie' ]
-    reason:  'Bug fixes and memory leak fixes.'
-    by_role: 'debops.apt_install'
-
   - package: 'needrestart needrestart-*'
-    backports: [ 'wheezy', 'jessie', 'trusty' ]
+    backports: [ 'trusty' ]
     reason: 'Better support for container technologies'
     by_role: 'debops.apt_install'
                                                                    # ]]]

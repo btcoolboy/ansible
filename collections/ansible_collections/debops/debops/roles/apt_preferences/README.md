@@ -11,4 +11,4 @@ configuration, `debops.apt_preferences` role will configure the
 specified packages to be installed from the backports repository of the
 current OS release.
 
-Read the [apt_preferences role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/apt_preferences/) for more details.
+Read the [apt_preferences role documentation](https://docs.debops.org/en/HEAD/ansible/roles/apt_preferences/) for more details.

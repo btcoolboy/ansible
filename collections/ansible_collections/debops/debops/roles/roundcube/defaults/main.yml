@@ -41,9 +41,9 @@ roundcube__required_php_packages:
 # List of recommended/optional PHP packages for Roundcube.
 # Refer to the `official Roundcube documentation <https://github.com/roundcube/roundcubemail/wiki/Install-Requirements>`__ for details.
 roundcube__optional_php_packages:
-  - '{{ "ldap"      if roundcube__ldap_enabled|bool      else [] }}'
-  - '{{ "memcached" if roundcube__memcached_enabled|bool else [] }}'
-  - '{{ "redis"     if roundcube__redis_enabled|bool     else [] }}'
+  - '{{ "ldap" if roundcube__ldap_enabled | bool else [] }}'
+  - '{{ "memcached" if roundcube__memcached_enabled | bool else [] }}'
+  - '{{ "redis" if roundcube__redis_enabled | bool else [] }}'
   - 'fileinfo'
   - 'enchant'
   - 'zip'
@@ -62,9 +62,9 @@ roundcube__base_php_packages:
   - '{{ roundcube__required_php_packages }}'
   - '{{ roundcube__apt_php_packages }}'
   - '{{ roundcube__optional_php_packages }}'
-  - '{{ [ "mysql" ] if (roundcube__database_map[roundcube__database].dbtype == "mysql") else [] }}'
-  - '{{ [ "pgsql" ] if (roundcube__database_map[roundcube__database].dbtype == "postgresql") else [] }}'
-  - '{{ [ "sqlite3" ] if (roundcube__database_map[roundcube__database].dbtype == "sqlite") else [] }}'
+  - '{{ ["mysql"] if (roundcube__database_map[roundcube__database].dbtype == "mysql") else [] }}'
+  - '{{ ["pgsql"] if (roundcube__database_map[roundcube__database].dbtype == "postgresql") else [] }}'
+  - '{{ ["sqlite3"] if (roundcube__database_map[roundcube__database].dbtype == "sqlite") else [] }}'
 
                                                                    # ]]]
 # .. envvar:: roundcube__apt_php_packages [[[
@@ -74,8 +74,8 @@ roundcube__base_php_packages:
 # minimal versions are taken from the file:`composer.json.dist` of the Roundcube
 # 1.3.0 release. If you install an older version of Roundcube you may want
 # to adjust this list.
-roundcube__apt_php_packages: '{{ [ "mail-mime", "net-smtp", "pear" ]
-                                 if ansible_distribution_release in [ "stretch", "buster", "sid", "xenial", "yakkety", "zesty", "artful" ]
+roundcube__apt_php_packages: '{{ ["mail-mime", "net-smtp", "pear"]
+                                 if ansible_distribution_release in ["stretch", "buster", "sid", "xenial", "yakkety", "zesty", "artful"]
                                  else [] }}'
 
                                                                    # ]]]
@@ -156,15 +156,15 @@ roundcube__git_repo: 'https://github.com/roundcube/roundcubemail.git'
 #
 # Roundcube source directory on the host.
 roundcube__git_dir: '{{ roundcube__src + "/"
-                        + roundcube__git_repo
-                          .split("@" if ("@" in roundcube__git_repo)
-                                     else "://")[1] }}'
+                        + roundcube__git_repo.split("@"
+                                                    if ("@" in roundcube__git_repo)
+                                                    else "://")[1] }}'
 
                                                                    # ]]]
 # .. envvar:: roundcube__git_version [[[
 #
 # Roundcube release tag to deploy.
-roundcube__git_version: '1.5.2'
+roundcube__git_version: '1.6.0'
 
                                                                    # ]]]
 # .. envvar:: roundcube__git_dest [[[
@@ -184,14 +184,14 @@ roundcube__src: '{{ (ansible_local.fhs.src | d("/usr/local/src"))
 #
 # Base web root directory for Roundcube website.
 roundcube__www: '{{ ansible_local.nginx.www
-                    if (ansible_local|d() and ansible_local.nginx|d())
+                    if (ansible_local | d() and ansible_local.nginx | d())
                     else "/srv/www" }}'
 
                                                                    # ]]]
 # .. envvar:: roundcube__webserver_user [[[
 #
 # Roundcube webserver user (needs read-only access to the website code).
-roundcube__webserver_user: '{{ ansible_local.nginx.user|d("www-data") }}'
+roundcube__webserver_user: '{{ ansible_local.nginx.user | d("www-data") }}'
                                                                    # ]]]
                                                                    # ]]]
 # Database configuration [[[
@@ -269,16 +269,8 @@ roundcube__database_schema_map:
 # .. envvar:: roundcube__database_schema [[[
 #
 # Initial Roundcube database schema loaded by Ansible.
-roundcube__database_schema: '{{ roundcube__database_schema_map[
-                                  roundcube__database_map[
-                                    roundcube__database
-                                  ].dbtype
-                                ]
-                                if roundcube__database_schema_map[
-                                     roundcube__database_map[
-                                       roundcube__database
-                                     ].dbtype
-                                   ]|d()
+roundcube__database_schema: '{{ roundcube__database_schema_map[roundcube__database_map[roundcube__database].dbtype]
+                                if roundcube__database_schema_map[roundcube__database_map[roundcube__database].dbtype] | d()
                                 else "" }}'
                                                                    # ]]]
                                                                    # ]]]
@@ -290,8 +282,8 @@ roundcube__database_schema: '{{ roundcube__database_schema_map[
 # Enable or disable support for :command:`memcached` service. It will be
 # enabled automatically if local instance of :command:`memcached` is detected.
 roundcube__memcached_enabled: '{{ True
-                                  if (ansible_local|d() and ansible_local.memcached|d() and
-                                      (ansible_local.memcached.installed|d())|bool)
+                                  if (ansible_local | d() and ansible_local.memcached | d() and
+                                      (ansible_local.memcached.installed | d()) | bool)
                                   else False }}'
 
                                                                    # ]]]
@@ -308,8 +300,8 @@ roundcube__memcached_hosts: [ 'localhost:11211' ]
 # Enable or disable support for :command:`redis` service. It will be enabled
 # automatically if local instance of :command:`redis` is detected.
 roundcube__redis_enabled: '{{ True
-                              if (ansible_local|d() and ansible_local.redis_server|d() and
-                                  (ansible_local.redis_server.installed|d())|bool)
+                              if (ansible_local | d() and ansible_local.redis_server | d() and
+                                  (ansible_local.redis_server.installed | d()) | bool)
                               else False }}'
 
                                                                    # ]]]
@@ -324,7 +316,7 @@ roundcube__redis_server: 'localhost'
 # .. envvar:: roundcube__redis_port [[[
 #
 # The TCP port to use for Redis connections.
-roundcube__redis_port: '{{ ansible_local.redis_server.port|d("6379") }}'
+roundcube__redis_port: '{{ ansible_local.redis_server.port | d("6379") }}'
 
                                                                    # ]]]
 # .. envvar:: roundcube__redis_database [[[
@@ -336,17 +328,17 @@ roundcube__redis_database: '1'
 # .. envvar:: roundcube__redis_password [[[
 #
 # Specify the password required for authentication to Redis.
-roundcube__redis_password: '{{ ansible_local.redis_server.password|d("") }}'
+roundcube__redis_password: '{{ ansible_local.redis_server.password | d("") }}'
 
                                                                    # ]]]
 # .. envvar:: roundcube__redis_hosts [[[
 #
 # List of the Redis instances which should be used by Roundcube. Currently only
 # a single instance is supported, but the variable expects a list.
-roundcube__redis_hosts: [ '{{ ([ roundcube__redis_server,
-                                 roundcube__redis_port,
-                                 roundcube__redis_database,
-                                 roundcube__redis_password ])
+roundcube__redis_hosts: [ '{{ ([roundcube__redis_server,
+                                roundcube__redis_port,
+                                roundcube__redis_database,
+                                roundcube__redis_password])
                               | join(":") }}' ]
 
                                                                    # ]]]
@@ -358,9 +350,9 @@ roundcube__redis_hosts: [ '{{ ([ roundcube__redis_server,
 # is empty, session storage will not be configured and will fall back to
 # the ``db`` storage type.
 roundcube__session_storage: '{{ "redis"
-                                if roundcube__redis_enabled|bool
+                                if roundcube__redis_enabled | bool
                                 else ("memcached"
-                                      if roundcube__memcached_enabled|bool
+                                      if roundcube__memcached_enabled | bool
                                       else "") }}'
                                                                    # ]]]
                                                                    # ]]]
@@ -379,7 +371,7 @@ roundcube__session_storage: '{{ "redis"
 #
 # Enable or disable LDAP integration in Roundcube.
 roundcube__ldap_enabled: '{{ ansible_local.ldap.enabled
-                             if (ansible_local|d() and ansible_local.ldap|d() and
+                             if (ansible_local | d() and ansible_local.ldap | d() and
                                  ansible_local.ldap.enabled is defined)
                              else False }}'
 
@@ -407,26 +399,26 @@ roundcube__ldap_addressbook_name: 'LDAP Address Book'
 #
 # List of the FQDN addresses of the LDAP directory servers which should be used
 # by Roundcube.
-roundcube__ldap_hosts: '{{ ansible_local.ldap.hosts|d([]) }}'
+roundcube__ldap_hosts: '{{ ansible_local.ldap.hosts | d([]) }}'
 
                                                                    # ]]]
 # .. envvar:: roundcube__ldap_port [[[
 #
 # The TCP port to use to connect to the LDAP directory.
-roundcube__ldap_port: '{{ ansible_local.ldap.port|d("389") }}'
+roundcube__ldap_port: '{{ ansible_local.ldap.port | d("389") }}'
 
                                                                    # ]]]
 # .. envvar:: roundcube__ldap_use_tls [[[
 #
 # Enable or disable support for STARTTLS extension while connecting to the LDAP
 # directory.
-roundcube__ldap_use_tls: '{{ ansible_local.ldap.start_tls|d(True) }}'
+roundcube__ldap_use_tls: '{{ ansible_local.ldap.start_tls | d(True) }}'
 
                                                                    # ]]]
 # .. envvar:: roundcube__ldap_base_dn [[[
 #
 # The Base Distinguished Name of the LDAP directory, defined as a YAML list.
-roundcube__ldap_base_dn: '{{ ansible_local.ldap.base_dn|d([]) }}'
+roundcube__ldap_base_dn: '{{ ansible_local.ldap.base_dn | d([]) }}'
 
                                                                    # ]]]
 # .. envvar:: roundcube__ldap_device_dn [[[
@@ -435,7 +427,7 @@ roundcube__ldap_base_dn: '{{ ansible_local.ldap.base_dn|d([]) }}'
 # list. It will be used as a base for the Roundcube application account LDAP
 # object. If the list is empty, the role will not create the account LDAP
 # object automatically.
-roundcube__ldap_device_dn: '{{ ansible_local.ldap.device_dn|d([]) }}'
+roundcube__ldap_device_dn: '{{ ansible_local.ldap.device_dn | d([]) }}'
 
                                                                    # ]]]
 # .. envvar:: roundcube__ldap_self_rdn [[[
@@ -459,7 +451,7 @@ roundcube__ldap_self_object_classes: [ 'account', 'simpleSecurityObject' ]
 roundcube__ldap_self_attributes:
   uid: '{{ roundcube__ldap_self_rdn.split("=")[1] }}'
   userPassword: '{{ roundcube__ldap_bindpw }}'
-  host: '{{ [ ansible_fqdn, ansible_hostname ] | unique }}'
+  host: '{{ [ansible_fqdn, ansible_hostname] | unique }}'
   description: 'Account used by the "Roundcube" application to access the LDAP directory'
 
                                                                    # ]]]
@@ -467,7 +459,7 @@ roundcube__ldap_self_attributes:
 #
 # The Distinguished Name of the account LDAP object used by the
 # Roundcube application to bind to the LDAP directory.
-roundcube__ldap_binddn: '{{ ([ roundcube__ldap_self_rdn ] + roundcube__ldap_device_dn) | join(",") }}'
+roundcube__ldap_binddn: '{{ ([roundcube__ldap_self_rdn] + roundcube__ldap_device_dn) | join(",") }}'
 
                                                                    # ]]]
 # .. envvar:: roundcube__ldap_bindpw [[[
@@ -476,7 +468,7 @@ roundcube__ldap_binddn: '{{ ([ roundcube__ldap_self_rdn ] + roundcube__ldap_devi
 # application to bind to the LDAP directory.
 roundcube__ldap_bindpw: '{{ (lookup("password", secret + "/ldap/credentials/"
                                     + roundcube__ldap_binddn | to_uuid + ".password length=32"))
-                            if roundcube__ldap_enabled|bool
+                            if roundcube__ldap_enabled | bool
                             else "" }}'
 
                                                                    # ]]]
@@ -484,14 +476,14 @@ roundcube__ldap_bindpw: '{{ (lookup("password", secret + "/ldap/credentials/"
 #
 # The Relative Distinguished Name of the people subtree which contains personal
 # LDAP entries.
-roundcube__ldap_people_rdn: '{{ ansible_local.ldap.people_rdn|d([]) }}'
+roundcube__ldap_people_rdn: '{{ ansible_local.ldap.people_rdn | d([]) }}'
 
                                                                    # ]]]
 # .. envvar:: roundcube__ldap_people_dn [[[
 #
 # The Distinguished Name of the people subtree which will be used for LDAP
 # address book searches.
-roundcube__ldap_people_dn: '{{ [ roundcube__ldap_people_rdn ]
+roundcube__ldap_people_dn: '{{ [roundcube__ldap_people_rdn]
                                + roundcube__ldap_base_dn }}'
 
                                                                    # ]]]
@@ -499,14 +491,14 @@ roundcube__ldap_people_dn: '{{ [ roundcube__ldap_people_rdn ]
 #
 # The Relative Distinguished Name of the groups subtree which contains group
 # LDAP entries.
-roundcube__ldap_groups_rdn: '{{ ansible_local.ldap.groups_rdn|d([]) }}'
+roundcube__ldap_groups_rdn: '{{ ansible_local.ldap.groups_rdn | d([]) }}'
 
                                                                    # ]]]
 # .. envvar:: roundcube__ldap_groups_dn [[[
 #
 # The Distinguished Name of the groups subtree which will be used for LDAP
 # address book searches.
-roundcube__ldap_groups_dn: '{{ [ roundcube__ldap_groups_rdn ]
+roundcube__ldap_groups_dn: '{{ [roundcube__ldap_groups_rdn]
                                + roundcube__ldap_base_dn }}'
 
                                                                    # ]]]
@@ -588,8 +580,8 @@ roundcube__domain: '{{ ansible_domain }}'
 # Finally, ``imap.<domain>`` is used as a fallback.
 roundcube__imap_srv_rr: '{{ q("debops.debops.dig_srv", "_imaps._tcp." + roundcube__domain,
                               ansible_fqdn
-                              if (ansible_local|d() and ansible_local.dovecot|d() and
-                                  (ansible_local.dovecot.installed|d())|bool)
+                              if (ansible_local | d() and ansible_local.dovecot | d() and
+                                  (ansible_local.dovecot.installed | d()) | bool)
                               else "imap." + roundcube__domain, 993) }}'
 
                                                                    # ]]]
@@ -627,7 +619,8 @@ roundcube__imap_server: '{{ ("ssl://"
                              else ("tls://"
                                    if (roundcube__imap_port == "143")
                                    else "tls://"))
-                             + roundcube__imap_fqdn }}'
+                             + roundcube__imap_fqdn
+                             + ":" + roundcube__imap_port }}'
 
                                                                    # ]]]
 # .. envvar:: roundcube__smtp_srv_rr [[[
@@ -641,8 +634,8 @@ roundcube__imap_server: '{{ ("ssl://"
 # Finally, ``smtp.<domain>`` is used as a fallback.
 roundcube__smtp_srv_rr: '{{ q("debops.debops.dig_srv", "_submissions._tcp." + roundcube__domain,
                               ansible_fqdn
-                              if (ansible_local|d() and ansible_local.postfix|d() and
-                                  (ansible_local.postfix.installed|d())|bool)
+                              if (ansible_local | d() and ansible_local.postfix | d() and
+                                  (ansible_local.postfix.installed | d()) | bool)
                               else ("smtp." + roundcube__domain), 465) }}'
 
                                                                    # ]]]
@@ -683,7 +676,8 @@ roundcube__smtp_server: '{{ ("ssl://"
                              else ("tls://"
                                    if (roundcube__smtp_port == "587")
                                    else "tls://"))
-                             + roundcube__smtp_fqdn }}'
+                             + roundcube__smtp_fqdn
+                             + ":" + roundcube__smtp_port }}'
 
                                                                    # ]]]
 # .. envvar:: roundcube__smtp_user [[[
@@ -710,8 +704,8 @@ roundcube__smtp_pass: '%p'
 # Finally, ``sieve.<domain>`` is used as a fallback.
 roundcube__sieve_srv_rr: '{{ q("debops.debops.dig_srv", "_sieve._tcp." + roundcube__domain,
                                ansible_fqdn
-                               if (ansible_local|d() and ansible_local.dovecot|d() and
-                                   (ansible_local.dovecot.installed|d())|bool)
+                               if (ansible_local | d() and ansible_local.dovecot | d() and
+                                   (ansible_local.dovecot.installed | d()) | bool)
                                else ("sieve." + roundcube__domain), 4190) }}'
 
                                                                    # ]]]
@@ -745,7 +739,7 @@ roundcube__sieve_server: '{{ "tls://" + roundcube__sieve_fqdn }}'
 # .. envvar:: roundcube__product_name [[[
 #
 # Name your service. This is displayed on the login screen and in the window title
-roundcube__product_name: '{{ ansible_local.machine.organization|d("Roundcube") + " Webmail" }}'
+roundcube__product_name: '{{ ansible_local.machine.organization | d("Roundcube") + " Webmail" }}'
 
                                                                    # ]]]
 # .. envvar:: roundcube__des_key [[[
@@ -817,7 +811,7 @@ roundcube__original_configuration:
     state: 'init'
 
   - name: 'db_dsnw_noread'
-    comment: 'Disable the use of already estabilished dsnw connections for subsequent reads'
+    comment: 'Disable the use of already established dsnw connections for subsequent reads'
     value: False
     section: 'sql'
     state: 'init'
@@ -975,28 +969,12 @@ roundcube__original_configuration:
     state: 'init'
                                                                    # ]]]
     # [[[ imap
-  - name: 'default_host'
+  - name: 'imap_host'
     comment: |
-      The IMAP host chosen to perform the log-in.
-      Leave blank to show a textbox at login, give a list of hosts
-      to display a pulldown menu or set one host as string.
-      To use SSL/TLS connection, enter hostname with prefix ssl:// or tls://
-      Supported replacement variables:
-      %n - hostname ($_SERVER['SERVER_NAME'])
-      %t - hostname without the first part
-      %d - domain (http hostname $_SERVER['HTTP_HOST'] without the first part)
-      %s - domain name after the '@' from e-mail address provided at login screen
-      For example %n = mail.domain.tld, %t = domain.tld
-      WARNING: After hostname change update of mail_host column in users table is
-               required to match old user data records with the new host.
-    value: 'localhost'
+      IMAP host chosen to perform the log-in.
+      See defaults.inc.php for the option description.
+    value: 'localhost:143'
     section: 'imap'
-
-  - name: 'default_port'
-    comment: 'TCP port used for IMAP connections'
-    value: 143
-    section: 'imap'
-    state: 'init'
 
   - name: 'imap_auth_type'
     comment: |
@@ -1182,26 +1160,11 @@ roundcube__original_configuration:
     state: 'init'
                                                                    # ]]]
     # [[[ smtp
-  - name: 'smtp_server'
+  - name: 'smtp_host'
     comment: |
       SMTP server host (for sending mails).
-      Enter hostname with prefix tls:// to use STARTTLS, or use
-      prefix ssl:// to use the deprecated SSL over SMTP (aka SMTPS)
-      Supported replacement variables:
-      %h - user's IMAP hostname
-      %n - hostname ($_SERVER['SERVER_NAME'])
-      %t - hostname without the first part
-      %d - domain (http hostname $_SERVER['HTTP_HOST'] without the first part)
-      %z - IMAP domain (IMAP hostname without the first part)
-      For example %n = mail.domain.tld, %t = domain.tld
-    value: 'localhost'
-    section: 'smtp'
-
-  - name: 'smtp_port'
-    comment: |
-      SMTP port (default is 25; use 587 for STARTTLS or 465 for the
-      deprecated SSL over SMTP (aka SMTPS))
-    value: 587
+      See defaults.inc.php for the option description.
+    value: 'localhost:587'
     section: 'smtp'
 
   - name: 'smtp_user'
@@ -2337,7 +2300,7 @@ roundcube__original_configuration:
           - 'uid':  'md5(microtime())'               # You may specify PHP code snippets which are then eval'ed
             'mail': '{givenname}.{sn}@mydomain.com'  # or composite strings with placeholders for existing attributes
         sort: 'cn'    # The field to sort the listing by.
-        scope: 'sub'  # Search mode sub|base|list
+        scope: 'sub'  # Search mode sub|base | list
         # Used for basic listing (if not empty) and will be &'d with search queries. Example: status=act
         filter: '(objectClass=inetOrgPerson)'
         fuzzy_search: True  # Server allows wildcard search
@@ -2367,7 +2330,7 @@ roundcube__original_configuration:
         # -> in this case, assure that groups and contacts are separated due to the concernig filters!
         groups:
           - 'base_dn': ''
-            'scope': 'sub'  # Search mode: sub|base|list
+            'scope': 'sub'  # Search mode: sub|base | list
             'filter': '(objectClass=groupOfNames)'
             'object_classes': [ 'top', 'groupOfNames' ]  # Object classes to be assigned to new groups
             'member_attr':   'member'           # Name of the default member attribute, e.g. uniqueMember
@@ -2795,7 +2758,6 @@ roundcube__original_configuration:
   - name: 'dsn_default'
     comment: |
       Delivery Status Notification checkbox default state
-      Note: This can be used only if smtp_server is non-empty
     value: 0
     section: 'userprefs'
     state: 'init'
@@ -2878,26 +2840,26 @@ roundcube__default_configuration:
 
   - name: 'db_dsnw'
     value: '{{ "sqlite:///" + roundcube__git_dest + "/"
-                            + roundcube__database_map[roundcube__database].dbname|d()
+                            + roundcube__database_map[roundcube__database].dbname | d()
                             + "?mode=640" }}'
     state: '{{ "present"
                if (roundcube__database_map[roundcube__database].dbtype == "sqlite")
                else "ignore" }}'
 
   - name: 'db_dsnw'
-    value: '{{ "mysql://" + roundcube__database_map[roundcube__database].dbuser|d() + ":"
-                          + roundcube__database_map[roundcube__database].dbpass|d() + "@"
-                          + roundcube__database_map[roundcube__database].dbhost|d() + "/"
-                          + roundcube__database_map[roundcube__database].dbname|d() }}'
+    value: '{{ "mysql://" + roundcube__database_map[roundcube__database].dbuser | d() + ":"
+                          + roundcube__database_map[roundcube__database].dbpass | d() + "@"
+                          + roundcube__database_map[roundcube__database].dbhost | d() + "/"
+                          + roundcube__database_map[roundcube__database].dbname | d() }}'
     state: '{{ "present"
                if (roundcube__database_map[roundcube__database].dbtype == "mysql")
                else "ignore" }}'
 
   - name: 'db_dsnw'
-    value: '{{ "pgsql://" + roundcube__database_map[roundcube__database].dbuser|d() + ":"
-                          + roundcube__database_map[roundcube__database].dbpass|d() + "@"
-                          + roundcube__database_map[roundcube__database].dbhost|d() + "/"
-                          + roundcube__database_map[roundcube__database].dbname|d() }}'
+    value: '{{ "pgsql://" + roundcube__database_map[roundcube__database].dbuser | d() + ":"
+                          + roundcube__database_map[roundcube__database].dbpass | d() + "@"
+                          + roundcube__database_map[roundcube__database].dbhost | d() + "/"
+                          + roundcube__database_map[roundcube__database].dbname | d() }}'
     state: '{{ "present"
                if (roundcube__database_map[roundcube__database].dbtype == "postgresql")
                else "ignore" }}'
@@ -2907,34 +2869,25 @@ roundcube__default_configuration:
       Log driver: "syslog", "stdout" or "file"
     value: '{{ roundcube__log_driver }}'
 
-  - name: 'default_host'
+  - name: 'imap_host'
     value: '{{ roundcube__imap_server }}'
-
-  - name: 'default_port'
-    comment: 'TCP port used for IMAP connections'
-    value: '{{ roundcube__imap_port }}'
-    value_cast: 'int'
 
     # Enable use of memcached to cache IMAP indexes, if local memcached
     # instance is detected
   - name: 'imap_cache'
     value: 'memcached'
-    state: '{{ "present" if roundcube__memcached_enabled|bool else "ignore" }}'
+    state: '{{ "present" if roundcube__memcached_enabled | bool else "ignore" }}'
 
     # Enable message caching in the database if the IMAP server is remote
   - name: 'messages_cache'
     value: True
     state: '{{ "ignore"
-               if (ansible_local|d() and ansible_local.dovecot|d() and
-                   (ansible_local.dovecot.installed|d())|bool)
+               if (ansible_local | d() and ansible_local.dovecot | d() and
+                   (ansible_local.dovecot.installed | d()) | bool)
                else "present" }}'
 
-  - name: 'smtp_server'
+  - name: 'smtp_host'
     value: '{{ roundcube__smtp_server }}'
-
-  - name: 'smtp_port'
-    value: '{{ roundcube__smtp_port }}'
-    value_cast: 'int'
 
   - name: 'smtp_user'
     value: '{{ roundcube__smtp_user }}'
@@ -2946,17 +2899,17 @@ roundcube__default_configuration:
     # is detected
   - name: 'ldap_cache'
     value: 'memcached'
-    state: '{{ "present" if roundcube__memcached_enabled|bool else "ignore" }}'
+    state: '{{ "present" if roundcube__memcached_enabled | bool else "ignore" }}'
 
     # Enable support for memcached on localhost if it's detected
   - name: 'memcache_hosts'
     value: '{{ roundcube__memcached_hosts }}'
-    state: '{{ "present" if roundcube__memcached_enabled|bool else "ignore" }}'
+    state: '{{ "present" if roundcube__memcached_enabled | bool else "ignore" }}'
 
     # Enable support for Redis on localhost if it's detected
   - name: 'redis_hosts'
     value: '{{ roundcube__redis_hosts }}'
-    state: '{{ "present" if roundcube__redis_enabled|bool else "ignore" }}'
+    state: '{{ "present" if roundcube__redis_enabled | bool else "ignore" }}'
 
   - name: 'skin_logo'
     value: '{{ roundcube__skin_logo }}'
@@ -2968,7 +2921,7 @@ roundcube__default_configuration:
     # Configure preferred session storage backend
   - name: 'session_storage'
     value: '{{ roundcube__session_storage }}'
-    state: '{{ "present" if roundcube__session_storage|d() else "ignore" }}'
+    state: '{{ "present" if roundcube__session_storage | d() else "ignore" }}'
 
   - name: 'des_key'
     value: '{{ roundcube__des_key }}'
@@ -3012,9 +2965,9 @@ roundcube__default_configuration:
 
     # Enable autocompletion for the LDAP address book.
   - name: 'autocomplete_addressbooks'
-    value: '{{ ([ "sql" ] + ([ "People" ] if roundcube__ldap_enabled|bool else []))
+    value: '{{ (["sql"] + (["People"] if roundcube__ldap_enabled | bool else []))
                | flatten }}'
-    state: '{{ "present" if roundcube__ldap_enabled|bool else "ignore" }}'
+    state: '{{ "present" if roundcube__ldap_enabled | bool else "ignore" }}'
 
     # Set the default number of autocompletion characters for lower sever load.
   - name: 'autocomplete_min_length'
@@ -3030,12 +2983,12 @@ roundcube__default_configuration:
   - name: 'ldap_public_people'
     option: [ 'ldap_public', 'People' ]
     section: 'addressbook'
-    state: '{{ "present" if roundcube__ldap_enabled|bool else "ignore" }}'
+    state: '{{ "present" if roundcube__ldap_enabled | bool else "ignore" }}'
     array:
       - name: '{{ roundcube__ldap_addressbook_name }}'
-        hosts: '{{ roundcube__ldap_hosts }}'
-        port: '{{ roundcube__ldap_port }}'
-        use_tls: '{{ roundcube__ldap_use_tls }}'
+        hosts: '{{ (["tls://"] if roundcube__ldap_use_tls else [""])
+                   | product(roundcube__ldap_hosts) | map("join")
+                   | product([roundcube__ldap_port]) | map("join") }}'
         ldap_version: 3
         user_specific: True
         base_dn: '{{ roundcube__ldap_people_dn | join(",") }}'
@@ -3281,7 +3234,7 @@ roundcube__default_plugins:
     # It's not a real plugin.
   - name: 'ldap_support'
     package: 'kolab/net_ldap3'
-    state: '{{ "present" if roundcube__ldap_enabled|bool else "ignore" }}'
+    state: '{{ "present" if roundcube__ldap_enabled | bool else "ignore" }}'
 
     # This plugin adds right-click context menus to various parts of the
     # Roundcube interface.
@@ -3326,7 +3279,7 @@ roundcube__default_plugins:
     # Roundcube 1.4.x might need to be patched for this to work correctly.
     # See: https://github.com/roundcube/roundcubemail/issues/7667
   - name: 'new_user_identity'
-    state: '{{ "enabled" if roundcube__ldap_enabled|bool else "ignore" }}'
+    state: '{{ "enabled" if roundcube__ldap_enabled | bool else "ignore" }}'
     options:
 
       - name: 'new_user_identity_addressbook'
@@ -3350,7 +3303,7 @@ roundcube__default_plugins:
         value: True
 
   - name: 'password'
-    state: '{{ "enabled" if roundcube__ldap_password_enabled|bool else "absent" }}'
+    state: '{{ "enabled" if roundcube__ldap_password_enabled | bool else "absent" }}'
     options:
 
       - name: 'password_driver'
@@ -3359,7 +3312,7 @@ roundcube__default_plugins:
           -----------------------
           A driver to use for password change. Default: "sql".
           See README file for list of supported driver names.
-        value: '{{ "ldap_exop" if roundcube__ldap_password_enabled|bool else "sql" }}'
+        value: '{{ "ldap_exop" if roundcube__ldap_password_enabled | bool else "sql" }}'
 
       - name: 'password_strength_driver'
         comment: |
@@ -3585,7 +3538,7 @@ roundcube__default_plugins:
           Example: array('ldap1.example.com', 'ldap2.example.com');
           Default: 'localhost'
         value: '{{ (roundcube__ldap_hosts | first)
-                   if roundcube__ldap_hosts|d()
+                   if roundcube__ldap_hosts | d()
                    else "" }}'
 
       - name: 'password_ldap_port'
@@ -4312,12 +4265,6 @@ roundcube__default_plugins:
     state: 'enabled'
     options:
 
-      - name: 'managesieve_port'
-        comment: |
-          managesieve server port. When empty the port will be determined automatically
-          using getservbyname() function, with 4190 as a fallback.
-        value: null
-
       - name: 'managesieve_host'
         comment: |
           managesieve server address, default is localhost.
@@ -4345,12 +4292,6 @@ roundcube__default_plugins:
         comment: |
           Optional managesieve authentication password to be used for imap_auth_cid
         value: null
-
-      - name: 'managesieve_usetls'
-        comment: |
-          Use or not TLS for managesieve server connection
-          Note: tls:// prefix in managesieve_host is also supported
-        value: False
 
       - name: 'managesieve_conn_options'
         comment: |
@@ -4590,7 +4531,7 @@ roundcube__ldap__dependent_tasks:
     attributes: '{{ roundcube__ldap_self_attributes }}'
     no_log: '{{ debops__no_log | d(True) }}'
     state: '{{ "present" if roundcube__ldap_password_enabled and
-                            roundcube__ldap_device_dn|d() else "ignore" }}'
+                            roundcube__ldap_device_dn | d() else "ignore" }}'
 
                                                                    # ]]]
 # .. envvar:: roundcube__nginx__dependent_servers [[[

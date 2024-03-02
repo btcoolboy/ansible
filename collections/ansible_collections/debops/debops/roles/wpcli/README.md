@@ -14,4 +14,4 @@ in mind; users need to utilize other DebOps/Ansible roles to manage the
 <debops.nginx>`, `database engine <debops.mariadb_server>`, `PHP
 environment <debops.php>` and `UNIX accounts <debops.users>`, etc.
 
-Read the [wpcli role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/wpcli/) for more details.
+Read the [wpcli role documentation](https://docs.debops.org/en/HEAD/ansible/roles/wpcli/) for more details.

@@ -5,19 +5,23 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Test nginx and restart
-  command: nginx -t
+  ansible.builtin.command: nginx -t
+  register: nginx__register_check_restart
+  changed_when: nginx__register_check_restart.changed | bool
   notify: [ 'Restart nginx' ]
 
 - name: Test nginx and reload
-  command: nginx -t
+  ansible.builtin.command: nginx -t
+  register: nginx__register_check_reload
+  changed_when: nginx__register_check_reload.changed | bool
   notify: [ 'Reload nginx' ]
 
 - name: Restart nginx
-  service:
+  ansible.builtin.service:
     name: 'nginx'
     state: 'restarted'
 
 - name: Reload nginx
-  service:
+  ansible.builtin.service:
     name: 'nginx'
     state: 'reloaded'

@@ -32,44 +32,44 @@
                  'debops.roles02', 'debops.roles03' ]
   hosts: [ 'all' ]
   serial: '1'
-  gather_subset: '!all'
+  gather_subset: [ '!all' ]
 
   vars:
 
     # LDAP base Distinguished Name
     ldap_base_dn: '{{ ansible_local.ldap.base_dn
-                      if (ansible_local.ldap.base_dn|d())
+                      if (ansible_local.ldap.base_dn | d())
                       else (ansible_domain.split(".")
                             | map("regex_replace", "^(.*)$", "dc=\1")
                             | list) }}'
 
     # Relative Distinguished Name of the LDAP object that contains the personal
     # user accounts
-    ldap_people_rdn: '{{ ansible_local.ldap.people_rdn|d("ou=People") }}'
+    ldap_people_rdn: '{{ ansible_local.ldap.people_rdn | d("ou=People") }}'
 
     # Relative Distinguished Name of an user account to convert to an UUID
     person_rdn: 'uid={{ person_uid.user_input }}'
 
     # Distinguished Name of an LDAP object to convert to an UUID
     object_dn: '{{ (([ person_rdn, ldap_people_rdn ] + ldap_base_dn) | join(","))
-                   if person_uid.user_input|d()
+                   if person_uid.user_input | d()
                    else object_dn_string.user_input }}'
 
   tasks:
 
     - name: Get the UUID of an user account based on uid
-      pause:
+      ansible.builtin.pause:
         prompt: 'uid (case-sensitive)'
       register: person_uid
 
     - name: Get the UUID of a Distinguished Name
-      pause:
+      ansible.builtin.pause:
         prompt: 'dn (case-sensitive)'
       register: object_dn_string
-      when: not person_uid.user_input|d()
+      when: not person_uid.user_input | d()
 
     - name: LDAP object information
-      debug:
+      ansible.builtin.debug:
         msg: '{{ {"DN:": object_dn,
                   "UUID:": (object_dn | to_uuid)} }}'
-      when: object_dn|d()
+      when: object_dn | d()

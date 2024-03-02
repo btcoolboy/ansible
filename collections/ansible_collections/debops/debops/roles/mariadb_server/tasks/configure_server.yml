@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Configure database server
-  template:
+  ansible.builtin.template:
     src: 'etc/mysql/conf.d/mysqld.cnf.j2'
     dest: '{{ mariadb_server__mysqld_cnf_file }}'
     owner: 'root'
@@ -12,16 +12,16 @@
     mode: '0644'
 
 - name: Setup automysqlbackup configuration
-  template:
+  ansible.builtin.template:
     src: 'etc/default/automysqlbackup.j2'
     dest: '/etc/default/automysqlbackup'
     owner: 'root'
     group: 'root'
     mode: '0644'
-  when: mariadb_server__backup|d()
+  when: mariadb_server__backup | d()
 
 - name: Enable events table backup in mysqldump
-  ini_file:
+  community.general.ini_file:
     dest:    '/etc/mysql/debian.cnf'
     section: 'mysqldump'
     option:  'events'

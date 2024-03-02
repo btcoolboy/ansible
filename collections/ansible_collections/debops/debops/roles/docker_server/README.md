@@ -9,4 +9,4 @@ Docker service on Debian/Ubuntu hosts. To role supports installation of
 Docker from OS distribution repositories, as well as from the upstream
 repository.
 
-Read the [docker_server role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/docker_server/) for more details.
+Read the [docker_server role documentation](https://docs.debops.org/en/HEAD/ansible/roles/docker_server/) for more details.

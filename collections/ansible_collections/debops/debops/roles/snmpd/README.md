@@ -7,4 +7,4 @@ service on a Debian or Ubuntu host, which in turn can be used to monitor
 that host resources like CPU utilization, memory and storage capacity,
 network usage and more.
 
-Read the [snmpd role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/snmpd/) for more details.
+Read the [snmpd role documentation](https://docs.debops.org/en/HEAD/ansible/roles/snmpd/) for more details.

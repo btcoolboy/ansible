@@ -24,16 +24,16 @@
 # Enable or disable support for local device mounts, bind mounts and custom
 # directories.
 mount__enabled: '{{ True
-                    if (((ansible_system_capabilities_enforced|d())|bool and
+                    if (((ansible_system_capabilities_enforced | d()) | bool and
                          "cap_sys_admin" in ansible_system_capabilities) or
-                        not (ansible_system_capabilities_enforced|d(True))|bool)
+                        not (ansible_system_capabilities_enforced | d(True)) | bool)
                     else False }}'
 
                                                                    # ]]]
 # .. envvar:: mount__base_packages [[[
 #
 # List of APT packages to install for correct filesystem management.
-mount__base_packages: '{{ [ "acl" ]
+mount__base_packages: '{{ ["acl"]
                           if (((mount__directories
                                 + mount__group_directories
                                 + mount__host_directories)

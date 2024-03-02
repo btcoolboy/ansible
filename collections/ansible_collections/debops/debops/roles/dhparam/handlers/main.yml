@@ -5,16 +5,18 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Execute DH parameter hooks
-  command: run-parts {{ dhparam__hook_path }}
+  ansible.builtin.command: run-parts {{ dhparam__hook_path }}
+  register: dhparam__register_hooks
+  changed_when: dhparam__register_hooks.changed | bool
 
 - name: Regenerate DH parameters on first install
-  at:
+  ansible.posix.at:  # noqa jinja[spacing]
     command: |
       test -x {{ dhparam__generate_params }} \
       && (echo 'nice {{ dhparam__generate_params }} run' | batch > /dev/null 2>&1) || true
     count: '{{ dhparam__generate_init_count }}'
     units: '{{ dhparam__generate_init_units }}'
     unique: True
-  when: (dhparam__generate_init|bool and
-         (ansible_local|d() and ansible_local.atd|d() and
-          ansible_local.atd.enabled|bool))
+  when: (dhparam__generate_init | bool and
+         (ansible_local | d() and ansible_local.atd | d() and
+          ansible_local.atd.enabled | bool))

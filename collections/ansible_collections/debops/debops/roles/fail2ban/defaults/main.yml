@@ -137,7 +137,7 @@ fail2ban_chain: 'INPUT'
 #
 # 3. Drop ``INVALID`` packets
 #
-# 4. Accept ``ESTABILISHED`` and ``RELATED`` packets
+# 4. Accept ``ESTABLISHED`` and ``RELATED`` packets
 #
 # 5. Filter ``SYN`` floods (jump to separate chain)
 #
@@ -246,7 +246,6 @@ fail2ban_ssh_jail_name: '{{ fail2ban_ssh_jail_distribution_map[ansible_distribut
 # Dictionary for release to default SSH jail name mappings.
 fail2ban_ssh_jail_distribution_map:
   'trusty': 'ssh'
-  'jessie': 'ssh'
 
                                                                    # ]]]
 # .. envvar:: fail2ban_group_jails [[[

@@ -100,7 +100,7 @@ machine__motd: ''
 #
 # Specify the state of the :file:`/etc/motd` file, either ``present`` (the file
 # exists) or ``absent`` (the file will be removed).
-machine__etc_motd_state: '{{ "present" if machine__motd|d() else "absent" }}'
+machine__etc_motd_state: '{{ "present" if machine__motd | d() else "absent" }}'
 
                                                                    # ]]]
 # .. envvar:: machine__motd_update_dir [[[
@@ -142,15 +142,11 @@ machine__motd_default_scripts:
   # This file comes with the 'base-files' APT package on Debian
   - name: 'uname'
     filename: '10-uname'
-    divert: '{{ False
-                if (ansible_distribution_release in [ "wheezy", "jessie" ])
-                else True }}'
+    divert: True
     content: |
       #!/bin/sh
       uname -snrvm
-    state: '{{ "present"
-               if (ansible_distribution_release in [ "wheezy", "jessie" ])
-               else "init" }}'
+    state: 'init'
 
   - name: 'ansible'
     weight: 50

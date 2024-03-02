@@ -17,4 +17,4 @@ application is used to interface with MinIO and perform various
 administrative tasks, including extended configuration of the service.
 It can be installed on a host using the `debops.mcli` Ansible role.
 
-Read the [minio role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/minio/) for more details.
+Read the [minio role documentation](https://docs.debops.org/en/HEAD/ansible/roles/minio/) for more details.

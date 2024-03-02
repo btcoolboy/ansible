@@ -6,4 +6,4 @@ local facts. This mechanism can be used to maintain common facts between
 separate Ansible roles without the need for them to know about the
 specific file structures, using `ini_file` Ansible module.
 
-Read the [debops_fact role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/debops_fact/) for more details.
+Read the [debops_fact role documentation](https://docs.debops.org/en/HEAD/ansible/roles/debops_fact/) for more details.

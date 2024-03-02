@@ -330,11 +330,11 @@ mailman__web_default_configuration:
     config:
       'default':
         'ENGINE':   'django.db.backends.mysql'
-        'NAME':     '{{ ansible_local.mailman.web_db_name     | d("mailman3web") }}'
-        'USER':     '{{ ansible_local.mailman.web_db_user     | d("mailman3web") }}'
+        'NAME':     '{{ ansible_local.mailman.web_db_name | d("mailman3web") }}'
+        'USER':     '{{ ansible_local.mailman.web_db_user | d("mailman3web") }}'
         'PASSWORD': '{{ ansible_local.mailman.web_db_password | d("password") }}'
-        'HOST':     '{{ ansible_local.mailman.web_db_host     | d("localhost") }}'
-        'PORT':     '{{ ansible_local.mailman.web_db_port     | d("") }}'
+        'HOST':     '{{ ansible_local.mailman.web_db_host | d("localhost") }}'
+        'PORT':     '{{ ansible_local.mailman.web_db_port | d("") }}'
         'OPTIONS':
           'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
 
@@ -345,11 +345,11 @@ mailman__web_default_configuration:
     config:
       'default':
         'ENGINE':   'django.db.backends.postgresql_psycopg2'
-        'NAME':     '{{ ansible_local.mailman.web_db_name     | d("mailman3web") }}'
-        'USER':     '{{ ansible_local.mailman.web_db_user     | d("mailman3web") }}'
+        'NAME':     '{{ ansible_local.mailman.web_db_name | d("mailman3web") }}'
+        'USER':     '{{ ansible_local.mailman.web_db_user | d("mailman3web") }}'
         'PASSWORD': '{{ ansible_local.mailman.web_db_password | d("password") }}'
-        'HOST':     '{{ ansible_local.mailman.web_db_host     | d("localhost") }}'
-        'PORT':     '{{ ansible_local.mailman.web_db_port     | d("") }}'
+        'HOST':     '{{ ansible_local.mailman.web_db_host | d("localhost") }}'
+        'PORT':     '{{ ansible_local.mailman.web_db_port | d("") }}'
         'OPTIONS': {}
 
     # Reset the variable to make sure it is empty by default
@@ -362,7 +362,7 @@ mailman__web_default_configuration:
     value: 'https://seccdn.libravatar.org/'
 
   - name: 'gravatar_default_image'
-    value: '{{ [ "mm", "identicon", "monsterid", "wavatar", "retro", "robohash", "pagan" ]
+    value: '{{ ["mm", "identicon", "monsterid", "wavatar", "retro", "robohash", "pagan"]
                | random(seed=inventory_hostname) }}'
 
   - name: 'gravatar_default_rating'
@@ -400,7 +400,7 @@ mailman__web_ldap_configuration:
     raw: |
       import ldap
       from django_auth_ldap.config import LDAPSearch, GroupOfNamesType
-    state: '{{ "present" if mailman__ldap_enabled|bool else "ignore" }}'
+    state: '{{ "present" if mailman__ldap_enabled | bool else "ignore" }}'
     copy_id_from: 'secret_key'
     weight: -200
 
@@ -409,19 +409,19 @@ mailman__web_ldap_configuration:
       Integration with the 'django-auth-ldap' library
       https://django-auth-ldap.readthedocs.io/en/latest/reference.html
     value: '{{ mailman__ldap_uri | join(" ") }}'
-    state: '{{ "present" if mailman__ldap_enabled|bool else "ignore" }}'
+    state: '{{ "present" if mailman__ldap_enabled | bool else "ignore" }}'
 
   - name: 'auth_ldap_start_tls'
     value: '{{ mailman__ldap_starttls }}'
-    state: '{{ "present" if mailman__ldap_enabled|bool else "ignore" }}'
+    state: '{{ "present" if mailman__ldap_enabled | bool else "ignore" }}'
 
   - name: 'auth_ldap_bind_dn'
     value: '{{ mailman__ldap_bind_dn }}'
-    state: '{{ "present" if mailman__ldap_enabled|bool else "ignore" }}'
+    state: '{{ "present" if mailman__ldap_enabled | bool else "ignore" }}'
 
   - name: 'auth_ldap_bind_password'
     value: '{{ mailman__ldap_bind_password }}'
-    state: '{{ "present" if mailman__ldap_enabled|bool else "ignore" }}'
+    state: '{{ "present" if mailman__ldap_enabled | bool else "ignore" }}'
 
   - name: 'auth_ldap_user_search'
     raw: |
@@ -430,7 +430,7 @@ mailman__web_ldap_configuration:
           ldap.SCOPE_SUBTREE,
           '{{ mailman__ldap_people_filter }}',
       )
-    state: '{{ "present" if mailman__ldap_enabled|bool else "ignore" }}'
+    state: '{{ "present" if mailman__ldap_enabled | bool else "ignore" }}'
 
   - name: 'auth_ldap_group_search'
     raw: |
@@ -440,34 +440,34 @@ mailman__web_ldap_configuration:
           '{{ mailman__ldap_groups_filter }}',
       )
       AUTH_LDAP_GROUP_TYPE = GroupOfNamesType(name_attr='cn')
-    state: '{{ "present" if mailman__ldap_enabled|bool else "ignore" }}'
+    state: '{{ "present" if mailman__ldap_enabled | bool else "ignore" }}'
 
   - name: 'auth_ldap_user_attr_map'
     config:
       'first_name': 'givenName'
       'last_name': 'sn'
       'email': 'mail'
-    state: '{{ "present" if mailman__ldap_enabled|bool else "ignore" }}'
+    state: '{{ "present" if mailman__ldap_enabled | bool else "ignore" }}'
 
   - name: 'auth_ldap_user_flags_by_group'
     config:
       'is_staff':     '{{ mailman__ldap_superusers_group + "," + mailman__ldap_groups_dn }}'
       'is_superuser': '{{ mailman__ldap_superusers_group + "," + mailman__ldap_groups_dn }}'
-    state: '{{ "present" if mailman__ldap_enabled|bool else "ignore" }}'
+    state: '{{ "present" if mailman__ldap_enabled | bool else "ignore" }}'
 
   - name: 'auth_ldap_find_group_perms'
     value: True
-    state: '{{ "present" if mailman__ldap_enabled|bool else "ignore" }}'
+    state: '{{ "present" if mailman__ldap_enabled | bool else "ignore" }}'
 
   - name: 'auth_ldap_cache_timeout'
     value: 3600
-    state: '{{ "present" if mailman__ldap_enabled|bool else "ignore" }}'
+    state: '{{ "present" if mailman__ldap_enabled | bool else "ignore" }}'
 
   - name: 'authentication_backends'
     value:
       - 'django_auth_ldap.backend.LDAPBackend'
       - 'django.contrib.auth.backends.ModelBackend'
-    state: '{{ "present" if mailman__ldap_enabled|bool else "ignore" }}'
+    state: '{{ "present" if mailman__ldap_enabled | bool else "ignore" }}'
 
                                                                    # ]]]
 # .. envvar:: mailman__web_configuration [[[

@@ -4,4 +4,6 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: 'Run bind-dirs'
-  command: '{{ persistent_paths__qubes_os_handler }}'
+  ansible.builtin.command: '{{ persistent_paths__qubes_os_handler }}'
+  register: persistent_paths__register_bind_dirs
+  changed_when: persistent_paths__register_bind_dirs.changed | bool

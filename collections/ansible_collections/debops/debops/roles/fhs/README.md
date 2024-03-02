@@ -17,4 +17,4 @@ the directory paths don't affect existing installations, and can be used
 by other Ansible roles to define various resource paths in their
 variables.
 
-Read the [fhs role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/fhs/) for more details.
+Read the [fhs role documentation](https://docs.debops.org/en/HEAD/ansible/roles/fhs/) for more details.

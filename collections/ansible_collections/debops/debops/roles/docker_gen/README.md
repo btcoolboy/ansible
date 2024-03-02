@@ -13,4 +13,4 @@ to configure Dockerized services, either local or remote, behind an
 `nginx` reverse proxy. Other services and templates might be provided in
 the future.
 
-Read the [docker_gen role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/docker_gen/) for more details.
+Read the [docker_gen role documentation](https://docs.debops.org/en/HEAD/ansible/roles/docker_gen/) for more details.

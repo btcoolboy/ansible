@@ -9,4 +9,4 @@ Elasticsearch instances on one or more (3+) hosts. The role can be used
 as a dependency by other Ansible roles to allow control over their
 configuration options in the Elasticsearch configuration file.
 
-Read the [elasticsearch role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/elasticsearch/) for more details.
+Read the [elasticsearch role documentation](https://docs.debops.org/en/HEAD/ansible/roles/elasticsearch/) for more details.

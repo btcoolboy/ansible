@@ -23,4 +23,4 @@ At the moment there is no solution for unprivileged UNIX account
 keyrings manageable via the inventory. This functionality will be
 implemented later via other DebOps roles that manage UNIX accounts.
 
-Read the [keyring role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/keyring/) for more details.
+Read the [keyring role documentation](https://docs.debops.org/en/HEAD/ansible/roles/keyring/) for more details.

@@ -9,4 +9,4 @@ Kernel module configuration can be specified using Ansible inventory, or
 other Ansible roles can use the `debops.kmod` role to configure kernel
 module options on their behalf.
 
-Read the [kmod role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/kmod/) for more details.
+Read the [kmod role documentation](https://docs.debops.org/en/HEAD/ansible/roles/kmod/) for more details.

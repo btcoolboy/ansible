@@ -28,4 +28,4 @@ Further service configuration should be done in a given application
 role. Usage via the Ansible inventory is, of course, still possible but
 might not be optimal.
 
-Read the [golang role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/golang/) for more details.
+Read the [golang role documentation](https://docs.debops.org/en/HEAD/ansible/roles/golang/) for more details.

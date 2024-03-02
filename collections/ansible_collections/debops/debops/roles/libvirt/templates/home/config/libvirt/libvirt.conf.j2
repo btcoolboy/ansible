@@ -26,6 +26,6 @@ uri_aliases = [
 # driver when no URI is supplied by the application.
 #uri_default = "qemu:///system"
 
-{% if libvirt__uri|d() %}
+{% if libvirt__uri | d() %}
 uri_default = "{{ libvirt__connections[libvirt__uri] }}"
 {% endif %}

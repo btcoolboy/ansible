@@ -8,4 +8,4 @@ This role can be used to set the contents of the alias database, either
 using Ansible inventory variables, or as a dependency of another Ansible
 role.
 
-Read the [etc_aliases role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/etc_aliases/) for more details.
+Read the [etc_aliases role documentation](https://docs.debops.org/en/HEAD/ansible/roles/etc_aliases/) for more details.

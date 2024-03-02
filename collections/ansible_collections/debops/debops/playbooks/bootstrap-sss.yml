@@ -38,7 +38,7 @@
   tasks:
 
     - name: Initialize Ansible support via raw tasks
-      import_role:
+      ansible.builtin.import_role:
         name: 'python'
         tasks_from: 'main_raw'
       tags: [ 'role::python_raw', 'skip::python_raw', 'role::python' ]
@@ -63,7 +63,8 @@
       tags: [ 'role::apt', 'skip::apt' ]
 
 
-- import_playbook: 'service/core.yml'
+- name: Apply core configuration
+  import_playbook: 'service/core.yml'
 
 
 - name: Bootstrap host for Ansible management with LDAP
@@ -84,21 +85,21 @@
   pre_tasks:
 
     - name: Prepare pki environment
-      import_role:
+      ansible.builtin.import_role:
         name: 'pki'
         tasks_from: 'main_env'
       tags: [ 'role::pki', 'role::pki:secret', 'role::secret' ]
 
     - name: Prepare sshd environment
-      import_role:
+      ansible.builtin.import_role:
         name: 'sshd'
         tasks_from: 'main_env'
       tags: [ 'role::sshd', 'role::ldap' ]
 
   roles:
 
-    - role: resolvconf
-      tags: [ 'role::resolvconf', 'skip::resolvconf' ]
+    - role: resolved
+      tags: [ 'role::resolved', 'skip::resolved' ]
 
     - role: python
       tags: [ 'role::python', 'skip::python', 'role::netbase', 'role::ldap' ]
@@ -124,7 +125,6 @@
       tags: [ 'role::apt_preferences', 'skip::apt_preferences' ]
       apt_preferences__dependent_list:
         - '{{ etckeeper__apt_preferences__dependent_list }}'
-        - '{{ sshd__apt_preferences__dependent_list }}'
         - '{{ yadm__apt_preferences__dependent_list }}'
 
     - role: etckeeper
@@ -159,7 +159,7 @@
 
     - role: sssd
       tags: [ 'role::sssd', 'skip::sssd' ]
-      when: ansible_local.ldap.posix_enabled|d()|bool
+      when: ansible_local.ldap.posix_enabled | d() | bool
 
     - role: keyring
       tags: [ 'role::keyring', 'skip::keyring', 'role::yadm' ]

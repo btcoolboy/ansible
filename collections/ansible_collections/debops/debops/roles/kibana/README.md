@@ -11,4 +11,4 @@ cluster. The role can be used as a dependency by other Ansible roles to
 allow control over their configuration options in the Kibana
 configuration file.
 
-Read the [kibana role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/kibana/) for more details.
+Read the [kibana role documentation](https://docs.debops.org/en/HEAD/ansible/roles/kibana/) for more details.

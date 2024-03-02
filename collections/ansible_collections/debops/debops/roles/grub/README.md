@@ -11,4 +11,4 @@ supported.
 Additionally, this role allows you to configure password protection for
 GRUB.
 
-Read the [grub role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/grub/) for more details.
+Read the [grub role documentation](https://docs.debops.org/en/HEAD/ansible/roles/grub/) for more details.

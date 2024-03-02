@@ -17,4 +17,4 @@ DebOps provides support for Icinga 2, split into several roles:
 -   the `debops.icinga_web` role manages the Icinga 2 Web interface,
     including installation of external modules like Icinga 2 Director.
 
-Read the [icinga_web role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/icinga_web/) for more details.
+Read the [icinga_web role documentation](https://docs.debops.org/en/HEAD/ansible/roles/icinga_web/) for more details.

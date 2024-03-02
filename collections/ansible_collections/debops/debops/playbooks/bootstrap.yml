@@ -43,7 +43,7 @@
   tasks:
 
     - name: Initialize Ansible support via raw tasks
-      import_role:
+      ansible.builtin.import_role:
         name: 'python'
         tasks_from: 'main_raw'
       tags: [ 'role::python_raw', 'skip::python_raw', 'role::python' ]
@@ -68,7 +68,8 @@
       tags: [ 'role::apt', 'skip::apt' ]
 
 
-- import_playbook: 'service/core.yml'
+- name: Apply core configuration
+  import_playbook: 'service/core.yml'
 
 
 - name: Bootstrap host for Ansible management
@@ -83,8 +84,8 @@
 
   roles:
 
-    - role: resolvconf
-      tags: [ 'role::resolvconf', 'skip::resolvconf' ]
+    - role: resolved
+      tags: [ 'role::resolved', 'skip::resolved' ]
 
     - role: python
       tags: [ 'role::python', 'skip::python', 'role::netbase' ]

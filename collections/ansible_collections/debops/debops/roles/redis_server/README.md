@@ -8,4 +8,4 @@ Redis on Debian/Ubuntu hosts. Role supports management of multiple Redis
 instances on a single host and is designed to cope with modifications
 done to Redis configuration files at runtime.
 
-Read the [redis_server role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/redis_server/) for more details.
+Read the [redis_server role documentation](https://docs.debops.org/en/HEAD/ansible/roles/redis_server/) for more details.

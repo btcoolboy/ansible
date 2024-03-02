@@ -42,16 +42,16 @@ preseed__base_domain: '{{ preseed__subdomain + "." + ansible_domain }}'
 preseed__domains:
   - '{{ preseed__base_domain }}'
   - '{{ preseed__base_domain | split(".") | first }}'
-  - '{{ "~^(?<preseed>.+)\." + preseed__base_domain | replace(".","\.") + "$" }}'
-  - '{{ "~^(?<preseed>.+)\." + ansible_domain       | replace(".","\.") + "$" }}'
-  - '{{ "~^(?<preseed>.+)\." + preseed__subdomain   | replace(".","\.") + "$" }}'
+  - '{{ "~^(?<preseed>.+)\." + preseed__base_domain | replace(".", "\.") + "$" }}'
+  - '{{ "~^(?<preseed>.+)\." + ansible_domain | replace(".", "\.") + "$" }}'
+  - '{{ "~^(?<preseed>.+)\." + preseed__subdomain | replace(".", "\.") + "$" }}'
   - '{{ "~^(?<preseed>.+)$" }}'
 
                                                                    # ]]]
 # .. envvar:: preseed__www [[[
 #
 # Path to main directory where Preseed files are served from.
-preseed__www: '{{ (ansible_local.fhs.www|d("/srv/www"))
+preseed__www: '{{ (ansible_local.fhs.www | d("/srv/www"))
                   + "/sites/debian-preseed/public" }}'
                                                                    # ]]]
                                                                    # ]]]
@@ -62,7 +62,7 @@ preseed__www: '{{ (ansible_local.fhs.www|d("/srv/www"))
 #
 # List of SSH public keys installed on the ``root`` UNIX account of the
 # preseeded host.
-preseed__root_sshkeys: [ '{{ lookup("pipe", "ssh-add -L | grep ^\\\(sk-\\\)\\\?ssh || cat ~/.ssh/*.pub || cat ~/.ssh/authorized_keys || true") }}' ]
+preseed__root_sshkeys: [ '{{ lookup("pipe", "ssh-add -L | grep ^\\\(sk-\\\)\\\?ssh || cat ~/.ssh/*.pub || cat ~/.ssh/authorized_keys || true") }}' ]  # noqa jinja[spacing]
 
                                                                    # ]]]
 # .. envvar:: preseed__admin_name [[[
@@ -83,7 +83,7 @@ preseed__admin_fullname: 'Ansible Control User'
 #
 # List of SSH public keys installed on the administrative UNIX account of the
 # preseeded host.
-preseed__admin_sshkeys: [ '{{ lookup("pipe", "ssh-add -L | grep ^\\\(sk-\\\)\\\?ssh || cat ~/.ssh/*.pub || cat ~/.ssh/authorized_keys || true") }}' ]
+preseed__admin_sshkeys: [ '{{ lookup("pipe", "ssh-add -L | grep ^\\\(sk-\\\)\\\?ssh || cat ~/.ssh/*.pub || cat ~/.ssh/authorized_keys || true") }}' ]  # noqa jinja[spacing]
 
                                                                    # ]]]
 # .. envvar:: preseed__debian_postinst_commands [[[
@@ -101,7 +101,7 @@ preseed__debian_postinst_commands: ''
 # List of APT packages to install on the preseeded host, included in all
 # Preseed flavors using the ``pkgsel/include`` Preseed option.
 preseed__debian_packages: [ 'python3', 'python3-apt', 'python3-pip',
-                            'lsb-release', 'git', 'curl' ]
+                            'python3-debian', 'lsb-release', 'git', 'curl' ]
 
                                                                    # ]]]
 # .. envvar:: preseed__debian_kernel_arguments [[[
@@ -159,18 +159,6 @@ preseed__debian_admin_password: "{{ lookup('password', secret + '/credentials/' 
 # List of Preseed definitions created by default by the role.
 preseed__default_definitions:
 
-  - name: 'debian-wheezy'
-    flavor: 'debian'
-    release: 'wheezy'
-    options: '{{ preseed__options_interactive_partman
-                 + preseed__options_enable_nonfree }}'
-
-  - name: 'debian-jessie'
-    flavor: 'debian'
-    release: 'jessie'
-    options: '{{ preseed__options_interactive_partman
-                 + preseed__options_enable_nonfree }}'
-
   - name: 'debian-stretch'
     flavor: 'debian'
     release: 'stretch'
@@ -189,21 +177,11 @@ preseed__default_definitions:
     options: '{{ preseed__options_interactive_partman
                  + preseed__options_enable_nonfree }}'
 
-  - name: 'debian-wheezy-user'
-    flavor: 'debian-user'
-    release: 'wheezy'
+  - name: 'debian-bookworm'
+    flavor: 'debian'
+    release: 'bookworm'
     options: '{{ preseed__options_interactive_partman
-                 + preseed__options_ansible_user
                  + preseed__options_enable_nonfree }}'
-    admin_username: '{{ preseed__admin_name }}'
-
-  - name: 'debian-jessie-user'
-    flavor: 'debian-user'
-    release: 'jessie'
-    options: '{{ preseed__options_interactive_partman
-                 + preseed__options_ansible_user
-                 + preseed__options_enable_nonfree }}'
-    admin_username: '{{ preseed__admin_name }}'
 
   - name: 'debian-stretch-user'
     flavor: 'debian-user'
@@ -229,13 +207,13 @@ preseed__default_definitions:
                  + preseed__options_enable_nonfree }}'
     admin_username: '{{ preseed__admin_name }}'
 
-  - name: 'debian-wheezy-vm'
-    flavor: 'debian-vm'
-    release: 'wheezy'
-
-  - name: 'debian-jessie-vm'
-    flavor: 'debian-vm'
-    release: 'jessie'
+  - name: 'debian-bookworm-user'
+    flavor: 'debian-user'
+    release: 'bookworm'
+    options: '{{ preseed__options_interactive_partman
+                 + preseed__options_ansible_user
+                 + preseed__options_enable_nonfree }}'
+    admin_username: '{{ preseed__admin_name }}'
 
   - name: 'debian-stretch-vm'
     flavor: 'debian-vm'
@@ -249,17 +227,9 @@ preseed__default_definitions:
     flavor: 'debian-vm'
     release: 'bullseye'
 
-  - name: 'debian-wheezy-vm-user'
-    flavor: 'debian-vm-user'
-    release: 'wheezy'
-    options: '{{ preseed__options_ansible_user }}'
-    admin_username: '{{ preseed__admin_name }}'
-
-  - name: 'debian-jessie-vm-user'
-    flavor: 'debian-vm-user'
-    release: 'jessie'
-    options: '{{ preseed__options_ansible_user }}'
-    admin_username: '{{ preseed__admin_name }}'
+  - name: 'debian-bookworm-vm'
+    flavor: 'debian-vm'
+    release: 'bookworm'
 
   - name: 'debian-stretch-vm-user'
     flavor: 'debian-vm-user'
@@ -276,6 +246,12 @@ preseed__default_definitions:
   - name: 'debian-bullseye-vm-user'
     flavor: 'debian-vm-user'
     release: 'bullseye'
+    options: '{{ preseed__options_ansible_user }}'
+    admin_username: '{{ preseed__admin_name }}'
+
+  - name: 'debian-bookworm-vm-user'
+    flavor: 'debian-vm-user'
+    release: 'bookworm'
     options: '{{ preseed__options_ansible_user }}'
     admin_username: '{{ preseed__admin_name }}'
 
@@ -1457,6 +1433,6 @@ preseed__nginx__dependent_servers:
         types {
                 text/plain cfg sh;
         }
-    state: '{{ "present" if (ansible_local.pki.enabled|d())|bool else "absent" }}'
+    state: '{{ "present" if (ansible_local.pki.enabled | d()) | bool else "absent" }}'
                                                                    # ]]]
                                                                    # ]]]

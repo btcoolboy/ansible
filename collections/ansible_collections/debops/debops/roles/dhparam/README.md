@@ -15,4 +15,4 @@ applications. A separate script can then be used on remote hosts in the
 background to generate new random DH parameters, either once or in
 regular intervals.
 
-Read the [dhparam role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/dhparam/) for more details.
+Read the [dhparam role documentation](https://docs.debops.org/en/HEAD/ansible/roles/dhparam/) for more details.

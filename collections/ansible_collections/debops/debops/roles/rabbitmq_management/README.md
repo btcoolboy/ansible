@@ -14,4 +14,4 @@ configure a reverse proxy to a remote instance of RabbitMQ.
 See the `debops.rabbitmq_server` Ansible role for general RabbitMQ
 service deployment and configuration.
 
-Read the [rabbitmq_management role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/rabbitmq_management/) for more details.
+Read the [rabbitmq_management role documentation](https://docs.debops.org/en/HEAD/ansible/roles/rabbitmq_management/) for more details.

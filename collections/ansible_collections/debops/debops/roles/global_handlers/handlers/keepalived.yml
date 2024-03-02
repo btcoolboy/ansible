@@ -4,19 +4,23 @@
 # SPDX-License-Identifier: GPL-3.0-only
 
 - name: Check keepalived configuration and restart
-  command: keepalived --config-test
+  ansible.builtin.command: keepalived --config-test
+  register: keepalived__register_config_restart
+  changed_when: keepalived__register_config_restart.changed | bool
   notify: [ 'Restart keepalived' ]
 
 - name: Check keepalived configuration and reload
-  command: keepalived --config-test
+  ansible.builtin.command: keepalived --config-test
+  register: keepalived__register_config_reload
+  changed_when: keepalived__register_config_reload.changed | bool
   notify: [ 'Reload keepalived' ]
 
 - name: Restart keepalived
-  service:
+  ansible.builtin.service:
     name: 'keepalived'
     state: 'restarted'
 
 - name: Reload keepalived
-  service:
+  ansible.builtin.service:
     name: 'keepalived'
     state: 'reloaded'

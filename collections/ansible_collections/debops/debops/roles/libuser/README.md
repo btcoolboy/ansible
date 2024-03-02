@@ -15,4 +15,4 @@ The default configuration set up by the role ensures that Ansible `user`
 and `group` modules, when instructed, can correctly create local account
 and group entries in the `passwd` and `group` databases.
 
-Read the [libuser role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/libuser/) for more details.
+Read the [libuser role documentation](https://docs.debops.org/en/HEAD/ansible/roles/libuser/) for more details.

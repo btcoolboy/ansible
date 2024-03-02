@@ -5,7 +5,7 @@
  #}
 # {{ ansible_managed }}
 
-{% if nginx_user|d() %}
+{% if nginx_user | d() %}
 user {{ nginx_user }};
 
 {% endif %}
@@ -54,11 +54,11 @@ http {
         server_names_hash_bucket_size {{ nginx_http_server_names_hash_bucket_size | default('64') }};
         server_names_hash_max_size {{ nginx_http_server_names_hash_max_size | default('512') }};
 
-{% if nginx_http_options|d() and nginx_http_options %}
+{% if nginx_http_options | d() and nginx_http_options %}
 {{ nginx_http_options | indent(8, true) | regex_replace("(?m)^\s*$", "") }}
 
 {% endif %}
-{% if nginx_http_extra_options|d() and nginx_http_extra_options %}
+{% if nginx_http_extra_options | d() and nginx_http_extra_options %}
 {{ nginx_http_extra_options | indent(8, true) | regex_replace("(?m)^\s*$", "") }}
 
 {% endif %}
@@ -79,7 +79,7 @@ http {
 
         add_header X-Clacks-Overhead "GNU Terry Pratchett";
 
-{% if nginx_http_client_max_body_size|d() and nginx_http_client_max_body_size %}
+{% if nginx_http_client_max_body_size | d() and nginx_http_client_max_body_size %}
         client_max_body_size {{ nginx_http_client_max_body_size }};
 
 {% endif %}
@@ -104,7 +104,7 @@ http {
 {% if nginx_flavor == 'passenger' %}
         # Configuration options for Phusion Passenger
 {# These values are set at playbook runtime #}
-{% if ansible_distribution_release in [ 'wheezy', 'jessie', 'precise', 'trusty', 'xenial' ] %}
+{% if ansible_distribution_release in [ 'trusty', 'xenial' ] %}
         passenger_root {{ nginx_passenger_root }};
         passenger_ruby {{ nginx_passenger_ruby }};
 

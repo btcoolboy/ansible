@@ -8,4 +8,4 @@ restarting services and notifying the system administrator.
 This role can be used to configure Monit on a host. It will
 automatically detect selected services and configure checks for them.
 
-Read the [monit role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/monit/) for more details.
+Read the [monit role documentation](https://docs.debops.org/en/HEAD/ansible/roles/monit/) for more details.

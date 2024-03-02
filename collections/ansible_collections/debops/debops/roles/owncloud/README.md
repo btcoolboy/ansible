@@ -21,4 +21,4 @@ tested.
 -   Theming support (only tested with ownCloud 10).
 -   Extensive configuration options via Ansible’s inventory.
 
-Read the [owncloud role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/owncloud/) for more details.
+Read the [owncloud role documentation](https://docs.debops.org/en/HEAD/ansible/roles/owncloud/) for more details.

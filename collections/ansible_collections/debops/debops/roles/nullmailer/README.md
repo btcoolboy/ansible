@@ -13,4 +13,4 @@ host, and if an MTA from a configurable list is found, the role will
 automatically disable itself to allow easy switch to different SMTP
 servers.
 
-Read the [nullmailer role documentation](https://docs.debops.org/en/stable-3.0/ansible/roles/nullmailer/) for more details.
+Read the [nullmailer role documentation](https://docs.debops.org/en/HEAD/ansible/roles/nullmailer/) for more details.
