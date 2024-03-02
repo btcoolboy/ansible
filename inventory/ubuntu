@@ -4,5 +4,5 @@ ubuntu-docker
 vm-data-30
 ceph-[01:03]
 k8s-master[01:03]
-k8s-worker[01:05]
+k8s-worker[01:03]
 k8s-adm
