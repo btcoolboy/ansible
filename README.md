@@ -1,3 +1,5 @@
-For debian11/ubuntu20.04
-- echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu focal main" > sudo tee /etc/apt/source.list.d/ansible.list
-- sudo apt-key add ansible.asc
+# Installing Ansible
+python3 -m pip install --user ansible
+
+# Upgrading Ansible
+python3 -m pip install --upgrade --user ansible
