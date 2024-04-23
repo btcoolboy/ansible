@@ -1,0 +1,9 @@
+sshd__configuration:
+
+  - name: 'PermitRootLogin'
+    value: True
+    state: 'present'
+
+  - name: 'PasswordAuthentication'
+    value: True
+    state: 'present'

@@ -24,17 +24,16 @@ roles:
   - name: apparmor
     src: https://github.com/Oefenweb/ansible-apparmor
   
-  - name: apt
-    src: https://github.com/Oefenweb/ansible-apt
-
   - name: bash
     src: https://github.com/Oefenweb/ansible-bash
   
-  - name: ca_certificates  
+  - name: oefenweb.ca_certificates  
     src: https://github.com/Oefenweb/ansible-ca-certificates
+    version: v1.0.47
 
-  - name: dns
+  - name: oefenweb.dns
     src: https://github.com/Oefenweb/ansible-dns
+    version: v1.1.39
     
   - name: fail2ban
     src: https://github.com/Oefenweb/ansible-fail2ban
@@ -90,8 +89,9 @@ roles:
   - name: ssh_client
     src: https://github.com/Oefenweb/ansible-ssh-client
   
-  - name: ssh_keys
+  - name: oefenweb.ssh_keys
     src: https://github.com/Oefenweb/ansible-ssh-keys
+    version: v5.0.3
 
   - name: ssh_server
     src: https://github.com/Oefenweb/ansible-ssh-server
@@ -120,8 +120,10 @@ roles:
   - name: ufw
     src: https://github.com/Oefenweb/ansible-ufw
   
-  - name: user
+  - name: oefenweb.user
     src: https://github.com/Oefenweb/ansible-user
+    version: v1.1.45
   
-  - name: vim
+  - name: oefenweb.vim
     src: https://github.com/Oefenweb/ansible-vim
+    version: v2.0.46

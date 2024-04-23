@@ -1,0 +1,6 @@
+authorized_keys__identities:
+
+  - name: 'ansible key'
+    sshkeys: [ 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDATt5nxq/bb3QkpVt212bJkGRgEBMhALCEf81mdq3L0lzGG5wB4EeSvJb7txBtcHW31bK/N+rmMJIHDSY11rTLFYNWmKFibbucd2SqQFKrBIm79BX2Sw0uBT7fT3En7C3Ag75lrJRxB1pfNLUuhrm4DWIyrhg980y4Xhl6TnW5rsoQ8++wxYgzXFpNqL4uv/e1YMMm0bzmoTYS7S6A97ctoVL9QuI33gCnpUA/C8TWGv6A2UiP2887qw7AvzI/v/wOEDki7WZE8bfB69fO3pFByTT2jE4vzA1SPGJ6XV5CJLoxybKP1k8z8MiYPDoM3y7nr05MeqBEJ55jDJmX3/U7' ]
+    accounts:
+      - 'debian'

@@ -1,0 +1,3 @@
+dns_domain: cloud.lab
+dns_nameservers: [10.200.101.20, 10.200.101.254]
+dns_searches: [cloud.lab]

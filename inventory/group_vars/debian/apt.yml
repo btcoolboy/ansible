@@ -1,0 +1,135 @@
+apt__distribution_repository_map:
+  'Debian': 'https://nexus3.cloud.lab/repository/debian'
+
+apt__debian_sources:
+
+  - name: 'debian-release'
+    types: '{{ apt__archive_types }}'
+    uri: '{{ apt__distribution_repository_map.Debian | d() }}'
+    suites:
+      - '{{ apt__distribution_release }}'
+    components: [ 'main' ]
+    state: '{{ "present"
+               if (apt__distribution == "Debian")
+               else "ignore" }}'
+
+  - name: 'debian-release'
+    uri: 'http://archive.debian.org/debian'
+    state: '{{ "present"
+               if (apt__distribution == "Debian" and
+                   apt__distribution_release in apt__debian_archived_releases)
+               else "ignore" }}'
+
+  - name: 'debian-release'
+    suites:
+      - '{{ apt__distribution_release + "-updates" }}'
+    state: '{{ "present"
+               if (apt__distribution == "Debian" and
+                   apt__distribution_release not in apt__debian_archived_releases and
+                   apt__distribution_version != "n/a")
+               else "ignore" }}'
+
+  - name: 'debian-release'
+    suites:
+      - '{{ apt__distribution_release + "-backports" }}'
+    state: '{{ "present"
+               if (apt__distribution == "Debian" and
+                   apt__distribution_version != "n/a")
+               else "ignore" }}'
+
+  - name: 'debian-release'
+    components: [ 'non-free-firmware' ]
+    state: '{{ "ignore"
+               if (apt__distribution == "Debian" and
+                   apt__distribution_release in ["wheezy", "jessie", "stretch",
+                                                 "buster", "bullseye"])
+               else ("present"
+                     if (apt__distribution == "Debian" and
+                         apt__nonfree_firmware | bool)
+                     else "ignore") }}'
+
+  - name: 'debian-release'
+    components: [ 'contrib', 'non-free' ]
+    state: '{{ "present"
+               if (apt__distribution == "Debian" and
+                   apt__nonfree | bool)
+               else "ignore" }}'
+
+  - name: 'debian-release-security'
+    types: '{{ apt__archive_types }}'
+    uri: 'https://nexus3.cloud.lab/repository/debian-security/'
+    suites:
+      - '{{ apt__distribution_release + "-security" }}'
+    components: [ 'main' ]
+    state: '{{ "present"
+               if (apt__distribution == "Debian" and
+                   apt__distribution_release not in apt__debian_archived_releases and
+                   apt__distribution_version != "n/a")
+               else "ignore" }}'
+
+  - name: 'debian-release-security'
+    uri: 'http://security.debian.org/'
+    suites:
+
+      # For some reason, filter doesn't accept '' string to reset the list of
+      # suites, so let's reset it "manually" for now.
+      - name: '{{ apt__distribution_release + "-security" }}'
+        state: 'absent'
+
+      - '{{ apt__distribution_release + "/updates" }}'
+
+    state: '{{ "present"
+               if (apt__distribution == "Debian" and
+                   apt__distribution_release not in apt__debian_archived_releases and
+                   apt__distribution_release in ["buster"] and
+                   apt__distribution_version != "n/a")
+               else "ignore" }}'
+
+  - name: 'debian-release-security'
+    components: [ 'non-free-firmware' ]
+    state: '{{ "present"
+               if (apt__distribution == "Debian" and
+                   apt__distribution_release not in apt__debian_archived_releases and
+                   apt__distribution_release not in ["buster", "bullseye"] and
+                   apt__distribution_version != "n/a" and
+                   apt__nonfree_firmware | bool)
+               else "ignore" }}'
+
+  - name: 'debian-release-security'
+    components: [ 'contrib', 'non-free' ]
+    state: '{{ "present"
+               if (apt__distribution == "Debian" and
+                   apt__distribution_release not in apt__debian_archived_releases and
+                   apt__distribution_version != "n/a" and
+                   apt__nonfree | bool)
+               else "ignore" }}'
+
+apt__repositories:
+
+  - name: 'ceph-v18'
+    filename: 'ceph-v18.list'
+    repo: 'deb https://nexus3.cloud.lab/repository/ceph/debian-reef/ {{ ansible_distribution_release }} main'
+    signed_by: 'https://nexus3.cloud.lab/repository/ceph/keys/release.asc'
+    state: '{{ "present"
+               if (ansible_distribution == "Debian" and 
+                   ansible_distribution_release in ["bookworm"] and
+                   apt__distribution_version != "n/a")
+               else "ignore" }}'
+
+  - name: 'ceph-v17'
+    filename: 'ceph-v17.list'
+    repo: 'deb https://nexus3.cloud.lab/repository/ceph/debian-quincy/ {{ ansible_distribution_release }} main'
+    signed_by: 'https://nexus3.cloud.lab/repository/ceph/keys/release.asc'
+    state: '{{ "present"
+               if (ansible_distribution == "Debian" and
+                   ansible_distribution_release in ["bullseye"] and
+                   apt__distribution_version != "n/a")
+               else "ignore" }}'
+
+apt__configuration:
+
+  - name: 'verify-peer'
+    filename: '99verify-peer.conf'
+    raw: |
+      Acquire { https::Verify-Peer false }
+    state: 'present'
