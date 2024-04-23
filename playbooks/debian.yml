@@ -1,6 +1,9 @@
 ---
 
-- hosts: debian
+- name: Initialize the system
+  hosts: debian
+  remote_user: debian
+  become: True
   tasks:
     - name: Manage Advanced Package Manager
       include_role:
@@ -46,11 +49,6 @@
       include_role:
         name: oefenweb.user
       tags: user
-
-    - name: Manage ssh public key authentication
-      include_role:
-        name: oefenweb.ssh_keys
-      tags: ssh_keys
 
     - name: Set up vim
       include_role:
