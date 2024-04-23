@@ -1,6 +1,6 @@
 ---
 
-- name: Initialize the system
+- name: Initialize Debian system
   hosts: debian
   remote_user: debian
   become: True
