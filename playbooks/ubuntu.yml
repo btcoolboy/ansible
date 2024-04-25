@@ -1,79 +1,56 @@
 ---
-- hosts: ubuntu
+
+- name: Initialize Ubuntu system
+  hosts: ubuntu
+  remote_user: ubuntu
+  become: True
   tasks:
-    - name: Add Ceph apt key.
-      ansible.builtin.get_url:
-        url: "https://nexus3.cloud.lab/repository/ceph/keys/release.asc"
-        dest: /etc/apt/trusted.gpg.d/ceph.asc
-        mode: '0644'
-        force: true
-      register: add_repository_key
-      ignore_errors: true
-    - name: Ensure curl is present (on older systems without SNI).
-      package: name=curl state=present
-      when: add_repository_key is failed
-    - name: Add Ceph apt key (alternative for older systems without SNI).
-      shell: >
-        curl -sSL "https://nexus3.cloud.lab/repository/ceph/keys/release.asc" | apt-key add -
-      args:
-        warn: false
-      when: add_repository_key is failed
-    - name: Add Ceph repository
-      ansible.builtin.apt_repository:
-        repo: "deb https://nexus3.cloud.lab/repository/ceph/debian-quincy/ {{ ansible_distribution_release }} main"
-        state: present
-        filename: ceph-v17
-      when: ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('20.04', '=')
-  roles:
-    - role: apt
-      vars:
-        apt_ubuntu_mirror: https://nexus3.cloud.lab/repository/ubuntu/
-        apt_ubuntu_security_mirror: https://nexus3.cloud.lab/repository/ubuntu/
-    - role: ca_certificates
-      vars:
-        ca_certificates_certificate_map:
-          - src: ca.crt
-            dest: cloud.lab/ca.crt
-    - role: user
-      vars:
-        user_groups:
-          - name: ansible
-            gid: 2000
-        user_users:
-          - name: ansible
-            gid: 2000
-            group: ansible
-            groups:
-              - sudo
-    - role: sudoers
-      vars:
-        sudoers_sudoers:
-          defaults:
-            - env_reset
-            - exempt_group=sudo
-            - mail_badpass
-            - secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-          privileges:
-            - name: root
-              entry: "ALL=(ALL:ALL) ALL"
-            - name: "%admin"
-              entry: "ALL=(ALL) ALL"
-            - name: "%sudo"
-              entry: "ALL=(ALL:ALL) NOPASSWD:ALL"
-    - role: ssh_keys
-      vars:
-        ssh_keys_private_keys:
-          - owner: ubuntu
-            src: files/id_rsa
-        ssh_keys_public_keys:
-          - owner: ubuntu
-            src: files/id_rsa.pub
-        ssh_keys_authorized_keys:
-          - owner: ubuntu
-            src: files/id_rsa.pub
-          - owner: ansible
-            src: files/id_rsa.pub
-    - role: timezone
-      vars:
-        timezone_zone: Asia/Shanghai
-    - role: chrony
+    - name: Manage Advanced Package Manager
+      include_role:
+        name: debops.debops.apt
+      tags: apt
+
+    - name: Manage ca-certificates
+      include_role:
+        name: oefenweb.ca_certificates
+      tags: ca_certificates
+
+    - name: Manage Network Time Protocol service
+      include_role:
+        name: debops.debops.ntp
+      tags: ntp
+
+    - name: Configure localization and internationalization
+      include_role:
+        name: debops.debops.locales
+      tags: locales
+
+    - name: Manage time zone configuration
+      include_role:
+        name: debops.debops.tzdata
+      tags: tzdata
+
+    - name: Configure sudo service
+      include_role:
+        name: debops.debops.sudo
+      tags: sudo
+
+    - name: Manage SSH public keys
+      include_role:
+        name: debops.debops.authorized_keys
+      tags: authorized_keys
+
+    - name: Manage OpenSSH Server
+      include_role:
+        name: debops.debops.sshd
+      tags: sshd
+
+    - name: Manage user and group accounts
+      include_role:
+        name: oefenweb.user
+      tags: user
+
+    - name: Set up vim
+      include_role:
+        name: oefenweb.vim
+      tags: vim

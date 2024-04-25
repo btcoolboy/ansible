@@ -1,3 +1,8 @@
+[debian]
+10.200.101.165
+10.200.101.164
+10.200.101.181
+
 [ubuntu]
 ubuntu-template ansible_host=10.200.101.160
 ubuntu-docker

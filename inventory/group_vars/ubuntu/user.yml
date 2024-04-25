@@ -1,0 +1,9 @@
+user_groups:
+  - name: ansible
+    gid: 2000
+user_users:
+  - name: ansible
+    gid: 2000
+    group: ansible
+    groups:
+      - sudo
