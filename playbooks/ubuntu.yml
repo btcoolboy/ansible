@@ -5,7 +5,7 @@
   remote_user: ubuntu
   become: True
   tasks:
-      - name: Add Ceph apt key
+    - name: Add Ceph apt key
       ansible.builtin.get_url:
         url: "https://nexus3.cloud.lab/repository/ceph/keys/release.asc"
         dest: /etc/apt/trusted.gpg.d/ceph.asc
