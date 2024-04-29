@@ -80,6 +80,10 @@ options:
         description: The home directory
         type: str
         required: false
+      gecos:
+        description: The GECOS
+        type: str
+        required: false
       shell:
         description: The login shell
         type: str
@@ -133,6 +137,10 @@ options:
         type: int
         required: false
         aliases: ["gidnumber"]
+      street:
+        description: Street address
+        type: str
+        required: false
       city:
         description: City
         type: str
@@ -200,7 +208,7 @@ options:
           Use empty string to reset userauthtype to the initial value.
         type: list
         elements: str
-        choices: ['password', 'radius', 'otp', '']
+        choices: ["password", "radius", "otp", "pkinit", "hardened", "idp", ""]
         required: false
         aliases: ["ipauserauthtype"]
       userclass:
@@ -234,10 +242,45 @@ options:
         description: Employee Type
         type: str
         required: false
+      smb_logon_script:
+        description: SMB logon script path
+        type: str
+        required: false
+        aliases: ["ipantlogonscript"]
+      smb_profile_path:
+        description: SMB profile path
+        type: str
+        required: false
+        aliases: ["ipantprofilepath"]
+      smb_home_dir:
+        description: SMB Home Directory
+        type: str
+        required: false
+        aliases: ["ipanthomedirectory"]
+      smb_home_drive:
+        description: SMB Home Directory Drive
+        type: str
+        required: false
+        choices: [
+           'A:', 'B:', 'C:', 'D:', 'E:', 'F:', 'G:', 'H:', 'I:', 'J:',
+           'K:', 'L:', 'M:', 'N:', 'O:', 'P:', 'Q:', 'R:', 'S:', 'T:',
+           'U:', 'V:', 'W:', 'X:', 'Y:', 'Z:', ''
+        ]
+        aliases: ["ipanthomedirectorydrive"]
       preferredlanguage:
         description: Preferred Language
         type: str
         required: false
+      idp:
+        description: External IdP configuration
+        type: str
+        required: false
+        aliases: ["ipaidpconfiglink"]
+      idp_user_id:
+        description: A string that identifies the user at external IdP
+        type: str
+        required: false
+        aliases: ["ipaidpsub"]
       certificate:
         description: List of base-64 encoded user certificates
         type: list
@@ -276,6 +319,11 @@ options:
         description: Suppress processing of membership attributes
         required: false
         type: bool
+      rename:
+        description: Rename the user object
+        required: false
+        type: str
+        aliases: ["new_name"]
     required: false
   first:
     description: The first name. Required if user does not exist.
@@ -302,6 +350,10 @@ options:
     required: false
   homedir:
     description: The home directory
+    type: str
+    required: false
+  gecos:
+    description: The GECOS
     type: str
     required: false
   shell:
@@ -357,6 +409,10 @@ options:
     type: int
     required: false
     aliases: ["gidnumber"]
+  street:
+    description: Street address
+    type: str
+    required: false
   city:
     description: City
     type: str
@@ -424,7 +480,7 @@ options:
       Use empty string to reset userauthtype to the initial value.
     type: list
     elements: str
-    choices: ['password', 'radius', 'otp', '']
+    choices: ["password", "radius", "otp", "pkinit", "hardened", "idp", ""]
     required: false
     aliases: ["ipauserauthtype"]
   userclass:
@@ -458,10 +514,45 @@ options:
     description: Employee Type
     type: str
     required: false
+  smb_logon_script:
+    description: SMB logon script path
+    type: str
+    required: false
+    aliases: ["ipantlogonscript"]
+  smb_profile_path:
+    description: SMB profile path
+    type: str
+    required: false
+    aliases: ["ipantprofilepath"]
+  smb_home_dir:
+    description: SMB Home Directory
+    type: str
+    required: false
+    aliases: ["ipanthomedirectory"]
+  smb_home_drive:
+    description: SMB Home Directory Drive
+    type: str
+    required: false
+    choices: [
+       'A:', 'B:', 'C:', 'D:', 'E:', 'F:', 'G:', 'H:', 'I:', 'J:',
+       'K:', 'L:', 'M:', 'N:', 'O:', 'P:', 'Q:', 'R:', 'S:', 'T:',
+       'U:', 'V:', 'W:', 'X:', 'Y:', 'Z:', ''
+    ]
+    aliases: ["ipanthomedirectorydrive"]
   preferredlanguage:
     description: Preferred Language
     type: str
     required: false
+  idp:
+    description: External IdP configuration
+    type: str
+    required: false
+    aliases: ["ipaidpconfiglink"]
+  idp_user_id:
+    description: A string that identifies the user at external IdP
+    type: str
+    required: false
+    aliases: ["ipaidpsub"]
   certificate:
     description: List of base-64 encoded user certificates
     type: list
@@ -500,6 +591,11 @@ options:
     description: Suppress processing of membership attributes
     required: false
     type: bool
+  rename:
+    description: Rename the user object
+    required: false
+    type: str
+    aliases: ["new_name"]
   preserve:
     description: Delete a user, keeping the entry available for future use
     required: false
@@ -521,7 +617,8 @@ options:
     default: present
     choices: ["present", "absent",
               "enabled", "disabled",
-              "unlocked", "undeleted"]
+              "unlocked", "undeleted",
+              "renamed"]
 author:
   - Thomas Woerner (@t-woerner)
 """
@@ -597,6 +694,24 @@ EXAMPLES = """
     ipaadmin_password: SomeADMINpassword
     name: pinky,brain
     state: disabled
+
+# Ensure a user has SMB attributes
+- freeipa.ansible_freeipa.ipauser:
+    ipaadmin_password: SomeADMINpassword
+    name: smbuser
+    first: SMB
+    last: User
+    smb_logon_script: N:\\logonscripts\\startup
+    smb_profile_path: \\\\server\\profiles\\some_profile
+    smb_home_dir: \\\\users\\home\\smbuser
+    smb_home_drive: "U:"
+
+# Rename an existing user
+- freeipa.ansible_freeipa.ipauser:
+    ipaadmin_password: SomeADMINpassword
+    name: someuser
+    rename: anotheruser
+    state: renamed
 """
 
 RETURN = """
@@ -652,12 +767,14 @@ def find_user(module, name):
     return _result
 
 
-def gen_args(first, last, fullname, displayname, initials, homedir, shell,
-             email, principalexpiration, passwordexpiration, password,
-             random, uid, gid, city, userstate, postalcode, phone, mobile,
-             pager, fax, orgunit, title, carlicense, sshpubkey, userauthtype,
-             userclass, radius, radiususer, departmentnumber, employeenumber,
-             employeetype, preferredlanguage, noprivate, nomembers):
+def gen_args(first, last, fullname, displayname, initials, homedir, gecos,
+             shell, email, principalexpiration, passwordexpiration, password,
+             random, uid, gid, street, city, userstate, postalcode, phone,
+             mobile, pager, fax, orgunit, title, carlicense, sshpubkey,
+             userauthtype, userclass, radius, radiususer, departmentnumber,
+             employeenumber, employeetype, preferredlanguage, smb_logon_script,
+             smb_profile_path, smb_home_dir, smb_home_drive, idp, idp_user_id,
+             noprivate, nomembers):
     # principal, manager, certificate and certmapdata are handled not in here
     _args = {}
     if first is not None:
@@ -672,6 +789,8 @@ def gen_args(first, last, fullname, displayname, initials, homedir, shell,
         _args["initials"] = initials
     if homedir is not None:
         _args["homedirectory"] = homedir
+    if gecos is not None:
+        _args["gecos"] = gecos
     if shell is not None:
         _args["loginshell"] = shell
     if email is not None and len(email) > 0:
@@ -688,6 +807,8 @@ def gen_args(first, last, fullname, displayname, initials, homedir, shell,
         _args["uidnumber"] = to_text(str(uid))
     if gid is not None:
         _args["gidnumber"] = to_text(str(gid))
+    if street is not None:
+        _args["street"] = street
     if city is not None:
         _args["l"] = city
     if userstate is not None:
@@ -726,52 +847,74 @@ def gen_args(first, last, fullname, displayname, initials, homedir, shell,
         _args["employeetype"] = employeetype
     if preferredlanguage is not None:
         _args["preferredlanguage"] = preferredlanguage
+    if idp is not None:
+        _args["ipaidpconfiglink"] = idp
+    if idp_user_id is not None:
+        _args["ipaidpsub"] = idp_user_id
     if noprivate is not None:
         _args["noprivate"] = noprivate
     if nomembers is not None:
         _args["no_members"] = nomembers
+    if smb_logon_script is not None:
+        _args["ipantlogonscript"] = smb_logon_script
+    if smb_profile_path is not None:
+        _args["ipantprofilepath"] = smb_profile_path
+    if smb_home_dir is not None:
+        _args["ipanthomedirectory"] = smb_home_dir
+    if smb_home_drive is not None:
+        _args["ipanthomedirectorydrive"] = smb_home_drive
     return _args
 
 
 def check_parameters(  # pylint: disable=unused-argument
         module, state, action, first, last, fullname, displayname, initials,
-        homedir, shell, email, principal, principalexpiration,
-        passwordexpiration, password, random, uid, gid, city, phone, mobile,
-        pager, fax, orgunit, title, manager, carlicense, sshpubkey,
+        homedir, gecos, shell, email, principal, principalexpiration,
+        passwordexpiration, password, random, uid, gid, street, city, phone,
+        mobile, pager, fax, orgunit, title, manager, carlicense, sshpubkey,
         userauthtype, userclass, radius, radiususer, departmentnumber,
         employeenumber, employeetype, preferredlanguage, certificate,
-        certmapdata, noprivate, nomembers, preserve, update_password):
-    invalid = []
-    if state == "present":
-        if action == "member":
-            invalid = ["first", "last", "fullname", "displayname", "initials",
-                       "homedir", "shell", "email", "principalexpiration",
-                       "passwordexpiration", "password", "random", "uid",
-                       "gid", "city", "phone", "mobile", "pager", "fax",
-                       "orgunit", "title", "carlicense", "sshpubkey",
-                       "userauthtype", "userclass", "radius", "radiususer",
-                       "departmentnumber", "employeenumber", "employeetype",
-                       "preferredlanguage", "noprivate", "nomembers",
-                       "preserve", "update_password"]
-
+        certmapdata, noprivate, nomembers, preserve, update_password,
+        smb_logon_script, smb_profile_path, smb_home_dir, smb_home_drive,
+        idp, ipa_user_id, rename
+):
+    if state == "present" and action == "user":
+        invalid = ["preserve"]
     else:
-        invalid = ["first", "last", "fullname", "displayname", "initials",
-                   "homedir", "shell", "email", "principalexpiration",
-                   "passwordexpiration", "password", "random", "uid",
-                   "gid", "city", "phone", "mobile", "pager", "fax",
-                   "orgunit", "title", "carlicense", "sshpubkey",
-                   "userauthtype", "userclass", "radius", "radiususer",
-                   "departmentnumber", "employeenumber", "employeetype",
-                   "preferredlanguage", "noprivate", "nomembers",
-                   "update_password"]
-        if action == "user":
-            invalid.extend(["principal", "manager",
-                            "certificate", "certmapdata",
-                            ])
+        invalid = [
+            "first", "last", "fullname", "displayname", "initials", "homedir",
+            "shell", "email", "principalexpiration", "passwordexpiration",
+            "password", "random", "uid", "gid", "street", "city", "phone",
+            "mobile", "pager", "fax", "orgunit", "title", "carlicense",
+            "sshpubkey", "userauthtype", "userclass", "radius", "radiususer",
+            "departmentnumber", "employeenumber", "employeetype",
+            "preferredlanguage", "noprivate", "nomembers", "update_password",
+            "gecos", "smb_logon_script", "smb_profile_path", "smb_home_dir",
+            "smb_home_drive", "idp", "idp_user_id"
+        ]
+
+        if state == "present" and action == "member":
+            invalid.append("preserve")
+        else:
+            if action == "user":
+                invalid.extend(
+                    ["principal", "manager", "certificate", "certmapdata"])
 
         if state != "absent" and preserve is not None:
             module.fail_json(
                 msg="Preserve is only possible for state=absent")
+
+    if state != "renamed":
+        invalid.append("rename")
+    else:
+        invalid.extend([
+            "preserve", "principal", "manager", "certificate", "certmapdata",
+        ])
+        if not rename:
+            module.fail_json(
+                msg="A value for attribute 'rename' must be provided.")
+        if action == "member":
+            module.fail_json(
+                msg="Action member can not be used with state: renamed.")
 
     module.params_fail_used_invalid(invalid, state, action)
 
@@ -799,6 +942,15 @@ def check_parameters(  # pylint: disable=unused-argument
                     module.fail_json(msg="certmapdata: issuer is missing")
                 if subject is None:
                     module.fail_json(msg="certmapdata: subject is missing")
+
+
+def check_userauthtype(module, userauthtype):
+    _invalid = module.ipa_command_invalid_param_choices(
+        "user_add", "ipauserauthtype", userauthtype)
+    if _invalid:
+        module.fail_json(
+            msg="The use of userauthtype '%s' is not supported "
+            "by your IPA version" % "','".join(_invalid))
 
 
 def extend_emails(email, default_email_domain):
@@ -902,6 +1054,7 @@ def main():
         displayname=dict(type="str", default=None),
         initials=dict(type="str", default=None),
         homedir=dict(type="str", default=None),
+        gecos=dict(type="str", default=None),
         shell=dict(type="str", aliases=["loginshell"], default=None),
         email=dict(type="list", elements="str", default=None),
         principal=dict(type="list", elements="str",
@@ -917,6 +1070,7 @@ def main():
         random=dict(type='bool', default=None),
         uid=dict(type="int", aliases=["uidnumber"], default=None),
         gid=dict(type="int", aliases=["gidnumber"], default=None),
+        street=dict(type="str", default=None),
         city=dict(type="str", default=None),
         userstate=dict(type="str", aliases=["st"], default=None),
         postalcode=dict(type="str", aliases=["zip"], default=None),
@@ -934,7 +1088,8 @@ def main():
                        default=None),
         userauthtype=dict(type='list', elements="str",
                           aliases=["ipauserauthtype"], default=None,
-                          choices=['password', 'radius', 'otp', '']),
+                          choices=["password", "radius", "otp", "pkinit",
+                                   "hardened", "idp", ""]),
         userclass=dict(type="list", elements="str", aliases=["class"],
                        default=None),
         radius=dict(type="str", aliases=["ipatokenradiusconfiglink"],
@@ -945,6 +1100,17 @@ def main():
         departmentnumber=dict(type="list", elements="str", default=None),
         employeenumber=dict(type="str", default=None),
         employeetype=dict(type="str", default=None),
+        smb_logon_script=dict(type="str", default=None,
+                              aliases=["ipantlogonscript"]),
+        smb_profile_path=dict(type="str", default=None,
+                              aliases=["ipantprofilepath"]),
+        smb_home_dir=dict(type="str", default=None,
+                          aliases=["ipanthomedirectory"]),
+        smb_home_drive=dict(type="str", default=None,
+                            choices=[
+                                ("%c:" % chr(x))
+                                for x in range(ord('A'), ord('Z') + 1)
+                            ] + [""], aliases=["ipanthomedirectorydrive"]),
         preferredlanguage=dict(type="str", default=None),
         certificate=dict(type="list", elements="str",
                          aliases=["usercertificate"], default=None),
@@ -959,6 +1125,11 @@ def main():
                          elements='dict', required=False),
         noprivate=dict(type='bool', default=None),
         nomembers=dict(type='bool', default=None),
+        idp=dict(type="str", default=None, aliases=['ipaidpconfiglink']),
+        idp_user_id=dict(type="str", default=None,
+                         aliases=['ipaidpconfiglink']),
+        rename=dict(type="str", required=False, default=None,
+                    aliases=["new_name"]),
     )
 
     ansible_module = IPAAnsibleModule(
@@ -990,7 +1161,7 @@ def main():
                         choices=["member", "user"]),
             state=dict(type="str", default="present",
                        choices=["present", "absent", "enabled", "disabled",
-                                "unlocked", "undeleted"]),
+                                "unlocked", "undeleted", "renamed"]),
 
             # Add user specific parameters for simple use case
             **user_spec
@@ -1015,6 +1186,7 @@ def main():
     displayname = ansible_module.params_get("displayname")
     initials = ansible_module.params_get("initials")
     homedir = ansible_module.params_get("homedir")
+    gecos = ansible_module.params_get("gecos")
     shell = ansible_module.params_get("shell")
     email = ansible_module.params_get("email")
     principal = ansible_module.params_get("principal")
@@ -1033,6 +1205,7 @@ def main():
     random = ansible_module.params_get("random")
     uid = ansible_module.params_get("uid")
     gid = ansible_module.params_get("gid")
+    street = ansible_module.params_get("street")
     city = ansible_module.params_get("city")
     userstate = ansible_module.params_get("userstate")
     postalcode = ansible_module.params_get("postalcode")
@@ -1045,9 +1218,9 @@ def main():
     manager = ansible_module.params_get("manager")
     carlicense = ansible_module.params_get("carlicense")
     sshpubkey = ansible_module.params_get("sshpubkey",
-                                          allow_empty_string=True)
+                                          allow_empty_list_item=True)
     userauthtype = ansible_module.params_get("userauthtype",
-                                             allow_empty_string=True)
+                                             allow_empty_list_item=True)
     userclass = ansible_module.params_get("userclass")
     radius = ansible_module.params_get("radius")
     radiususer = ansible_module.params_get("radiususer")
@@ -1055,6 +1228,12 @@ def main():
     employeenumber = ansible_module.params_get("employeenumber")
     employeetype = ansible_module.params_get("employeetype")
     preferredlanguage = ansible_module.params_get("preferredlanguage")
+    smb_logon_script = ansible_module.params_get("smb_logon_script")
+    smb_profile_path = ansible_module.params_get("smb_profile_path")
+    smb_home_dir = ansible_module.params_get("smb_home_dir")
+    smb_home_drive = ansible_module.params_get("smb_home_drive")
+    idp = ansible_module.params_get("idp")
+    idp_user_id = ansible_module.params_get("idp_user_id")
     certificate = ansible_module.params_get("certificate")
     certmapdata = ansible_module.params_get("certmapdata")
     noprivate = ansible_module.params_get("noprivate")
@@ -1063,6 +1242,8 @@ def main():
     preserve = ansible_module.params_get("preserve")
     # mod
     update_password = ansible_module.params_get("update_password")
+    # rename
+    rename = ansible_module.params_get("rename")
     # general
     action = ansible_module.params_get("action")
     state = ansible_module.params_get("state")
@@ -1073,25 +1254,30 @@ def main():
        (users is None or len(users) < 1):
         ansible_module.fail_json(msg="One of name and users is required")
 
-    if state == "present":
+    if state in ["present", "renamed"]:
         if names is not None and len(names) != 1:
+            act = "renamed" if state == "renamed" else "added"
             ansible_module.fail_json(
-                msg="Only one user can be added at a time using name.")
-
-    check_parameters(
-        ansible_module, state, action,
-        first, last, fullname, displayname, initials, homedir, shell, email,
-        principal, principalexpiration, passwordexpiration, password, random,
-        uid, gid, city, phone, mobile, pager, fax, orgunit, title, manager,
-        carlicense, sshpubkey, userauthtype, userclass, radius, radiususer,
-        departmentnumber, employeenumber, employeetype, preferredlanguage,
-        certificate, certmapdata, noprivate, nomembers, preserve,
-        update_password)
-    certmapdata = convert_certmapdata(certmapdata)
+                msg="Only one user can be %s at a time using name." % (act))
 
     # Use users if names is None
     if users is not None:
         names = users
+    else:
+        check_parameters(
+            ansible_module, state, action,
+            first, last, fullname, displayname, initials, homedir, gecos,
+            shell, email,
+            principal, principalexpiration, passwordexpiration, password,
+            random,
+            uid, gid, street, city, phone, mobile, pager, fax, orgunit, title,
+            manager, carlicense, sshpubkey, userauthtype, userclass, radius,
+            radiususer, departmentnumber, employeenumber, employeetype,
+            preferredlanguage, certificate, certmapdata, noprivate, nomembers,
+            preserve, update_password, smb_logon_script, smb_profile_path,
+            smb_home_dir, smb_home_drive, idp, idp_user_id, rename,
+        )
+        certmapdata = convert_certmapdata(certmapdata)
 
     # Init
 
@@ -1104,6 +1290,10 @@ def main():
         # Check version specific settings
 
         server_realm = ansible_module.ipa_get_realm()
+
+        # Check API specific parameters
+
+        check_userauthtype(ansible_module, userauthtype)
 
         # Default email domain
 
@@ -1133,6 +1323,7 @@ def main():
                 displayname = user.get("displayname")
                 initials = user.get("initials")
                 homedir = user.get("homedir")
+                gecos = user.get("gecos")
                 shell = user.get("shell")
                 email = user.get("email")
                 principal = user.get("principal")
@@ -1150,6 +1341,7 @@ def main():
                 random = user.get("random")
                 uid = user.get("uid")
                 gid = user.get("gid")
+                street = user.get("street")
                 city = user.get("city")
                 userstate = user.get("userstate")
                 postalcode = user.get("postalcode")
@@ -1170,6 +1362,13 @@ def main():
                 employeenumber = user.get("employeenumber")
                 employeetype = user.get("employeetype")
                 preferredlanguage = user.get("preferredlanguage")
+                smb_logon_script = user.get("smb_logon_script")
+                smb_profile_path = user.get("smb_profile_path")
+                smb_home_dir = user.get("smb_home_dir")
+                smb_home_drive = user.get("smb_home_drive")
+                idp = user.get("idp")
+                idp_user_id = user.get("idp_user_id")
+                rename = user.get("rename")
                 certificate = user.get("certificate")
                 certmapdata = user.get("certmapdata")
                 noprivate = user.get("noprivate")
@@ -1178,15 +1377,21 @@ def main():
                 check_parameters(
                     ansible_module, state, action,
                     first, last, fullname, displayname, initials, homedir,
-                    shell, email, principal, principalexpiration,
-                    passwordexpiration, password, random, uid, gid, city,
-                    phone, mobile, pager, fax, orgunit, title, manager,
+                    gecos, shell, email, principal, principalexpiration,
+                    passwordexpiration, password, random, uid, gid, street,
+                    city, phone, mobile, pager, fax, orgunit, title, manager,
                     carlicense, sshpubkey, userauthtype, userclass, radius,
                     radiususer, departmentnumber, employeenumber,
                     employeetype, preferredlanguage, certificate,
                     certmapdata, noprivate, nomembers, preserve,
-                    update_password)
+                    update_password, smb_logon_script, smb_profile_path,
+                    smb_home_dir, smb_home_drive, idp, idp_user_id, rename,
+                )
                 certmapdata = convert_certmapdata(certmapdata)
+
+                # Check API specific parameters
+
+                check_userauthtype(ansible_module, userauthtype)
 
                 # Extend email addresses
 
@@ -1227,6 +1432,34 @@ def main():
                     msg="The use of certmapdata is not supported by "
                     "your IPA version")
 
+            # Check if SMB attributes are available
+            if (
+                any([
+                    smb_logon_script, smb_profile_path, smb_home_dir,
+                    smb_home_drive
+                ])
+                and not ansible_module.ipa_command_param_exists(
+                    "user_mod", "ipanthomedirectory"
+                )
+            ):
+                ansible_module.fail_json(
+                    msg="The use of smb_logon_script, smb_profile_path, "
+                    "smb_profile_path, and smb_home_drive is not supported "
+                    "by your IPA version")
+
+            # Check if IdP support is available
+            require_idp = (
+                idp is not None
+                or idp_user_id is not None
+                or userauthtype == "idp"
+            )
+            has_idp_support = ansible_module.ipa_command_param_exists(
+                "user_add", "ipaidpconfiglink"
+            )
+            if require_idp and not has_idp_support:
+                ansible_module.fail_json(
+                    msg="Your IPA version does not support External IdP.")
+
             # Make sure user exists
             res_find = find_user(ansible_module, name)
 
@@ -1235,12 +1468,16 @@ def main():
                 # Generate args
                 args = gen_args(
                     first, last, fullname, displayname, initials, homedir,
+                    gecos,
                     shell, email, principalexpiration, passwordexpiration,
-                    password, random, uid, gid, city, userstate, postalcode,
-                    phone, mobile, pager, fax, orgunit, title, carlicense,
-                    sshpubkey, userauthtype, userclass, radius, radiususer,
-                    departmentnumber, employeenumber, employeetype,
-                    preferredlanguage, noprivate, nomembers)
+                    password, random, uid, gid, street, city, userstate,
+                    postalcode, phone, mobile, pager, fax, orgunit, title,
+                    carlicense, sshpubkey, userauthtype, userclass, radius,
+                    radiususer, departmentnumber, employeenumber, employeetype,
+                    preferredlanguage, smb_logon_script, smb_profile_path,
+                    smb_home_dir, smb_home_drive, idp, idp_user_id, noprivate,
+                    nomembers,
+                )
 
                 if action == "user":
                     # Found the user
@@ -1252,6 +1489,10 @@ def main():
                                 del args["userpassword"]
                             if "random" in args:
                                 del args["random"]
+                        # if using "random:false" password should not be
+                        # generated.
+                        if not args.get("random", True):
+                            del args["random"]
                         if "noprivate" in args:
                             del args["noprivate"]
 
@@ -1276,8 +1517,21 @@ def main():
                             ansible_module.fail_json(
                                 msg="Last name is needed")
 
+                        smb_attrs = {
+                            k: args[k]
+                            for k in [
+                                "ipanthomedirectory",
+                                "ipanthomedirectorydrive",
+                                "ipantlogonscript",
+                                "ipantprofilepath",
+                            ]
+                            if k in args
+                        }
+                        for key in smb_attrs.keys():
+                            del args[key]
                         commands.append([name, "user_add", args])
-
+                        if smb_attrs:
+                            commands.append([name, "user_mod", smb_attrs])
                     # Handle members: principal, manager, certificate and
                     # certmapdata
                     if res_find is not None:
@@ -1523,6 +1777,12 @@ def main():
                 else:
                     raise ValueError("No user '%s'" % name)
 
+            elif state == "renamed":
+                if res_find is None:
+                    ansible_module.fail_json(msg="No user '%s'" % name)
+                else:
+                    if rename != name:
+                        commands.append([name, 'user_mod', {"rename": rename}])
             else:
                 ansible_module.fail_json(msg="Unkown state '%s'" % state)
 

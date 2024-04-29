@@ -22,7 +22,7 @@ Requirements
 ------------
 
 **Controller**
-* Ansible version: 2.8+
+* Ansible version: 2.13+
 
 **Node**
 * Supported FreeIPA version (see above)
@@ -92,6 +92,26 @@ Example playbook to make sure sudocmds are not present in Sudo Rule:
       action: member
       state: absent
 ```
+
+
+Example playbook to ensure a Group of RunAs User is present in sudo rule:
+
+```yaml
+---
+- name: Playbook to manage sudorule member
+  hosts: ipaserver
+  become: no
+  gather_facts: no
+
+  tasks:
+  - name: Ensure sudorule 'runasuser' has 'ipasuers' group as runas users.
+    freeipa.ansible_freeipa.ipasudorule:
+      ipaadmin_password: SomeADMINpassword
+      name: testrule1
+      runasuser_group: ipausers
+      action: member
+```
+
 
 Example playbook to make sure Sudo Rule is absent:
 

@@ -30,7 +30,8 @@ __all__ = ["gssapi", "netaddr", "api", "ipalib_errors", "Env",
            "kinit_password", "kinit_keytab", "run", "DN", "VERSION",
            "paths", "tasks", "get_credentials_if_valid", "Encoding",
            "DNSName", "getargspec", "certificate_loader",
-           "write_certificate_list"]
+           "write_certificate_list", "boolean", "template_str",
+           "urlparse"]
 
 import os
 # ansible-freeipa requires locale to be C, IPA requires utf-8.
@@ -42,6 +43,7 @@ import tempfile
 import shutil
 import socket
 import base64
+import ast
 from datetime import datetime
 from contextlib import contextmanager
 from ansible.module_utils.basic import AnsibleModule
@@ -49,6 +51,7 @@ from ansible.module_utils._text import to_text
 from ansible.module_utils.common.text.converters import jsonify
 from ansible.module_utils import six
 from ansible.module_utils.common._collections_compat import Mapping
+from ansible.module_utils.parsing.convert_bool import boolean
 
 # Import getargspec from inspect or provide own getargspec for
 # Python 2 compatibility with Python 3.11+.
@@ -88,6 +91,7 @@ try:
     except ImportError:
         from ipapython.ipautil import kinit_password, kinit_keytab
     from ipapython.ipautil import run
+    from ipapython.ipautil import template_str
     from ipapython.dn import DN
     from ipapython.version import VERSION
     from ipaplatform.paths import paths
@@ -143,6 +147,11 @@ try:
         _dcerpc_bindings_installed = True  # pylint: disable=invalid-name
     except ImportError:
         _dcerpc_bindings_installed = False  # pylint: disable=invalid-name
+
+    try:
+        from urllib.parse import urlparse
+    except ImportError:
+        from ansible.module_utils.six.moves.urllib.parse import urlparse
 
 except ImportError as _err:
     ANSIBLE_FREEIPA_MODULE_IMPORT_ERROR = str(_err)
@@ -224,7 +233,7 @@ def temp_kdestroy(ccache_dir, ccache_name):
     """Destroy temporary ticket and remove temporary ccache."""
     if ccache_name is not None:
         run([paths.KDESTROY, '-c', ccache_name], raiseonerr=False)
-        del os.environ['KRB5CCNAME']
+        os.environ.pop('KRB5CCNAME', None)
     if ccache_dir is not None:
         shutil.rmtree(ccache_dir, ignore_errors=True)
 
@@ -461,12 +470,11 @@ def _afm_convert(value):
     return value
 
 
-def module_params_get(module, name, allow_empty_string=False):
+def module_params_get(module, name, allow_empty_list_item=False):
     value = _afm_convert(module.params.get(name))
 
-    # Fail on empty strings in the list or if allow_empty_string is True
-    # if there is another entry in the list together with the empty
-    # string.
+    # Fail on empty strings in the list or if allow_empty_list_item is True
+    # if there is another entry in the list together with the empty string.
     # Due to an issue in Ansible it is possible to use the empty string
     # "" for lists with choices, even if the empty list is not part of
     # the choices.
@@ -474,7 +482,7 @@ def module_params_get(module, name, allow_empty_string=False):
     if isinstance(value, list):
         for val in value:
             if isinstance(val, (str, unicode)) and not val:
-                if not allow_empty_string:
+                if not allow_empty_list_item:
                     module.fail_json(
                         msg="Parameter '%s' contains an empty string" %
                         name)
@@ -486,12 +494,54 @@ def module_params_get(module, name, allow_empty_string=False):
     return value
 
 
-def module_params_get_lowercase(module, name, allow_empty_string=False):
-    value = module_params_get(module, name, allow_empty_string)
+def module_params_get_lowercase(module, name, allow_empty_list_item=False):
+    value = module_params_get(module, name, allow_empty_list_item)
     if isinstance(value, list):
         value = [v.lower() for v in value]
     if isinstance(value, (str, unicode)):
         value = value.lower()
+    return value
+
+
+def module_params_get_with_type_cast(
+    module, name, datatype, allow_empty=False
+):
+    """
+    Retrieve value set for module parameter as a specific data type.
+
+    Parameters
+    ----------
+    module: AnsibleModule
+        The module from where to get the parameter value from.
+    name: string
+        The name of the parameter to retrieve.
+    datatype: type
+        The type to convert the value to, if value is not empty.
+    allow_empty: bool
+        Allow an empty string for non list parameters or a list
+        containing (only) an empty string item. This is used for
+        resetting parameters to the default value.
+
+    """
+    value = module_params_get(module, name, allow_empty)
+    if not allow_empty and value == "":
+        module.fail_json(
+            msg="Argument '%s' must not be an empty string" % (name,)
+        )
+    if value is not None and value != "":
+        try:
+            if datatype is bool:
+                # We let Ansible handle bool values
+                value = boolean(value)
+            else:
+                value = datatype(value)
+        except ValueError:
+            module.fail_json(
+                msg="Invalid value '%s' for argument '%s'" % (value, name)
+            )
+        except TypeError as terr:
+            # If Ansible fails to parse a boolean, it will raise TypeError
+            module.fail_json(msg="Param '%s': %s" % (name, str(terr)))
     return value
 
 
@@ -1042,7 +1092,7 @@ class IPAAnsibleModule(AnsibleModule):
             finally:
                 temp_kdestroy(ccache_dir, ccache_name)
 
-    def params_get(self, name, allow_empty_string=False):
+    def params_get(self, name, allow_empty_list_item=False):
         """
         Retrieve value set for module parameter.
 
@@ -1050,13 +1100,13 @@ class IPAAnsibleModule(AnsibleModule):
         ----------
         name: string
             The name of the parameter to retrieve.
-        allow_empty_string: bool
+        allow_empty_list_item: bool
             The parameter allowes to have empty strings in a list
 
         """
-        return module_params_get(self, name, allow_empty_string)
+        return module_params_get(self, name, allow_empty_list_item)
 
-    def params_get_lowercase(self, name, allow_empty_string=False):
+    def params_get_lowercase(self, name, allow_empty_list_item=False):
         """
         Retrieve value set for module parameter as lowercase, if not None.
 
@@ -1064,11 +1114,34 @@ class IPAAnsibleModule(AnsibleModule):
         ----------
         name: string
             The name of the parameter to retrieve.
-        allow_empty_string: bool
+        allow_empty_list_item: bool
             The parameter allowes to have empty strings in a list
 
         """
-        return module_params_get_lowercase(self, name, allow_empty_string)
+        return module_params_get_lowercase(self, name, allow_empty_list_item)
+
+    def params_get_with_type_cast(
+        self, name, datatype, allow_empty=True
+    ):
+        """
+        Retrieve value set for module parameter as a specific data type.
+
+        Parameters
+        ----------
+        name: string
+            The name of the parameter to retrieve.
+        datatype: type
+            The type to convert the value to, if not empty.
+        datatype: type
+            The type to convert the value to, if value is not empty.
+        allow_empty: bool
+            Allow an empty string for non list parameters or a list
+            containing (only) an empty string item. This is used for
+            resetting parameters to the default value.
+
+        """
+        return module_params_get_with_type_cast(
+            self, name, datatype, allow_empty)
 
     def params_fail_used_invalid(self, invalid_params, state, action=None):
         """
@@ -1167,6 +1240,45 @@ class IPAAnsibleModule(AnsibleModule):
 
         """
         return api_check_param(command, name)
+
+    def ipa_command_invalid_param_choices(self, command, name, value):
+        """
+        Return invalid parameter choices for IPA command.
+
+        Parameters
+        ----------
+        command: string
+            The IPA API command to test.
+        name: string
+            The parameter name to check.
+        value: string
+            The parameter value to verify.
+
+        """
+        if command not in api.Command:
+            self.fail_json(msg="The command '%s' does not exist." % command)
+        if name not in api.Command[command].params:
+            self.fail_json(msg="The command '%s' does not have a parameter "
+                           "named '%s'." % (command, name))
+        if not hasattr(api.Command[command].params[name], "cli_metavar"):
+            self.fail_json(msg="The parameter '%s' of the command '%s' does "
+                           "not have choices." % (name, command))
+        # For IPA 4.6 (RHEL-7):
+        # - krbprincipalauthind in host_add does not have choices defined
+        # - krbprincipalauthind in service_add does not have choices defined
+        #
+        # api.Command[command].params[name].cli_metavar returns "STR" and
+        # ast.literal_eval failes with a ValueError "malformed string".
+        #
+        # There is no way to verify that the given values are valid or not in
+        # this case. The check is done later on while applying the change
+        # with host_add, host_mod, service_add and service_mod.
+        try:
+            _choices = ast.literal_eval(
+                api.Command[command].params[name].cli_metavar)
+        except ValueError:
+            return None
+        return (set(value or []) - set([""])) - set(_choices)
 
     @staticmethod
     def ipa_check_version(oper, requested_version):

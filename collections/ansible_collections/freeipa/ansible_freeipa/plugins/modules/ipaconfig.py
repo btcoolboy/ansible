@@ -160,7 +160,8 @@ options:
         required: false
         type: list
         elements: str
-        choices: ["password", "radius", "otp", "disabled", ""]
+        choices: ["password", "radius", "otp", "pkinit", "hardened", "idp",
+                  "disabled", ""]
         aliases: ["ipauserauthtype"]
     ca_renewal_master_server:
         description: Renewal master for IPA certificate authority.
@@ -357,8 +358,7 @@ def get_netbios_name(module):
         _result = module.ipa_command_no_name("trustconfig_show", {"all": True})
     except Exception:  # pylint: disable=broad-except
         return None
-    else:
-        return _result["result"]["ipantflatname"][0]
+    return _result["result"]["ipantflatname"][0]
 
 
 def is_enable_sid(module):
@@ -425,6 +425,7 @@ def main():
                           choices=["MS-PAC", "PAD", "nfs:NONE", ""]),
             user_auth_type=dict(type="list", elements="str", required=False,
                                 choices=["password", "radius", "otp",
+                                         "pkinit", "hardened", "idp",
                                          "disabled", ""],
                                 aliases=["ipauserauthtype"]),
             ca_renewal_master_server=dict(type="str", required=False),
@@ -469,13 +470,13 @@ def main():
         "netbios_name": "netbios_name",
         "add_sids": "add_sids",
     }
-    allow_empty_string = ["pac_type", "user_auth_type", "configstring"]
     reverse_field_map = {v: k for k, v in field_map.items()}
+    allow_empty_list_item = ["pac_type", "user_auth_type", "configstring"]
 
     params = {}
     for x in field_map:
         val = ansible_module.params_get(
-            x, allow_empty_string=(x in allow_empty_string))
+            x, allow_empty_list_item=x in allow_empty_list_item)
 
         if val is not None:
             params[field_map.get(x, x)] = val
@@ -525,6 +526,15 @@ def main():
         result = config_show(ansible_module)
 
         if params:
+            # Verify ipauserauthtype(s)
+            if "ipauserauthtype" in params and params["ipauserauthtype"]:
+                _invalid = ansible_module.ipa_command_invalid_param_choices(
+                    "config_mod", "ipauserauthtype", params["ipauserauthtype"])
+                if _invalid:
+                    ansible_module.fail_json(
+                        msg="The use of userauthtype '%s' is not "
+                        "supported by your IPA version" % "','".join(_invalid))
+
             enable_sid = params.get("enable_sid")
             sid_is_enabled = has_enable_sid and is_enable_sid(ansible_module)
 
@@ -609,7 +619,7 @@ def main():
                         # boolean values, so we need to convert it to str
                         # for comparison.
                         # See: https://github.com/freeipa/freeipa/pull/6294
-                        exit_args[k] = (str(value[0]).upper() == "TRUE")
+                        exit_args[k] = str(value[0]).upper() == "TRUE"
                     else:
                         if arg_type not in type_map:
                             raise ValueError(

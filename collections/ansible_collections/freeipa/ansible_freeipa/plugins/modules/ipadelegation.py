@@ -134,8 +134,7 @@ def find_delegation(module, name):
     except Exception:  # pylint: disable=broad-except
         # An exception is raised if delegation name is not found.
         return None
-    else:
-        return _result["result"]
+    return _result["result"]
 
 
 def gen_args(permission, attribute, membergroup, group):
@@ -181,10 +180,10 @@ def main():
     names = ansible_module.params_get("name")
 
     # present
-    permission = ansible_module.params_get("permission")
-    attribute = ansible_module.params_get("attribute")
+    permission = ansible_module.params_get_lowercase("permission")
+    attribute = ansible_module.params_get_lowercase("attribute")
     membergroup = ansible_module.params_get("membergroup")
-    group = ansible_module.params_get("group")
+    group = ansible_module.params_get_lowercase("group")
     action = ansible_module.params_get("action")
     # state
     state = ansible_module.params_get("state")
@@ -234,6 +233,7 @@ def main():
 
         commands = []
         for name in names:
+            args = {}
             # Make sure delegation exists
             res_find = find_delegation(ansible_module, name)
 
@@ -245,14 +245,7 @@ def main():
 
                 if action == "delegation":
                     # Found the delegation
-                    if res_find is not None:
-                        # For all settings is args, check if there are
-                        # different settings in the find result.
-                        # If yes: modify
-                        if not compare_args_ipa(ansible_module, args,
-                                                res_find):
-                            commands.append([name, "delegation_mod", args])
-                    else:
+                    if res_find is None:
                         commands.append([name, "delegation_add", args])
 
                 elif action == "member":
@@ -266,9 +259,7 @@ def main():
                     # New attribute list (add given ones to find result)
                     # Make list with unique entries
                     attrs = list(set(list(res_find["attrs"]) + attribute))
-                    if len(attrs) > len(res_find["attrs"]):
-                        commands.append([name, "delegation_mod",
-                                         {"attrs": attrs}])
+                    args["attrs"] = attrs
 
             elif state == "absent":
                 if action == "delegation":
@@ -289,14 +280,17 @@ def main():
                     if len(attrs) < 1:
                         ansible_module.fail_json(
                             msg="At minimum one attribute is needed.")
-
-                    # Entries New number of attributes is smaller
-                    if len(attrs) < len(res_find["attrs"]):
-                        commands.append([name, "delegation_mod",
-                                         {"attrs": attrs}])
+                    args["attrs"] = attrs
 
             else:
                 ansible_module.fail_json(msg="Unkown state '%s'" % state)
+
+            # Manage members
+            if (
+                args and res_find and
+                not compare_args_ipa(ansible_module, args, res_find)
+            ):
+                commands.append([name, "delegation_mod", args])
 
         # Execute commands
 

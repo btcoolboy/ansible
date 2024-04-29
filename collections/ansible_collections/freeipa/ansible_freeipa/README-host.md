@@ -24,7 +24,7 @@ Requirements
 ------------
 
 **Controller**
-* Ansible version: 2.8+
+* Ansible version: 2.13+
 
 **Node**
 * Supported FreeIPA version (see above)
@@ -335,7 +335,7 @@ Variable | Description | Required
 -------- | ----------- | --------
 `description` | The host description. | no
 `locality` | Host locality (e.g. "Baltimore, MD"). | no
-`location` \| `ns_host_location` | Host location (e.g. "Lab 2"). | no
+`location` \| `ns_host_location` | Host physical location hint (e.g. "Lab 2"). | no
 `platform` \| `ns_hardware_platform` | Host hardware platform (e.g. "Lenovo T61"). | no
 `os` \| `ns_os_version` | Host operating system and version (e.g. "Fedora 9"). | no
 `password` \| `user_password` \| `userpassword` | Password used in bulk enrollment for absent or not enrolled hosts. | no
@@ -354,7 +354,7 @@ Variable | Description | Required
 `mac_address` \| `macaddress` | List of hardware MAC addresses. | no
 `sshpubkey` \| `ipasshpubkey` | List of SSH public keys | no
 `userclass` \| `class` | Host category (semantics placed on this attribute are for local interpretation) | no
-`auth_ind` \| `krbprincipalauthind` | Defines an allow list for Authentication Indicators. Use 'otp' to allow OTP-based 2FA authentications. Use 'radius' to allow RADIUS-based 2FA authentications. Use empty string to reset auth_ind to the initial value. Other values may be used for custom configurations. choices: ["radius", "otp", "pkinit", "hardened", ""] | no
+`auth_ind` \| `krbprincipalauthind` | Defines an allow list for Authentication Indicators. Use 'otp' to allow OTP-based 2FA authentications. Use 'radius' to allow RADIUS-based 2FA authentications. Use empty string to reset auth_ind to the initial value. Other values may be used for custom configurations. An additional check ensures that only types can be used that are supported by the IPA version. Choices: ["radius", "otp", "pkinit", "hardened", "idp", ""] | no
 `requires_pre_auth` \| `ipakrbrequirespreauth` | Pre-authentication is required for the service (bool) | no
 `ok_as_delegate` \| `ipakrbokasdelegate` | Client credentials may be delegated to the service (bool) | no
 `ok_to_auth_as_delegate` \| `ipakrboktoauthasdelegate` | The service is allowed to authenticate on behalf of a client (bool) | no

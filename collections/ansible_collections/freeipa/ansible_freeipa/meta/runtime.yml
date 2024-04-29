@@ -18,7 +18,11 @@ action_groups:
   - ipahbacsvcgroup
   - ipahost
   - ipahostgroup
+  - ipaidoverridegroup
+  - ipaidoverrideuser
+  - ipaidp
   - ipaidrange
+  - ipaidview
   - ipalocation
   - ipanetgroup
   - ipapermission
@@ -38,4 +42,4 @@ action_groups:
   - ipatrust
   - ipauser
   - ipavault
-requires_ansible: '>=2.9'
+requires_ansible: '>=2.13'

@@ -1,0 +1,266 @@
+---
+- name: Test idoverridegroup
+  hosts: "{{ ipa_test_host | default('ipaserver') }}"
+  become: false
+  gather_facts: false
+  module_defaults:
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+    freeipa.ansible_freeipa.ipaidview:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+    freeipa.ansible_freeipa.ipagroup:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+
+  tasks:
+
+  # CLEANUP TEST ITEMS
+
+  - name: Ensure test groups test_group1..3 do not exist
+    freeipa.ansible_freeipa.ipagroup:
+      name:
+      - test_group1
+      - test_group2
+      - test_group3
+      state: absent
+
+  - name: Ensure test groups test_group1..3 are absent in idview test_idview
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor:
+      - test_group1
+      - test_group2
+      - test_group3
+      state: absent
+
+  - name: Ensure test idview test_idview does not exist
+    freeipa.ansible_freeipa.ipaidview:
+      name: test_idview
+      state: absent
+
+  # CREATE TEST ITEMS
+
+  - name: Ensure test group test_group1 exists
+    freeipa.ansible_freeipa.ipagroup:
+      name: test_group1
+
+  - name: Ensure test group test_group2 exists
+    freeipa.ansible_freeipa.ipagroup:
+      name: test_group2
+
+  - name: Ensure test group test_group3 exists
+    freeipa.ansible_freeipa.ipagroup:
+      name: test_group3
+
+  - name: Ensure test idview test_idview exists
+    freeipa.ansible_freeipa.ipaidview:
+      name: test_idview
+
+  # TESTS
+
+  - name: Ensure test group test_group1 is present in idview test_idview
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group1
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Ensure test group test_group1 is present in idview test_idview, again
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group1
+    register: result
+    failed_when: result.changed or result.failed
+
+  - name: Ensure test group test_group2 is present in idview test_idview
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group2
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Ensure test group test_group2 is present in idview test_idview, again
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group2
+    register: result
+    failed_when: result.changed or result.failed
+
+  - name: Ensure test group test_group3 is present in idview test_idview
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group3
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Ensure test group test_group3 is present in idview test_idview, again
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group3
+    register: result
+    failed_when: result.changed or result.failed
+
+  # description
+
+  - name: Ensure test group test_group1 is present in idview test_idview with description
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group1
+      description: "test_group1 description"
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Ensure test group test_group1 is present in idview test_idview with description, again
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group1
+      description: "test_group1 description"
+    register: result
+    failed_when: result.changed or result.failed
+
+  - name: Ensure test group test_group1 is present in idview test_idview without description
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group1
+      description: ""
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Ensure test group test_group1 is present in idview test_idview without description, again
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group1
+      description: ""
+    register: result
+    failed_when: result.changed or result.failed
+
+  # name
+
+  - name: Ensure test group test_group1 is present in idview test_idview with internal name test_123_group
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group1
+      name: test_123_group
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Ensure test group test_group1 is present in idview test_idview with internal name test_123_group, again
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group1
+      name: test_123_group
+    register: result
+    failed_when: result.changed or result.failed
+
+  - name: Ensure test group test_group1 is present in idview test_idview without internal name
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group1
+      name: ""
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Ensure test group test_group1 is present in idview test_idview without internal name, again
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group1
+      name: ""
+    register: result
+    failed_when: result.changed or result.failed
+
+  # gid
+
+  - name: Ensure test group test_group1 is present in idview test_idview with gid 20001
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group1
+      gid: 20001
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Ensure test group test_group1 is present in idview test_idview with gid 20001, again
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group1
+      gid: 20001
+    register: result
+    failed_when: result.changed or result.failed
+
+  - name: Ensure test group test_group1 is present in idview test_idview without gid
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group1
+      gid: ""
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Ensure test group test_group1 is present in idview test_idview without gid, again
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group1
+      gid: ""
+    register: result
+    failed_when: result.changed or result.failed
+
+  # no fallback_to_ldap tests
+
+  # absent
+
+  - name: Ensure test group test_group1 is absent in idview test_idview
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group1
+      state: absent
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Ensure test group test_group1 is absent in idview test_idview, again
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor: test_group1
+      state: absent
+    register: result
+    failed_when: result.changed or result.failed
+
+  - name: Ensure test groups test_group2,3 are absent in idview test_idview
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor:
+      - test_group2
+      - test_group3
+      state: absent
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Ensure test groups test_group2,3 are absent in idview test_idview, again
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor:
+      - test_group2
+      - test_group3
+      state: absent
+    register: result
+    failed_when: result.changed or result.failed
+
+  # CLEANUP TEST ITEMS
+
+  - name: Ensure test group test_group1 does not exist
+    freeipa.ansible_freeipa.ipagroup:
+      name: test_group1
+      state: absent
+
+  - name: Ensure test groups test_group1..3 are absent in idview test_idview
+    freeipa.ansible_freeipa.ipaidoverridegroup:
+      idview: test_idview
+      anchor:
+      - test_group1
+      - test_group2
+      - test_group3
+      state: absent
+
+  - name: Ensure test idview test_idview does not exist
+    freeipa.ansible_freeipa.ipaidview:
+      name: test_idview
+      state: absent

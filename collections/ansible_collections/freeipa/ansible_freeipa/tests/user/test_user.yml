@@ -9,7 +9,7 @@
     freeipa.ansible_freeipa.ipauser:
       ipaadmin_password: SomeADMINpassword
       ipaapi_context: "{{ ipa_context | default(omit) }}"
-      name: manager1,manager2,manager3,pinky,pinky2
+      name: manager1,manager2,manager3,pinky,pinky2,igagarin,reddy
       state: absent
 
   - name: User manager1 present
@@ -59,6 +59,7 @@
       #password: foo2
       principal: pa
       random: yes
+      street: PinkyStreet
       city: PinkyCity
       userstate: PinkyState
       postalcode: PinkyZip
@@ -85,6 +86,44 @@
       #subject: PinkySubject
     register: result
     failed_when: not result.changed or result.failed
+
+  - name: Ensure user presence with 'random:false'
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+      name: pinky
+      first: pinky
+      last: Acme
+      random: false
+    register: result
+    failed_when: result.changed or result.failed
+
+  - name: Set street, again
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+      name: pinky
+      street: PinkyStreet
+    register: result
+    failed_when: result.changed or result.failed
+
+  - name: Clear street attribute.
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+      name: pinky
+      street: ""
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Clear street attribute, again
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+      name: pinky
+      street: ""
+    register: result
+    failed_when: result.changed or result.failed
 
   - name: User pinky present with changed settings
     freeipa.ansible_freeipa.ipauser:
@@ -313,6 +352,46 @@
     register: result
     failed_when: result.changed or result.failed
 
+  - name: Rename user pinky to reddy
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+      name: pinky
+      rename: reddy
+      state: renamed
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Rename user pinky to reddy, again
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+      name: pinky
+      rename: reddy
+      state: renamed
+    register: result
+    failed_when: not result.failed or "No user 'pinky'" not in result.msg
+
+  - name: Rename user reddy to reddy
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+      name: reddy
+      rename: reddy
+      state: renamed
+    register: result
+    failed_when: result.changed or result.failed
+
+  - name: Rename user reddy back to pinky
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+      name: reddy
+      rename: pinky
+      state: renamed
+    register: result
+    failed_when: not result.changed or result.failed
+
   - name: User pinky absent and preserved for future exclusion.
     freeipa.ansible_freeipa.ipauser:
       ipaadmin_password: SomeADMINpassword
@@ -342,9 +421,107 @@
     register: result
     failed_when: result.changed or result.failed
 
+  - name: Ensure user with GECOS information exists.
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+      name: igagarin
+      first: Iuri
+      last: Gagarin
+      gecos: Юрий Алексеевич Гагарин
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Ensure user with GECOS information exists, again.
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+      name: igagarin
+      first: Iuri
+      last: Gagarin
+      gecos: Юрий Алексеевич Гагарин
+    register: result
+    failed_when: result.changed or result.failed
+
+  - name: Modify GECOS information.
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+      name: igagarin
+      gecos: Юрий Гагарин
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Updating with existent data, should not change user.
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+      name: igagarin
+      first: Iuri
+      last: Gagarin
+      gecos: Юрий Гагарин
+    register: result
+    failed_when: result.changed or result.failed
+
+  - name: Ensure GECOS parameter is cleared.
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+      name: igagarin
+      gecos: ""
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Ensure GECOS parameter is cleared, again
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+      name: igagarin
+      gecos: ""
+    register: result
+    failed_when: result.changed or result.failed
+
+  - name: Ensure GECOS parameter cannot be used with state absent.
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+      name: igagarin
+      gecos: Юрий Гагарин
+      state: absent
+    register: result
+    failed_when: not result.failed or "Argument 'gecos' can not be used with action 'user' and state 'absent'" not in result.msg
+
+  - name: Ensure user igagarin is absent.
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+      name: igagarin
+      state: absent
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Ensure user with non-ascii name exists.
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+      name: igagarin
+      first: Юрий
+      last: Гагарин
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Ensure user with non-ascii name exists has proper GECOS value.
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+      name: igagarin
+      gecos: Юрий Гагарин
+    register: result
+    failed_when: result.changed or result.failed
+
   - name: Remove test users
     freeipa.ansible_freeipa.ipauser:
       ipaadmin_password: SomeADMINpassword
       ipaapi_context: "{{ ipa_context | default(omit) }}"
-      name: manager1,manager2,manager3,pinky,pinky2
+      name: manager1,manager2,manager3,pinky,pinky2,igagarin
       state: absent

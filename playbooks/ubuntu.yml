@@ -5,6 +5,24 @@
   remote_user: ubuntu
   become: True
   tasks:
+      - name: Add Ceph apt key
+      ansible.builtin.get_url:
+        url: "https://nexus3.cloud.lab/repository/ceph/keys/release.asc"
+        dest: /etc/apt/trusted.gpg.d/ceph.asc
+        mode: '0644'
+        force: true
+      register: add_repository_key
+      ignore_errors: true
+
+    - name: Add Docker apt key
+      ansible.builtin.get_url:
+        url: "https://nexus3.cloud.lab/repository/docker/debian/gpg"
+        dest: /etc/apt/trusted.gpg.d/docker.asc
+        mode: '0644'
+        force: true
+      register: add_repository_key
+      ignore_errors: true
+
     - name: Manage Advanced Package Manager
       include_role:
         name: debops.debops.apt

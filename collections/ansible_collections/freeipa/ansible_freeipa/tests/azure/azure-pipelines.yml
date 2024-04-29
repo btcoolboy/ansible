@@ -20,6 +20,17 @@ stages:
 
 # Fedora
 
+- stage: Fedora_Ansible_min_supported
+  dependsOn: []
+  jobs:
+  - template: templates/group_tests.yml
+    parameters:
+      build_number: $(Build.BuildNumber)
+      scenario: fedora-latest
+      ansible_version: "-core <2.14"
+
+# Fedora
+
 - stage: Fedora_Latest
   dependsOn: []
   jobs:
@@ -27,7 +38,7 @@ stages:
     parameters:
       build_number: $(Build.BuildNumber)
       scenario: fedora-latest
-      ansible_version: "-core >=2.13,<2.14"
+      ansible_version: "-core >=2.14,<2.15"
 
 # Galaxy on Fedora
 
@@ -38,7 +49,7 @@ stages:
     parameters:
       build_number: $(Build.BuildNumber)
       scenario: fedora-latest
-      ansible_version: "-core >=2.13,<2.14"
+      ansible_version: "-core >=2.14,<2.15"
 
 # CentOS 9 Stream
 
@@ -49,7 +60,7 @@ stages:
     parameters:
       build_number: $(Build.BuildNumber)
       scenario: c9s
-      ansible_version: "-core >=2.13,<2.14"
+      ansible_version: "-core >=2.14,<2.15"
 
 # CentOS 8 Stream
 
@@ -60,7 +71,7 @@ stages:
     parameters:
       build_number: $(Build.BuildNumber)
       scenario: c8s
-      ansible_version: "-core >=2.13,<2.14"
+      ansible_version: "-core >=2.14,<2.15"
 
 # CentOS 7
 
@@ -71,4 +82,4 @@ stages:
     parameters:
       build_number: $(Build.BuildNumber)
       scenario: centos-7
-      ansible_version: "-core >=2.13,<2.14"
+      ansible_version: "-core >=2.14,<2.15"

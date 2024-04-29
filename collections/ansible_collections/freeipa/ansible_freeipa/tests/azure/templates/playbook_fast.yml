@@ -21,7 +21,7 @@ parameters:
 jobs:
 - job: Test_Group${{ parameters.group_number }}
   displayName: Run playbook tests ${{ parameters.scenario }} (${{ parameters.group_number }}/${{ parameters.number_of_groups }})
-  timeoutInMinutes: 240
+  timeoutInMinutes: 360
   variables:
   - template: variables.yaml
   - template: variables_${{ parameters.scenario }}.yaml
@@ -72,6 +72,7 @@ jobs:
         --suppress-no-test-exit-code \
         --splits=${{ parameters.number_of_groups }} \
         --group=${{ parameters.group_number }} \
+        --randomly-seed=$(date "+%Y%m%d") \
         --junit-xml=TEST-results-group-${{ parameters.group_number }}.xml
       then
         [ $? -eq 5 ] && true || false
@@ -82,6 +83,7 @@ jobs:
       RUN_TESTS_IN_DOCKER: true
       IPA_DISABLED_MODULES: ${{ variables.ipa_disabled_modules }}
       IPA_DISABLED_TESTS: ${{ variables.ipa_disabled_tests }}
+      IPA_VERBOSITY: "-vvv"
 
   - task: PublishTestResults@2
     inputs:

@@ -1,68 +1,69 @@
-Changes for 1.11.0 since 1.10.0
+Changes for 1.12.1 since 1.12.0
 -------------------------------
 
-  - Multiple service management (#1101)
-  - Don't allow the FQDN to match the domain on server installs (#1099)
-  - upstream CI: Disable ansible-lint var-naming check (#1097)
-  - Upstream CI: Disable execution of pytest tests (#1094)
-  - tests/azure/templates/build_container.yml: Quote requests with version (#1092)
-  - Pin requests to < 2.29 temporarily (#1089)
-  - Fix new ansible lint disallowes ignores (#1088)
-  - tests/azure: Install molecule-plguins to get docker driver (#1083)
-  - pwpolicy test: Fix maxsequence test (#1082)
-  - Fix typo in ipapwpolicy.py (#1081)
-  - Create action group in collection for use with module_defaults (#1080)
-  - ipapwpolicy: simplified and faster attribute verification (#1078)
-  - Make Git ignore temporary and output files. (#1077)
-  - Fixes and enhancements for utils/new_module and templates (#1035)
-  - ipacert module (#687)
+  - Disable config tests for pac type without ms pac (#1211)
+  - ipaclient_setup_automount with new install states (#1208)
+  - ipaclient: Enable SELinux for SSSD (#1207)
+  - ipaserver: Fix deployment after Bronze-bit fix (#1206)
+  - ipahbacrule: Fix handling of hbacsvcgroup in members (#1203)
+  - ipahostgroup: Fix idempotence issues due to capitalization (#1202)
+  - ipagroup: Fix idempotence issues due to capitalization (#1201)
+  - Fixes for ansible-lint 6.22.1 (#1195)
+  - Revert "[TEMP] Enable only idp, service and user module tests" (#1189)
+  - Bump minimum ansible-lint version to 6.22 (#1188)
+  - ipaclient: Fix OTP error reporting (#1187)
+  - test_host_random: No jinja2 templating in conditional statements (#1186)
+  - upstream ci: Increase timeout for PR tests (#1184)
+  - ipaidp: Fix validation and reset of parameters (#1183)
+  - test_pwpolicy: minlength parameter can be reset with empty string now (#1180)
+  - ipagroup: Add support for renaming groups (#1178)
+  - ipauser: Add support for renaming users (#1174)
+  - ipaclient: Properly name automount_location var and add documentation (#1169)
+  - ipareplica: Support inventory groups.ipaserver (#1151)
+  - ipauser: Do not try to modify user when not changing password (#1149)
+  - ipadnszone: Add support for per-zone privilege delegation (#1147)
+  - Handle data type or empty string in module_utils (#1143)
+  - ipasudorule: Allow setting groups for runasuser. (#899)
+  - ipadelegation: Fix idempotence issues due to capitalization. (#760)
 
-Detailed changelog for 1.11.0 since 1.10.0 by author
+Detailed changelog for 1.12.1 since 1.12.0 by author
 ----------------------------------------------------
-  5 authors, 30 commits
+  2 authors, 31 commits
 
-Denis Karpelevich (1)
+Rafael Guterres Jeffman (20)
 
-  - Allow multiple services creation
+  - ipadelegation: Fix idempotence issues due to capitalization.
+  - ipagroup: Fix idempotence issues due to capitalization
+  - ipahostgroup: Fix idempotence issues due to capitalization
+  - ipaserver: Fix deployment after Bronze-bit fix
+  - ipahbacrule: Fix handling of hbacsvcgroup in members
+  - ipasudorule: Allow setting groups for runasuser.
+  - ipagroup: Add support for renaming groups
+  - tests/group: Use module_defaults on tests_group
+  - ipauser: Add support for renaming users
+  - ipadnszone: Add support for per-zone privilege delegation
+  - idoveridegroup: Use module.params_get_type
+  - idoverideuser: Use module.params_get_type
+  - ipapwpolicy: Use modules.params_get_type
+  - ansible_freeipa_module: Ensure data type when retrieving parameter
+  - Rename parameter 'allow_empty_string' to 'allow_empty_list_item'
+  - upstream ci: Increase timeout for PR tests
+  - Bump minimum ansible-lint version to 6.22
+  - ipaclient: Fix OTP error reporting
+  - ipauser: Do not try to modify user when not changing password
+  - ipareplica: Support inventory groups.ipaserver
 
-Jacob Cutright (1)
+Thomas Woerner (11)
 
-  - Fix typo in ipapwpolicy.py
-
-Rafael Guterres Jeffman (6)
-
-  - Don't allow the FQDN to match the domain on server installs
-  - upstream CI: Disable ansible-lint var-naming check
-  - Upstream CI: Disable execution of pytest tests.
-  - Make Git ignore temporary and output files.
-  - utils/new_module: Ensure correct number of parameters for new_module
-  - ipapwpolicy: simplified and faster attribute verification
-
-Sam Morris (1)
-
-  - New certificate management module.
-
-Thomas Woerner (21)
-
-  - pwpolicy test: Fix maxsequence test
-  - ipaservice: Updated and new tests for certificates and multi service handling
-  - ipaservice: Add Denis Karpelevich to the authors header
-  - ipaservice: Properly Handle certs with leading or trailing white space
-  - tests/azure/templates/build_container.yml: Quote requests with version
-  - ansible_freeipa_module.py: Calm down ansible-test on print and sys.exit
-  - ipaserver_test.py: Add missing default for random_serial_numbers
-  - ansible-test: Do not use automatic field numbering specification
-  - Use "#!/usr/bin/env python" for python shebang
-  - Add -eu to all bash shebangs
-  - Remove old or empty sanity ignore files
-  - Pin requests to < 2.29 temporarily
-  - tests/azure: Install molecule-plguins to get docker driver
-  - utils/templates/test_module*.yml.in: Use generic module_defaults
-  - utils/templates/test_module*.yml.in: Better docs for become and gather_facts
-  - utils/templates/{README*.md.in,test_module*.yml.in}: Use true and false
-  - utils/build-galaxy-release.sh: Create module action group
-  - utils/galaxyfy.py: Handle module_defaults, match roles and modules
-  - New utils/facts.py: Provide facts about the repo like role and module lists
-  - utils/templates/ipamodule.py.in: Add missing bracket
-  - utils/new_module: Fix github_user test
+  - config: Disable config tests due to pac type requirement MS-PAC
+  - ipaclient_setup_automount: Only return changed if there was a change
+  - ipaclient_setup_automount with new install states
+  - ipaclient: Enable SELinux for SSSD
+  - Fixes for ansible-lint 6.22.1
+  - Revert "[TEMP] Enable only idp, service and user module tests"
+  - test_host_random: No jinja2 templating in conditional statements
+  - [TEMP] Enable only idp, service and user module tests
+  - ipaidp: Fix validation and reset of parameters
+  - test_pwpolicy: minlength parameter can be reset with empty string now
+  - ipaclient: Properly name automount_location var and add documentation
 

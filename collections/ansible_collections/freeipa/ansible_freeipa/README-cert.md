@@ -25,7 +25,7 @@ Requirements
 ------------
 
 **Controller**
-* Ansible version: 2.8+
+* Ansible version: 2.13+
 * Some tool to generate a certificate signing request (CSR) might be needed, like `openssl`.
 
 **Node**
@@ -77,6 +77,23 @@ Example playbook to revoke an existing certificate:
     freeipa.ansible_freeipa.ipacert:
       ipaadmin_password: SomeADMINpassword
       serial_number: 123456789
+      reason: 5
+      state: revoked
+```
+
+When revoking a certificate a mnemonic can also be used to set the revocation reason:
+
+```yaml
+---
+- name: Revoke certificate
+  hosts: ipaserver
+
+  tasks:
+  - name Revoke a certificate
+    freeipa.ansible_freeipa.ipacert:
+      ipaadmin_password: SomeADMINpassword
+      serial_number: 123456789
+      reason: cessationOfOperation
       state: revoked
 ```
 

@@ -24,15 +24,16 @@ Supported Distributions
 -----------------------
 
 * RHEL/CentOS 7.6+
+* CentOS Stream 8+
 * Fedora 26+
-* Ubuntu
+* Ubuntu 16.04 and 18.04
 
 
 Requirements
 ------------
 
 **Controller**
-* Ansible version: 2.8+
+* Ansible version: 2.13+
 
 **Node**
 * Supported FreeIPA version (see above)
@@ -179,7 +180,7 @@ ipaserver_domain=example.com
 ipaserver_realm=EXAMPLE.COM
 ipaadmin_password=MySecretPassword123
 ipadm_password=MySecretPassword234
-ipaserver_random_serial_number=true
+ipaserver_random_serial_numbers=true
 ```
 
 By setting the variable in the inventory file, the same ipaserver deployment playbook, shown before, can be used.
