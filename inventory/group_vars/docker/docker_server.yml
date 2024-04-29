@@ -1,0 +1,16 @@
+docker_server__upstream: True
+
+docker_server__packages: 
+  - 'docker-buildx-plugin'
+  - 'docker-scan-plugin'
+
+docker_server__configuration:
+
+  - name: 'registry-mirrors'
+    config:
+      'registry-mirrors':
+        - 'https://registry-docker.cloud.lab'
+        - 'https://registry-quay.cloud.lab'
+        - 'https://registry-k8s.cloud.lab'
+        - 'https://upload-docker.cloud.lab'
+    state: 'present'

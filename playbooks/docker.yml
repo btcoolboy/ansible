@@ -1,13 +1,11 @@
 ---
-- hosts: docker
-  roles:
-    - role: docker
-      vars:
-        docker_repo_url: https://nexus3.cloud.lab/repository/docker
-        docker_install_compose_plugin: true
-        docker_daemon_options:
-          registry-mirrors:
-            - https://registry-docker.cloud.lab
-            - https://registry-quay.cloud.lab
-            - https://registry-k8s.cloud.lab
-            - https://upload-docker.cloud.lab
+
+- name: Manage Docker server
+  hosts: docker
+  remote_user: ansible
+  become: True
+  tasks:
+    - name: Manage Docker server
+      include_role:
+        name: debops.debops.docker_server
+      tags: docker_server
