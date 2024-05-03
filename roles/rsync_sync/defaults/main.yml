@@ -1,8 +1,0 @@
-# defaults file
----
-rsync_sync_install_path: /usr/local/bin
-rsync_sync_scripts: {}
-
-rsync_sync_x_from_files: []
-
-rsync_sync_jobs: []

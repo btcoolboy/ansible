@@ -1,7 +1,0 @@
-# handlers file
----
-- name: restart snmpd
-  service:
-    name: snmpd
-    state: restarted
-  when: service_default_state | default('started') == 'started'

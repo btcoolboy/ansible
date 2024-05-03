@@ -1,5 +1,0 @@
----
-warn_list:
-  - '106'
-  - no-handler
-  - command-instead-of-module

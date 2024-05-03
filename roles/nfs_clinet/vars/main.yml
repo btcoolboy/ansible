@@ -1,4 +1,0 @@
-# vars file
----
-nfs_client_dependencies:
-  - nfs-common

@@ -1,5 +1,0 @@
-{{ ansible_managed | comment }}
-
-{% for line in nfs_server_exports | default([]) %}
-{{ line }}
-{% endfor %}
