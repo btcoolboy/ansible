@@ -1,3 +1,0 @@
-ca_certificates_certificate_map:
-  - src: ../../../files/ca.crt
-    dest: cloud.lab/ca.crt
