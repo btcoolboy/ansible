@@ -1,4 +1,5 @@
-[containerd]
+[kubernetes]
 k8s-master[01:03]
 k8s-worker[01:05]
+[adm]
 k8s-adm

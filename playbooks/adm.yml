@@ -1,0 +1,27 @@
+---
+
+- name: Initialize Kubernetes adm system
+  hosts: adm
+  remote_user: ansible
+  become: True
+  tasks:
+    - name: Add helm apt key
+      ansible.builtin.get_url:
+        url: 'https://baltocdn.com/helm/signing.asc'
+        dest: '/etc/apt/trusted.gpg.d/helm.asc'
+        mode: '0644'
+        force: true
+      register: add_repository_key
+      ignore_errors: true
+      environment:
+        https_proxy: 'http://10.200.101.20:3128'
+
+    - name: Manage Advanced Package Manager
+      include_role:
+        name: debops.debops.apt
+      tags: apt
+  
+    - name: Install APT packages
+      include_role:
+        name: debops.debops.apt_install
+      tags: apt_install

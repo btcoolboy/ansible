@@ -109,7 +109,6 @@ apt__repositories:
   - name: 'ceph-v18'
     filename: 'ceph-v18.list'
     repo: 'deb https://nexus3.cloud.lab/repository/ceph/debian-reef/ {{ ansible_distribution_release }} main'
-    signed_by: 'https://nexus3.cloud.lab/repository/ceph/keys/release.asc'
     state: '{{ "present"
                if (ansible_distribution == "Debian" and 
                    ansible_distribution_release in ["bookworm"] and
@@ -119,7 +118,6 @@ apt__repositories:
   - name: 'ceph-v17'
     filename: 'ceph-v17.list'
     repo: 'deb https://nexus3.cloud.lab/repository/ceph/debian-quincy/ {{ ansible_distribution_release }} main'
-    signed_by: 'https://nexus3.cloud.lab/repository/ceph/keys/release.asc'
     state: '{{ "present"
                if (ansible_distribution == "Debian" and
                    ansible_distribution_release in ["bullseye"] and
@@ -129,7 +127,6 @@ apt__repositories:
   - name: 'docker'
     filename: 'docker.list'
     repo: 'deb https://nexus3.cloud.lab/repository/docker/debian {{ ansible_distribution_release }} stable'
-    signed_by: 'https://nexus3.cloud.lab/repository/docker/debian/gpg'
     state: '{{ "present"
                if (ansible_distribution == "Debian" and
                    apt__distribution_version != "n/a")

@@ -168,7 +168,6 @@ apt__repositories:
   - name: 'ceph-v18'
     filename: 'ceph-v18.list'
     repo: 'deb https://nexus3.cloud.lab/repository/ceph/debian-reef/ {{ ansible_distribution_release }} main'
-    signed_by: 'https://nexus3.cloud.lab/repository/ceph/keys/release.asc'
     state: '{{ "present"
                if (ansible_distribution == "Ubuntu" and 
                    ansible_distribution_release in ["focal", "jammy"] and
@@ -178,7 +177,6 @@ apt__repositories:
   - name: 'docker'
     filename: 'docker.list'
     repo: 'deb https://nexus3.cloud.lab/repository/docker/ubuntu {{ ansible_distribution_release }} stable'
-    signed_by: 'https://nexus3.cloud.lab/repository/docker/ubuntu/gpg'
     state: '{{ "present"
                if (ansible_distribution == "Ubuntu" and
                    apt__distribution_version != "n/a")

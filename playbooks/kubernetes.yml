@@ -1,5 +1,5 @@
 ---
-- hosts: containerd
+- hosts: kubernetes
   tasks:
     - name: Install packages
       apt:
