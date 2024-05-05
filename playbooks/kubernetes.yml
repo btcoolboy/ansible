@@ -1,5 +1,7 @@
 ---
 - hosts: kubernetes
+  remote_user: ansible
+  become: True
   tasks:
     - name: Install packages
       apt:
@@ -28,16 +30,13 @@
         containerd_registry_mirrors:
           - name: docker.io
             endpoint:
-              - https://registry-docker.cloud.lab
+              - https://registry.cloud.lab
           - name: quay.io
             endpoint:
-              - https://registry-quay.cloud.lab 
+              - https://registry.cloud.lab 
           - name: gcr.io
             endpoint:
-              - https://registry-k8s.cloud.lab
-          - name: k8s.gcr.io
-            endpoint:
-              - https://registry-k8s.cloud.lab
+              - https://registry.cloud.lab
           - name: registry.k8s.io
             endpoint:
-              - https://registry-k8s.cloud.lab
+              - https://registry.cloud.lab

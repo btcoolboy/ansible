@@ -174,14 +174,6 @@ apt__repositories:
                    apt__distribution_version != "n/a")
                else "ignore" }}'
 
-  - name: 'docker'
-    filename: 'docker.list'
-    repo: 'deb https://nexus3.cloud.lab/repository/docker/ubuntu {{ ansible_distribution_release }} stable'
-    state: '{{ "present"
-               if (ansible_distribution == "Ubuntu" and
-                   apt__distribution_version != "n/a")
-               else "ignore" }}'
-
 apt__configuration:
 
   - name: 'verify-peer'
