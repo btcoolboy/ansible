@@ -17,8 +17,4 @@ docker_server__configuration:
     config:
       'registry-mirrors':
         - 'https://registry.cloud.lab'
-        - 'https://registry-docker.cloud.lab'
-        - 'https://registry-quay.cloud.lab'
-        - 'https://registry-k8s.cloud.lab'
-        - 'https://upload-docker.cloud.lab'
     state: 'present'
