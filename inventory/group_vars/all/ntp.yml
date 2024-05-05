@@ -1,4 +1,4 @@
 ntp__daemon: 'chrony'
 
 ntp__servers:
-  - 'vm-data-20.cloud.lab iburst minpoll 6 maxpoll 10'
+  - 'vm-data-20.cloud.lab burst iburst minpoll 4 maxpoll 4'
