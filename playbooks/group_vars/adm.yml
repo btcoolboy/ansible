@@ -5,5 +5,11 @@ apt__repositories:
     repo: 'deb https://nexus3.cloud.lab/repository/helm all main'
     state: 'present'
 
+  - name: 'k8s'
+    filename: 'k8s.list'
+    repo: 'deb https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /'
+    state: 'present'
+
 apt_install__packages:
   - 'helm'
+  - 'kubectl'
