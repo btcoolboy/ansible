@@ -1,8 +1,7 @@
 ---
 
-- name: Initialize Debian system
-  hosts: debian
-  remote_user: debian
+- name: Initialize operation system
+  hosts: all
   become: True
   tasks:
     - name: Add Ceph apt key
@@ -68,3 +67,4 @@
       include_role:
         name: oefenweb.dns
       tags: dns
+      when: ansible_distribution == 'Debian'

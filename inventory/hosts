@@ -2,6 +2,8 @@
 10.200.101.165
 10.200.101.164
 10.200.101.181
+[debian:vars]
+ansible_ssh_user=debian
 
 [ubuntu]
 ubuntu-template ansible_host=10.200.101.160
@@ -11,3 +13,6 @@ ceph-[01:03]
 k8s-master[01:03]
 k8s-worker[01:03]
 k8s-adm
+
+[ubuntu:vars]
+ansible_ssh_user=ubuntu
