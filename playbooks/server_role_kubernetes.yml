@@ -1,7 +1,6 @@
 ---
-- hosts: kubernetes
-  remote_user: ansible
-  become: True
+- name: Manage kubernetes server
+  hosts: kubernetes
   tasks:
     - name: Install packages
       apt:

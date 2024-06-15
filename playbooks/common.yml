@@ -2,7 +2,6 @@
 
 - name: Initialize operation system
   hosts: all
-  become: True
   tasks:
     - name: Add Ceph apt key
       ansible.builtin.get_url:

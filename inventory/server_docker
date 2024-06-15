@@ -1,6 +1,0 @@
-[docker]
-ubuntu-docker
-vm-data-30
-10.200.101.165
-ceph-[01:03]
-10.200.101.181

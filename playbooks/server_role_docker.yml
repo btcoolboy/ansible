@@ -2,8 +2,6 @@
 
 - name: Manage Docker server
   hosts: docker
-  remote_user: ansible
-  become: True
   tasks:
     - name: Add Docker apt key
       ansible.builtin.get_url:

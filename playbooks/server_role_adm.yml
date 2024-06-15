@@ -2,8 +2,6 @@
 
 - name: Initialize Kubernetes adm system
   hosts: adm
-  remote_user: ansible
-  become: True
   tasks:
     - name: Add helm apt key
       ansible.builtin.get_url:

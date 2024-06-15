@@ -2,8 +2,10 @@
 10.200.101.165
 10.200.101.164
 10.200.101.181
+
 [debian:vars]
 ansible_ssh_user=debian
+become=True
 
 [ubuntu]
 ubuntu-template ansible_host=10.200.101.160
@@ -16,3 +18,4 @@ k8s-adm
 
 [ubuntu:vars]
 ansible_ssh_user=ubuntu
+become=True

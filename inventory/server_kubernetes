@@ -1,5 +1,0 @@
-[kubernetes]
-k8s-master[01:03]
-k8s-worker[01:03]
-[adm]
-k8s-adm
