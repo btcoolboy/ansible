@@ -11,4 +11,4 @@ client program to work with the service. The only "graphical" interface
 provided is the administration web interface, that you can use to manage
 EteSync users (available under `/admin`).
 
-Read the [etesync role documentation](https://docs.debops.org/en/HEAD/ansible/roles/etesync/) for more details.
+Read the [etesync role documentation](https://docs.debops.org/en/master/ansible/roles/etesync/) for more details.

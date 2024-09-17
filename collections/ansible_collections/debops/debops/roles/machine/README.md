@@ -6,4 +6,4 @@ well as static and dynamic Message Of The Day (MOTD) shown after login,
 and the contents of the `/etc/issue` file displayed on the [system
 console](https://en.wikipedia.org/wiki/System_console).
 
-Read the [machine role documentation](https://docs.debops.org/en/HEAD/ansible/roles/machine/) for more details.
+Read the [machine role documentation](https://docs.debops.org/en/master/ansible/roles/machine/) for more details.

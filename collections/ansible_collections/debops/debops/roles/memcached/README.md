@@ -4,4 +4,4 @@
 data in RAM. It can be used by other applications to speed up slow
 operations on the databases/data stores.
 
-Read the [memcached role documentation](https://docs.debops.org/en/HEAD/ansible/roles/memcached/) for more details.
+Read the [memcached role documentation](https://docs.debops.org/en/master/ansible/roles/memcached/) for more details.

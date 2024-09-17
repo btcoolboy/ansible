@@ -9,4 +9,4 @@ and [MQTT](https://en.wikipedia.org/wiki/MQTT) protocols.
 This Ansible role can be used to install and manage RabbitMQ service on
 Debian/Ubuntu hosts.
 
-Read the [rabbitmq_server role documentation](https://docs.debops.org/en/HEAD/ansible/roles/rabbitmq_server/) for more details.
+Read the [rabbitmq_server role documentation](https://docs.debops.org/en/master/ansible/roles/rabbitmq_server/) for more details.

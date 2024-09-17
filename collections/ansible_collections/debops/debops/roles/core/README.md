@@ -8,4 +8,4 @@ stored on remote hosts to ensure that the variables are always evaluated
 by Ansible, even when playbook is run with or without different sets of
 role tags.
 
-Read the [core role documentation](https://docs.debops.org/en/HEAD/ansible/roles/core/) for more details.
+Read the [core role documentation](https://docs.debops.org/en/master/ansible/roles/core/) for more details.

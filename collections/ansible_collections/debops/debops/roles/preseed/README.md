@@ -10,4 +10,4 @@ the target environment to prepare host for remote use (an admin account
 will be created, SSH keys will be configured, optionally a Salt Minion
 will be installed and will start on the next boot).
 
-Read the [preseed role documentation](https://docs.debops.org/en/HEAD/ansible/roles/preseed/) for more details.
+Read the [preseed role documentation](https://docs.debops.org/en/master/ansible/roles/preseed/) for more details.

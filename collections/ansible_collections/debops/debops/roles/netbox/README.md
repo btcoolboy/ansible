@@ -6,4 +6,4 @@ and data center infrastructure management
 ([DCIM](https://en.wikipedia.org/wiki/Data_center_infrastructure_management))
 application developed by [DigitalOcean](https://digitalocean.com/).
 
-Read the [netbox role documentation](https://docs.debops.org/en/HEAD/ansible/roles/netbox/) for more details.
+Read the [netbox role documentation](https://docs.debops.org/en/master/ansible/roles/netbox/) for more details.

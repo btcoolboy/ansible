@@ -15,4 +15,4 @@ on one or multiple hosts. If `debops.postfix` role is used together with
 this one, Postfix can be automatically configured to sign and verify
 e-mail messages.
 
-Read the [opendkim role documentation](https://docs.debops.org/en/HEAD/ansible/roles/opendkim/) for more details.
+Read the [opendkim role documentation](https://docs.debops.org/en/master/ansible/roles/opendkim/) for more details.

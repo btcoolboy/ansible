@@ -9,4 +9,4 @@ only for installation of packages, additional configuration and
 management of the installed software is performed by other Ansible
 roles.
 
-Read the [influxdata role documentation](https://docs.debops.org/en/HEAD/ansible/roles/influxdata/) for more details.
+Read the [influxdata role documentation](https://docs.debops.org/en/master/ansible/roles/influxdata/) for more details.

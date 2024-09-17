@@ -1,0 +1,127 @@
+---
+# Copyright (C) 2015-2017 Robin Schneider <ypid@riseup.net>
+# Copyright (C) 2022 David Härdeman <david@hardeman.nu>
+# Copyright (C) 2015-2022 DebOps <https://debops.org/>
+# SPDX-License-Identifier: GPL-3.0-only
+
+- name: Import custom Ansible plugins
+  ansible.builtin.import_role:
+    name: 'ansible_plugins'
+
+- name: Import DebOps global handlers
+  ansible.builtin.import_role:
+    name: 'global_handlers'
+
+- name: Install required packages
+  ansible.builtin.package:
+    name: '{{ q("flattened", (apparmor__base_packages
+                              + apparmor__packages)) }}'
+    state: 'present'
+  register: apparmor__register_packages
+  until: apparmor__register_packages is succeeded
+  tags: [ 'role::apparmor:pkg' ]
+
+- name: Make sure that the Ansible local facts directory exists
+  ansible.builtin.file:
+    path: '/etc/ansible/facts.d'
+    state: 'directory'
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+
+- name: Save AppArmor local facts
+  ansible.builtin.template:
+    src: 'etc/ansible/facts.d/apparmor.fact.j2'
+    dest: '/etc/ansible/facts.d/apparmor.fact'
+    owner: 'root'
+    group: 'root'
+    mode: '0755'
+  tags: [ 'meta::facts' ]
+
+- name: Update Ansible facts if they were modified
+  ansible.builtin.meta: 'flush_handlers'
+
+- name: Add AppArmor kernel parameters to GRUB configuration
+  ansible.builtin.template:
+    src: 'etc/default/grub.d/debops.apparmor.cfg.j2'
+    dest: '/etc/default/grub.d/debops.apparmor.cfg'
+    mode: '0644'
+  when: >
+    apparmor__enabled | d(False) | bool and
+    apparmor__manage_grub | d(False) | bool
+  notify: [ 'Update GRUB' ]
+  tags: [ 'role::apparmor:grub' ]
+
+- name: Remove AppArmor kernel parameters from GRUB configuration
+  ansible.builtin.file:
+    path: '/etc/default/grub.d/debops.apparmor.cfg'
+    state: 'absent'
+  when: >
+    not apparmor__enabled | d(False) | bool or
+    not apparmor__manage_grub | d(False) | bool
+  notify: [ 'Update GRUB' ]
+  tags: [ 'role::apparmor:grub' ]
+
+- name: Remove legacy GRUB configuration options
+  ansible.builtin.lineinfile:
+    dest: '/etc/default/grub'
+    regexp: '^GRUB_CMDLINE_LINUX="(.*?)\$GRUB_CMDLINE_LINUX_ANSIBLE_APPARMOR(.*)"'
+    line: 'GRUB_CMDLINE_LINUX="\1 \2"'
+    backrefs: yes
+    mode: '0644'
+  notify: [ 'Update GRUB' ]
+  tags: [ 'role::apparmor:grub' ]
+
+- name: Configure tunables
+  ansible.builtin.include_tasks: handle_tunables.yml
+  loop: '{{ apparmor__combined_tunables | debops.debops.parse_kv_items() }}'
+  loop_control:
+    label: '{{ item.name }}'
+  tags: [ 'role::apparmor:tunables' ]
+
+- name: Configure local changes to system profiles
+  ansible.builtin.include_tasks: handle_locals.yml
+  loop: '{{ apparmor__combined_locals | debops.debops.parse_kv_items() }}'
+  loop_control:
+    label: '{{ item.name }}'
+  tags: [ 'role::apparmor:locals' ]
+
+- name: Configure profiles
+  ansible.builtin.include_tasks: handle_profiles.yml
+  loop: '{{ apparmor__combined_profiles | debops.debops.parse_kv_items() }}'
+  loop_control:
+    label: '{{ item.name }}'
+  tags: [ 'role::apparmor:profiles' ]
+
+- name: Start and enable the AppArmor service
+  ansible.builtin.service:
+    name: 'apparmor'
+    state: 'started'
+    enabled: True
+  when:
+    - apparmor__enabled | d(False) | bool
+    - ansible_local.apparmor.installed | d(False) | bool
+  tags: [ 'role::apparmor:service' ]
+
+- name: Reload AppArmor profiles if necessary
+  ansible.builtin.meta: 'flush_handlers'
+  tags: [ 'role::apparmor:profiles' ]
+
+- name: Stop and disable the AppArmor service
+  ansible.builtin.service:
+    name: 'apparmor'
+    state: 'stopped'
+    enabled: False
+  when:
+    - not apparmor__enabled | d(False) | bool
+    - ansible_local.apparmor.installed | d(False) | bool
+  tags: [ 'role::apparmor:service' ]
+
+- name: Unload all AppArmor profiles
+  ansible.builtin.command: aa-teardown
+  when:
+    - not apparmor__enabled | d(False) | bool
+    - ansible_local.apparmor.installed | d(False) | bool
+  register: apparmor__register_teardown
+  changed_when: apparmor__register_teardown.changed | bool
+  tags: [ 'role::apparmor:profiles' ]

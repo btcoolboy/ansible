@@ -10,4 +10,4 @@ The `filebeat` Ansible role configures Filebeat on Debian/Ubuntu hosts.
 The software itself will be installed using the `debops.elastic_co`
 Ansible role.
 
-Read the [filebeat role documentation](https://docs.debops.org/en/HEAD/ansible/roles/filebeat/) for more details.
+Read the [filebeat role documentation](https://docs.debops.org/en/master/ansible/roles/filebeat/) for more details.

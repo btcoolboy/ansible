@@ -15,4 +15,4 @@ packages included in a given OS release (if possible), but it can also
 automatically install or upgrade an existing installation to their
 upstream versions.
 
-Read the [nodejs role documentation](https://docs.debops.org/en/HEAD/ansible/roles/nodejs/) for more details.
+Read the [nodejs role documentation](https://docs.debops.org/en/master/ansible/roles/nodejs/) for more details.

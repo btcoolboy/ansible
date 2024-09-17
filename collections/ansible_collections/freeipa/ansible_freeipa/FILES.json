@@ -46,28 +46,28 @@
    "name": ".github/workflows/ansible-test.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "b884fb088da8534b003001f1019f5dc08da15e8fda73b706fd40adacb2d699cf",
+   "chksum_sha256": "7eb73abbc34b6258a3b10e48741c047495c92a4a7b08245054b397563bb94f54",
    "format": 1
   },
   {
    "name": ".github/workflows/docs.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "38316c0ca87654a03ce4a69f668d66354e19fd53843dd286a2fd1295ac465f0e",
+   "chksum_sha256": "864e2546af556dc7fbb693245e151b2c2ae937009a1c2087093223fa8d0c96d5",
    "format": 1
   },
   {
    "name": ".github/workflows/lint.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "2f3c428fa3778c3ac033326a3783a59589c6f9960e74dae248631ee8e728bfdd",
+   "chksum_sha256": "704ed9036d20c6b376fd750f9058bdcd69573ec544f9a455ac13f5b1700db6e1",
    "format": 1
   },
   {
    "name": ".github/workflows/readme.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "80b40541804e7c7cbc71fdcae5dfcdc8d3eb9d0f8c515749e7b8359974a2f736",
+   "chksum_sha256": "6c24a75de47ed65639964dd261a416613544fed139f84a0f103a837b9561079b",
    "format": 1
   },
   {
@@ -81,7 +81,7 @@
    "name": ".pre-commit-config.yaml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "864005a6afcc3661fe9dbc179c4bb5245d82b2bb351d788182de560264ce8309",
+   "chksum_sha256": "27cd6952b193e80788c081e889793a325e99b43f811e91f3c82f64808d3948a2",
    "format": 1
   },
   {
@@ -109,287 +109,287 @@
    "name": "README-automember.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "c9661e5120038afce8528fb1e727df2df6df73aff9325397778914344a4f2002",
+   "chksum_sha256": "1832b6fef4fc7aadd5959357a70cf8fed9b0ec43ba3f351530645f8f366d69d7",
    "format": 1
   },
   {
    "name": "README-automountkey.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "77870fe00389ea204cf73282378e3c0f45bebb4f80c52af0ab9d0657ae968ed0",
+   "chksum_sha256": "27a75331804f2deb148cf57a67155731c1c58b2dcee08593b4c374b2305faa71",
    "format": 1
   },
   {
    "name": "README-automountlocation.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "3ec922be374a3e1ea59b7b4cce699bf6d832b59c6ed4e445208987ba36512e56",
+   "chksum_sha256": "1af08624d17830892239701fcf314dd6ea9139d9fab5bae677d9b8d3ed25c9c5",
    "format": 1
   },
   {
    "name": "README-automountmap.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "c9ea95dda4c6dc6cdb8d15cbbc5aaddd2c680ea3bcce5f9893363592fd3a1fed",
+   "chksum_sha256": "02211f28f3bd145d999fbb21cda0a0f03d2724b6f480d1b1ee5aadab25520c8b",
    "format": 1
   },
   {
    "name": "README-cert.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "93971cfb0f8f730d02fed149f7c37c5ba61227d9aaee1a544b488b16dfce120f",
+   "chksum_sha256": "86a7bcdaaa5717b65085ef101be8d3ee4adf29d3a98984e0779c929ae3e125e0",
    "format": 1
   },
   {
    "name": "README-config.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "74868bd0e1b633c65e903160a8d5275f57226870000301fe48c7bdc3b80645fe",
+   "chksum_sha256": "4addc976f50b42fa6d99aec97472d3adf8d75b6c3fa308b34711dc14d535e765",
    "format": 1
   },
   {
    "name": "README-delegation.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "c1c9b6b73eb9f334db3d645a06feb4feec9848f80eee2b17757aac8e4f45099d",
+   "chksum_sha256": "c7cb50747987b7baeac7d50874b26260b25fc77e40bb09da521483b17cca8627",
    "format": 1
   },
   {
    "name": "README-dnsconfig.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "b3130fd6024241f2a9b603104b504434c7d1ecea158f92fbea8e0be05459a294",
+   "chksum_sha256": "894cf8d13a02eb89a8cb90b1ee79b782dc58fe8b1810d88cfe5d1a95e7cf4ae8",
    "format": 1
   },
   {
    "name": "README-dnsforwardzone.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "67571ad0eea2a38460e75eb222b7fa8be469ffbb321da5693d11493afdfb3384",
+   "chksum_sha256": "3343d6a4af5a725cfd7c3af4262c6ce46497f67641a2a4b0e5ea88f83a927ae5",
    "format": 1
   },
   {
    "name": "README-dnsrecord.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "e300469eab1414d28c726f8806ae3aec1f4016d4ca6be99527a45ec70c6189a2",
+   "chksum_sha256": "1695d2e05c14bcb4885addf855b7b028041d311f52d246b33208e7131123a90e",
    "format": 1
   },
   {
    "name": "README-dnszone.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "300adbd44381587d158436a399a8496c0d7dca7b4c194c9a8d4fe7bf545347d0",
+   "chksum_sha256": "f41ee2754123ee5c506586f654b57730bf5875a0141dbc8f8f2158e2e25f4be1",
    "format": 1
   },
   {
    "name": "README-group.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "36e626b212c358d3270ed961e85e2a42b5e3d7a3a6bdec1817a44f2839879a91",
+   "chksum_sha256": "431266b44ebbc4aebb8666028ed4c373f4f7d1bea9772de049e42311d1f3e4ae",
    "format": 1
   },
   {
    "name": "README-hbacrule.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "0987409a9901f7e8158d19c54f952f19d2530643fa9f3f26601bb8624e8d49d2",
+   "chksum_sha256": "c7b5fae6c38aafaa0ff71a1668ed538ffb47e57f089ab9384c2cee7a9014e9e0",
    "format": 1
   },
   {
    "name": "README-hbacsvc.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "b98999d7c4a3930397139a719f23ef836058c0f3527213c2b37d2f7e6dbfb190",
+   "chksum_sha256": "09272461a8e084fb08a3c9eec0827087dbfef11a3e2b4a11b608a66095610f1b",
    "format": 1
   },
   {
    "name": "README-hbacsvcgroup.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "4e1b7fe671e7c015aa9c7a9a0a36be0b368f3b2b36504ee65810cb4346b70edd",
+   "chksum_sha256": "90c2ccff1796b2b701eedbea91fd7e67071c11a6649c4f047225a25edd3c68cb",
    "format": 1
   },
   {
    "name": "README-host.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "a7b16204e125b2729305af07c4e173933b325dd7fe5dab891dc546de9760fc56",
+   "chksum_sha256": "041a81c3b32b2fff855394d7e97e305f2e1625deb28070c7cafb3039372de630",
    "format": 1
   },
   {
    "name": "README-hostgroup.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "327f1434a86a698daab0949d4547f2056a32d6c30fd1c387e2ee41e740804a23",
+   "chksum_sha256": "b7f3e5d6acf43ecb477f94dfcbbfdff2ca6d9876ec4495ad10fcde5924c6fc40",
    "format": 1
   },
   {
    "name": "README-idoverridegroup.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "6b3b4b0f52236716016e58cdcfd0574e015a9adde87af690772846dcb6ce039b",
+   "chksum_sha256": "3e61eeb0c01ac4ffdff983c1e19958961172bf63a2c968ce4d33b2fef3dc4d46",
    "format": 1
   },
   {
    "name": "README-idoverrideuser.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "91f1fe9ed096cb9e1bf56656a254f9bce602396f642766ee5f959079254cf5a4",
+   "chksum_sha256": "e664c99901e6ec1f279f6fbc099682c4ec4b0a9e46cf3583766530bfaf94f614",
    "format": 1
   },
   {
    "name": "README-idp.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "e3fc6260e714b67abadd20097cd4fd9858c377580e3801d7e91091586297fe6b",
+   "chksum_sha256": "16cfb6a50f3d3d95c44510a5212373bc8650b9cf15fb61cd46412fae5d297686",
    "format": 1
   },
   {
    "name": "README-idrange.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "6886d6e9df9647aa6397dca07a818c1952c8ad45ae03212750bfbbe4831d7ba4",
+   "chksum_sha256": "66de7a2cc8bacfefac89b9dfa23b62579be8157beca8e5d9ae9afc272c428db2",
    "format": 1
   },
   {
    "name": "README-idview.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "783c11bf4bbec6dffabb990b96406e835aeefcde91672da013707c484f77f138",
+   "chksum_sha256": "683200f5871a0709d8dc34ac6821f1591b03bdbb627453664a7aaba6612b0b44",
    "format": 1
   },
   {
    "name": "README-location.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "f57c3ba6f4dc824b5210759b761fa6dbd88e0de0d8705affa7be3245c9b7e42d",
+   "chksum_sha256": "551e944f5395189bedd2eea3bae1cc79fe2d30faa1de8daedbb85b8683f18d58",
    "format": 1
   },
   {
    "name": "README-netgroup.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "78216679c141110f582118ba0949d67b08fa5fe5a51e03f6dcd65a68dbd01ef6",
+   "chksum_sha256": "26447a4ae339320a955643629cfb90a1b36163f797f6140a6650ace1d20ed8ae",
    "format": 1
   },
   {
    "name": "README-permission.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "29b34eafa1242d074084429c92a7ae10b4f727134cebf09866ca058246b9b72f",
+   "chksum_sha256": "0b3644d4d52a8bea6d7b9a2dc9e860bd00adcf17d8be2a4c3964b4dae2e73d14",
    "format": 1
   },
   {
    "name": "README-privilege.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "de279eeb99ecd0eed95895c668226d755b0b2ddd5bf935bdec20724f600cec18",
+   "chksum_sha256": "034b59f3e1612950cd59d47c82bfb788783a9bcc87137a6a9de44ecad263b4a6",
    "format": 1
   },
   {
    "name": "README-pwpolicy.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "ade540c8e865789aea1c7f98bb150886a6d52136b9e1e7d0ca6e789c8eb013f2",
+   "chksum_sha256": "4cb4b30346ca44363851e340e7542b3b189a0bc655ed0f419bb3b06b6d084b55",
    "format": 1
   },
   {
    "name": "README-role.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "e12bba6bb290fc422687456f01c38b6867077b3f238a08fa9444013891d4f8a9",
+   "chksum_sha256": "79de4be42b0729bda4da30e913f520324c74b41c8986308e1558f8f44cfbdefa",
    "format": 1
   },
   {
    "name": "README-selfservice.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "23d557b2d987f2a7b6888e6d953e68650a452a180d9e9ae18a57b1d73c2f6cd3",
+   "chksum_sha256": "ff1acb8fff7b16d504e4a0be2db251e448aa9351c3019b44b7c120fe070f1cde",
    "format": 1
   },
   {
    "name": "README-server.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "47287d5959e54760dbcdca15552c66d7e9beb45c5bf1e75c009b7033fd51223b",
+   "chksum_sha256": "e96548b218a283719b096e51311d8f86529c8bf56a5d8b6c6cb8815880e261b3",
    "format": 1
   },
   {
    "name": "README-service.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "7c18d9f813b2d7d3f4f2670b10ee83652c4f8a371ea92d3f0d096f4ccf21a2f5",
+   "chksum_sha256": "462ddf8423b48ceb07e01e62c15c5759da7b12d3cfb7ae5ad42b78c34dd53d1c",
    "format": 1
   },
   {
    "name": "README-servicedelegationrule.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "701a8fa1ba0a4c2ecf1a86149de2d7546d29e8bc4226474d2490017062491f06",
+   "chksum_sha256": "42fe176d0a45c9e04591f7ad74638213b1f038f163898b1034d8aacbc873b55b",
    "format": 1
   },
   {
    "name": "README-servicedelegationtarget.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "e5e890cd0627791af6d8fdbab57c8570d6221a97c574cbc356e3d2e8d3bc44ba",
+   "chksum_sha256": "df539e3850762620357f8822d0a676102a17e894c9e71f4f47826d755e0699b0",
    "format": 1
   },
   {
    "name": "README-sudocmd.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "8a83d8eaf912718346e7f79325b6ac7c6659f7323bb148f01d62b21dba2ed3f4",
+   "chksum_sha256": "692b18b0a653e12c1528edc78bc3ff74a38d362dc20fb7c83cd02296f18b7301",
    "format": 1
   },
   {
    "name": "README-sudocmdgroup.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "c94bbe233fa4e95c51b87d096eeadcfe1a58456681d1b6d20a9f3199f56bfc7b",
+   "chksum_sha256": "794734d2533a43606b04e96ab91ed596337e49f94bb85a79f3b4824a2ff3ef44",
    "format": 1
   },
   {
    "name": "README-sudorule.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "d06be85a27f7ed49e26abbdf3308b992c8e35acf2990dd7aa1ad22d02013cb6a",
+   "chksum_sha256": "ce6aaedaf1f2f41be63c1aa31055631ab4090551e8fae74b2b9b8865c6e80ba1",
    "format": 1
   },
   {
    "name": "README-topology.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "939544e9d68d9d5e9d19ab1d6e58a350fbbc2631d3217008202a06dbdfb4bf1a",
+   "chksum_sha256": "65e407945f93f6fc79bd5fd3b42c507b1fc4c40a490f591d2c1c9d19d88f0da3",
    "format": 1
   },
   {
    "name": "README-trust.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "b212ba889fe509d0c7f145fef5dc4af58985cbff2f5ed66db7f108b915e4a88f",
+   "chksum_sha256": "e1b5b4763f20472a36f5be53f4bc998f4f22f2890eba9f2fec373b4bc0c0b0a0",
    "format": 1
   },
   {
    "name": "README-user.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "6025a2133043e8d7917ca943b9fd3860049ac6e34e40572ce2d30cb0e49f3d27",
+   "chksum_sha256": "9ff1927bb1c19958c85cd3569de9d9914f26060c5fc27eb5d666397fdbcfed32",
    "format": 1
   },
   {
    "name": "README-vault.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "fdfa1ad7a7d393e8f1dc4526e27628894759270329d8094131abd15aebe9a9c4",
+   "chksum_sha256": "26b157b7566d5dfdfef6aaa92417b400934eccc67c224487a856f537f34cee2d",
    "format": 1
   },
   {
    "name": "README.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "0844e4c21d68f1d7720318064bf9df5082e31f69b2cec3fc0bf44fa35afb6405",
+   "chksum_sha256": "24755120baf04511c128102503cd92c13d1216e9479dd98858c65a91460f6f9d",
    "format": 1
   },
   {
@@ -431,7 +431,7 @@
    "name": "meta/runtime.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "ff50d9529540780c193ca3b25eac73f63fc18ebda40342fddb06ca73e7d39f9b",
+   "chksum_sha256": "0f6fa8c2c25d00ff570f271b7558ccfe639628811028a0d1241400360f922900",
    "format": 1
   },
   {
@@ -3203,7 +3203,21 @@
    "name": "plugins/doc_fragments/ipamodule_base_docs.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "9fe19607170b42a81298d63549e18021f6f44d83972f035b4a8bd8ff22c4befa",
+   "chksum_sha256": "d080292637427b5f380f79bfac443793dbcf5d3285b79381596d4dc734c6d488",
+   "format": 1
+  },
+  {
+   "name": "plugins/inventory",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "plugins/inventory/freeipa.py",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "2f86c41deaa800543414f4b3685fd1d71e9a9639041b83a499b72285d15ab5d3",
    "format": 1
   },
   {
@@ -3217,28 +3231,28 @@
    "name": "plugins/module_utils/ansible_freeipa_module.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "ae7f8ebe444e280698d01ee17d43851f890c4cf520cf49119d336cfab7cc0d3d",
+   "chksum_sha256": "db58439c9dcb91461c9354a855b1838819a5b9a1b6622d5bf0950a001d51c79e",
    "format": 1
   },
   {
    "name": "plugins/module_utils/ansible_ipa_client.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "73e104aaf450f45ad05a6c7435be696a99d3f8e609c7329e68dd33fe3aac8f65",
+   "chksum_sha256": "c0586957562f8695b147803c3b30d6c5291622ab121d2f26c831044b0f0eef0d",
    "format": 1
   },
   {
    "name": "plugins/module_utils/ansible_ipa_replica.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "d8fec7e8dd197119bd77513d725e762b5313853daa5fc8fc437c8db96120cc50",
+   "chksum_sha256": "ea126722924c80df75d0ae66ecb3e19c6eb27a8b2469d9fd88ea4b60039daf6f",
    "format": 1
   },
   {
    "name": "plugins/module_utils/ansible_ipa_server.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "ffb9b54ba1373b81c3eabfea37101cabe894be809d02adf08cb0d72005c8710e",
+   "chksum_sha256": "b7ec8326c899b78d16cfd44d648178c6b7c4af699157384cd9ba23fa96385555",
    "format": 1
   },
   {
@@ -3259,7 +3273,7 @@
    "name": "plugins/modules/ipaautomember.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "9144d39aec729d490cd0292623b40d70f55711a131da35d6c7802331aac145a8",
+   "chksum_sha256": "61c5381722acfcd5396477e7feb01f7ee275b878146948f4983fbdbc1beaa8fd",
    "format": 1
   },
   {
@@ -3294,7 +3308,7 @@
    "name": "plugins/modules/ipacert.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "4015abbae1abb4440d884d7d7d5a87ee80f0ffb8ddf215cc855cf600c1274ce7",
+   "chksum_sha256": "11fc484aa06524c09a413fa890b8a6a2e85c471ed705606c4680f61200153184",
    "format": 1
   },
   {
@@ -3308,7 +3322,7 @@
    "name": "plugins/modules/ipaclient_configure_dns_resolver.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "1a2b8c3d04a8c82a2c075bb2ef81f2bf8446453e9e5115b3dd11cf37c015966c",
+   "chksum_sha256": "6c38b24b59554fe6d8665a3f3e76cb09647cb3121f69689c1a9d2304c6973625",
    "format": 1
   },
   {
@@ -3329,7 +3343,7 @@
    "name": "plugins/modules/ipaclient_get_otp.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "7ce338f8cb02332656ea7fa471fa5f5432b1fc0f1cfda3f6498e939d4a0e8342",
+   "chksum_sha256": "350935e658a601bf74a313aadd7a1eae8f025f829db189fe9b75b685185a4b00",
    "format": 1
   },
   {
@@ -3392,7 +3406,7 @@
    "name": "plugins/modules/ipaclient_setup_nss.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "b7a7101ff3b785f942cd7bdfb300b71ef1ed83e82ffa73312de7491c01aa3b8f",
+   "chksum_sha256": "9832f151ee35ef6457db9d51f8ae02e0435d780a516cfa1c6c8a6fc072f913d8",
    "format": 1
   },
   {
@@ -3462,14 +3476,14 @@
    "name": "plugins/modules/ipadnsforwardzone.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "70407f1b84de0c217730d371358230dc08c7ad48a612b809ad824e6113f0dd3a",
+   "chksum_sha256": "14eac6b242d8f4731d0eb8754488e047f4facddfb4c77dfd000713d73cdfef3a",
    "format": 1
   },
   {
    "name": "plugins/modules/ipadnsrecord.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "2a53d4ceaf220d05837ebae12e17ec4888a2505ee21dd2c331738e2f6a24ae49",
+   "chksum_sha256": "f5e247425eb95a517bac8fff3e33f437b8ef7e147668e77c7478a1761442b30f",
    "format": 1
   },
   {
@@ -3483,7 +3497,7 @@
    "name": "plugins/modules/ipagroup.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "154bb5b27384d469b3a190de68ca7f7a3a6da6e984eefb6c7d5af2549d375668",
+   "chksum_sha256": "0b3812bdad67af14dbb8c14584ab306795391d5f32f4703b59b6df679decab65",
    "format": 1
   },
   {
@@ -3518,7 +3532,7 @@
    "name": "plugins/modules/ipahost.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "41e489957a9f3b14b2a2b02fbdcbffe6c6550f6e113c36000861510b85f8235d",
+   "chksum_sha256": "89724d93026b5a242ea0198652b375e6a114d600ad8521e399dca96960bd0c7f",
    "format": 1
   },
   {
@@ -3532,14 +3546,14 @@
    "name": "plugins/modules/ipaidoverrideuser.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "1225525a98e41e00d2228b51ffa0859623536e33f0004e8d0e8b9da1a707503b",
+   "chksum_sha256": "5bf65aa1a37e1bf7883018c84260b2e61a706740b02c4bf3594a9adc8f401e70",
    "format": 1
   },
   {
    "name": "plugins/modules/ipaidp.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "d86002dac64c40f796e97079becfa20c0b948647b4ed491a37f170f426f2978b",
+   "chksum_sha256": "d94b40830206151b4560c1161045eb350871bbc0be28cfc347817ca2fbacdd37",
    "format": 1
   },
   {
@@ -3574,7 +3588,7 @@
    "name": "plugins/modules/ipapermission.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "1aae651acf546977753f19ad54e81aba89ff0e276d6aa4292da11058a1cc79ad",
+   "chksum_sha256": "f72da94976e334c04f5ead5e87e40ee62413df686cdf163c46373a6cc538128b",
    "format": 1
   },
   {
@@ -3595,14 +3609,14 @@
    "name": "plugins/modules/ipareplica_add_to_ipaservers.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "28b9f1a9ddd6f95ea10ecff84f1032e46c10f18f0e31b93df15b896eed984604",
+   "chksum_sha256": "d195169b5c9bf8fa7cade7509e0110f1b222b5197f5907cb0a0609c1414e4308",
    "format": 1
   },
   {
    "name": "plugins/modules/ipareplica_create_ipa_conf.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "7b3b90c0a476b44337b87e62ca16e0f0a503d1a8ac22b4e50ff59406ea3608b9",
+   "chksum_sha256": "a165cdb41e1698917300dabd28dfbfea9cf02eaaf5a6f8cf3aeded029be88309",
    "format": 1
   },
   {
@@ -3630,14 +3644,14 @@
    "name": "plugins/modules/ipareplica_enable_ipa.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "4360c1ab25c28bf0fbec17f9a52db7d01213d39fab84d8fd470c54ad5714dd8b",
+   "chksum_sha256": "7687e7a8da693aecb570aa32d1ec38280df1a87f9c65a89986f48e0edad2e437",
    "format": 1
   },
   {
    "name": "plugins/modules/ipareplica_install_ca_certs.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "df4296a968cc5e9a178e55e3ac592529250344315ef101c55939c65328daa0ad",
+   "chksum_sha256": "086b8d23e9cb0c256d409003ada24782ae771c124df04d2df7b289e5204f615c",
    "format": 1
   },
   {
@@ -3658,7 +3672,7 @@
    "name": "plugins/modules/ipareplica_prepare.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "20d6cb1cd584cef36445689ad624f2f46987c375739d4636aeb703258fe9d519",
+   "chksum_sha256": "14f8eed8dffadfdb4b59f6cbcc44a033c6487faf3c9a74c57772ecdb2854bed6",
    "format": 1
   },
   {
@@ -3693,7 +3707,7 @@
    "name": "plugins/modules/ipareplica_setup_ca.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "aa1ba99883750a30709fb25700ac601ce29bd3d7723bf441fb1a6b042fe33d4a",
+   "chksum_sha256": "1c448351b566c67af43b178190767574a3c5f02dd469648e1b420c421f87c780",
    "format": 1
   },
   {
@@ -3714,14 +3728,14 @@
    "name": "plugins/modules/ipareplica_setup_dns.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "e7334c0f02500398b3da1d34304ba4e9500b4f70d2b81ce9000547205099ce0f",
+   "chksum_sha256": "97d2971fe5636f01a89ccafd3df633a4367e20f7ba49448af3f40c1b3eac23d4",
    "format": 1
   },
   {
    "name": "plugins/modules/ipareplica_setup_ds.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "cd27552e7abd441a323044aa8a5d42be23b547afa2fce6e85cdcdd525d7f0677",
+   "chksum_sha256": "e0c55c0d42048cdda4acf11c56f6cd965f0e0daea23ba37c9c29a5e34391dfcc",
    "format": 1
   },
   {
@@ -3735,7 +3749,7 @@
    "name": "plugins/modules/ipareplica_setup_kra.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "db1e9ff75eaa40771dfeb01310e86d60c31a6d95cdfcb591ac8018ec090769ff",
+   "chksum_sha256": "7d316fd6284e37c093698edd6e75e6508461294b125eb901917d2cc1d39f7da6",
    "format": 1
   },
   {
@@ -3756,14 +3770,14 @@
    "name": "plugins/modules/ipareplica_test.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "7c6b9f9f6efb0126de8aa4e56da7f8930c6ca3b7a7fd30c5eb773192513dae3f",
+   "chksum_sha256": "aa78b9afbc556635720e1d847e33018eb4f9635c587f683daa7349e04902ddb0",
    "format": 1
   },
   {
    "name": "plugins/modules/iparole.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "68172bb824bed56d076f900c8ce31c3414dafd0d6b5e53a6b3314a79c26b21d1",
+   "chksum_sha256": "d39e6055e12eaf215e9601b29b042a0422abc0101838dbb3b2947c882f5ae32c",
    "format": 1
   },
   {
@@ -3784,7 +3798,7 @@
    "name": "plugins/modules/ipaserver_get_connected_server.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "13704638cdab2e12e04b5b0ed9f14136f1ac895e7e05570c5e8b078cf000b87a",
+   "chksum_sha256": "200113284a65ff9992a592841beefb90b7e0154a8fb535c1bca62659dd77bc49",
    "format": 1
   },
   {
@@ -3805,7 +3819,7 @@
    "name": "plugins/modules/ipaserver_prepare.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "432ee2ab130daa17585cc6519cd7bd8f1cf5c9e87fa396db83143f449691d223",
+   "chksum_sha256": "26a390c5da29308525c582e7e02f3f2fba86182fa1327e26e8463bd2726c782b",
    "format": 1
   },
   {
@@ -3819,7 +3833,7 @@
    "name": "plugins/modules/ipaserver_set_ds_password.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "eb05af790c50de0d529e3cbf08afef978cc0f09d0d74194cbef54b1e980e27c3",
+   "chksum_sha256": "6af19f1c71a5dd835ade61ce326198e5d75d465fab88ccf8f93c26dbf0c4e46e",
    "format": 1
   },
   {
@@ -3833,49 +3847,42 @@
    "name": "plugins/modules/ipaserver_setup_ca.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "8257634e8f55906abe60ad8ed45447d273f68d4d62012f117dafacbb1894fc73",
-   "format": 1
-  },
-  {
-   "name": "plugins/modules/ipaserver_setup_custodia.py",
-   "ftype": "file",
-   "chksum_type": "sha256",
-   "chksum_sha256": "91e3d63a3e6688ee70291456f98ea06fdc13547b8ae7ee9d9a227364cd9bda93",
+   "chksum_sha256": "8ae4fdb2a13e9e9e3895ad2426fa825283e3fb60d51dc42b4407fd70189b6dd4",
    "format": 1
   },
   {
    "name": "plugins/modules/ipaserver_setup_dns.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "ef3db2a1c59a3fe474ab785c3e9c27362348adb2da0194ed4bce9d2aa42896a0",
+   "chksum_sha256": "39129840d80f5677cac64628bac2f89e87fc47172e107876269707bf4ff153b6",
    "format": 1
   },
   {
    "name": "plugins/modules/ipaserver_setup_ds.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "939604210619f5117ea1a28c3a82099e86e2637fee72d44f1e0ea90977c629a3",
+   "chksum_sha256": "c902368692fc2ce0c63af2d2c32f938bd2d0c66cb5c68312919aa8b0748ab207",
    "format": 1
   },
   {
    "name": "plugins/modules/ipaserver_setup_http.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "961f5fcf8eb921c504a3b5aa8ff5820894d6045c7eea68b78abffa6394311d09",
+   "chksum_sha256": "7677f620537fdc279cb7e33a89563613127e2c33b054df648b290d8eb12d597d",
    "format": 1
   },
   {
    "name": "plugins/modules/ipaserver_setup_kra.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "66bb2974014796d656637f7a66354e4af26a4f56f76e893ed0fb416cdd824ea7",
+   "chksum_sha256": "67bda45351eb88bf09d74182eab744a6e9948bb509cea91965c66ef22219388a",
    "format": 1
   },
   {
    "name": "plugins/modules/ipaserver_setup_krb.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "c4c5f735edf071f62787c0f5a774ae8576f0dacbca958fada2102e277ca84335",
+   "chksum_sha256": "9347465322e582e1bdf0d667fa064093bc757dc44ed6d87b595ea809197e8e57",
    "format": 1
   },
   {
@@ -3896,7 +3903,7 @@
    "name": "plugins/modules/ipaserver_test.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "d0a2c666b468485b2e419317d80b4aa103f2c1a9a3e2f060836a9080cc51e860",
+   "chksum_sha256": "92f1c61e76fe1fa64801e3ab5750efddc4219e1181e6b109a162d711ca7220a7",
    "format": 1
   },
   {
@@ -3917,7 +3924,7 @@
    "name": "plugins/modules/ipaservice.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "5b41525779fe715e6e45fa81939d945c0d4085d48a43538ec4b96ce62f8f2760",
+   "chksum_sha256": "009283d72f43b1273646dc450df5c5185300140b8bda82f66d46100e4ff10b58",
    "format": 1
   },
   {
@@ -3931,7 +3938,7 @@
    "name": "plugins/modules/ipasmartcard_client_validate_ca_certs.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "f413685035b5d656447f49993d687bec2d2ab63bb3186b21779fc0e476db6cf0",
+   "chksum_sha256": "1a652e41ba0596a49ef2844502ff2ca8641b91f3c4e93ab99c88020b76d483b0",
    "format": 1
   },
   {
@@ -3945,7 +3952,7 @@
    "name": "plugins/modules/ipasmartcard_server_validate_ca_certs.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "f7ff2209e36a0e1d0bad874cc2fe040db31ed849633f990a5e019308851ea01a",
+   "chksum_sha256": "5f6b7dd3319addd5f4c7442fb4552c845307825f66453d355e87ad80676ebf6b",
    "format": 1
   },
   {
@@ -3994,7 +4001,7 @@
    "name": "plugins/modules/ipauser.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "a016e91cd94adae8961e974a3bf54dd4d031e85c5d9f94c784f8c6602ef5ab44",
+   "chksum_sha256": "dd45b09184a1100a0693b904edbc44bcabffac9613fb0e795e43648aa8c6254d",
    "format": 1
   },
   {
@@ -4015,7 +4022,7 @@
    "name": "requirements-dev.txt",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "a33dee1b6803bb2d02e72a2511ed5b4e9d05d8b7b2a6141c9020f4da99305aa7",
+   "chksum_sha256": "45772e24191e8b37664eb4e6467c5e9e1e62b0c0c68bf825482b4de2f033364f",
    "format": 1
   },
   {
@@ -4064,7 +4071,7 @@
    "name": "roles/ipabackup/README.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "c8d96bc8c23aec73597692e14b96bc19c29b6a72249b8f463f6e8c44c28fdfbe",
+   "chksum_sha256": "8fa7cb0042193867f5a2f09cdd6f2b5fd51ace582d0667d808ce9154a095a5fd",
    "format": 1
   },
   {
@@ -4106,7 +4113,7 @@
    "name": "roles/ipabackup/meta/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "317c62368079e223d4fb90c55f1a7195698996bc2678eda4cc40b0bfaa184f00",
+   "chksum_sha256": "82a2c23e8da6a10dac1c5aa59397f93623e44638170ec41e5f8cdfafb8b91c29",
    "format": 1
   },
   {
@@ -4225,7 +4232,7 @@
    "name": "roles/ipaclient/README.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "5b3c35e103e6574ce7e5a620507c3757fc52928afd82b7b4ac7505664f06dea8",
+   "chksum_sha256": "48403fa1f280fbef7e043cac7e6ee64a6c7ff9ca96006a7c57b05f53dcc7e164",
    "format": 1
   },
   {
@@ -4260,7 +4267,7 @@
    "name": "roles/ipaclient/library/ipaclient_configure_dns_resolver.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "1a2b8c3d04a8c82a2c075bb2ef81f2bf8446453e9e5115b3dd11cf37c015966c",
+   "chksum_sha256": "6c38b24b59554fe6d8665a3f3e76cb09647cb3121f69689c1a9d2304c6973625",
    "format": 1
   },
   {
@@ -4281,7 +4288,7 @@
    "name": "roles/ipaclient/library/ipaclient_get_otp.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "7ce338f8cb02332656ea7fa471fa5f5432b1fc0f1cfda3f6498e939d4a0e8342",
+   "chksum_sha256": "350935e658a601bf74a313aadd7a1eae8f025f829db189fe9b75b685185a4b00",
    "format": 1
   },
   {
@@ -4344,7 +4351,7 @@
    "name": "roles/ipaclient/library/ipaclient_setup_nss.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "b7a7101ff3b785f942cd7bdfb300b71ef1ed83e82ffa73312de7491c01aa3b8f",
+   "chksum_sha256": "9832f151ee35ef6457db9d51f8ae02e0435d780a516cfa1c6c8a6fc072f913d8",
    "format": 1
   },
   {
@@ -4400,7 +4407,7 @@
    "name": "roles/ipaclient/meta/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "9566f43795171963399529a99cdf6f2f6e688444e4537d598751cb4177336e04",
+   "chksum_sha256": "d7566c7376f74a7cd8f22d6b77520ff6001b8c2ea6c0bc5ad31a76b28def8a7a",
    "format": 1
   },
   {
@@ -4414,7 +4421,7 @@
    "name": "roles/ipaclient/module_utils/ansible_ipa_client.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "73e104aaf450f45ad05a6c7435be696a99d3f8e609c7329e68dd33fe3aac8f65",
+   "chksum_sha256": "c0586957562f8695b147803c3b30d6c5291622ab121d2f26c831044b0f0eef0d",
    "format": 1
   },
   {
@@ -4526,7 +4533,7 @@
    "name": "roles/ipareplica/README.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "76f1ba60b0b967796478d64e3b693789ca56e305bd9751cd2bba173f1144aefe",
+   "chksum_sha256": "c5045aca8e365d37aa8c1152d180327f4761ccda27d66ffe2b228944f63f6618",
    "format": 1
   },
   {
@@ -4554,14 +4561,14 @@
    "name": "roles/ipareplica/library/ipareplica_add_to_ipaservers.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "28b9f1a9ddd6f95ea10ecff84f1032e46c10f18f0e31b93df15b896eed984604",
+   "chksum_sha256": "d195169b5c9bf8fa7cade7509e0110f1b222b5197f5907cb0a0609c1414e4308",
    "format": 1
   },
   {
    "name": "roles/ipareplica/library/ipareplica_create_ipa_conf.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "7b3b90c0a476b44337b87e62ca16e0f0a503d1a8ac22b4e50ff59406ea3608b9",
+   "chksum_sha256": "a165cdb41e1698917300dabd28dfbfea9cf02eaaf5a6f8cf3aeded029be88309",
    "format": 1
   },
   {
@@ -4589,14 +4596,14 @@
    "name": "roles/ipareplica/library/ipareplica_enable_ipa.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "4360c1ab25c28bf0fbec17f9a52db7d01213d39fab84d8fd470c54ad5714dd8b",
+   "chksum_sha256": "7687e7a8da693aecb570aa32d1ec38280df1a87f9c65a89986f48e0edad2e437",
    "format": 1
   },
   {
    "name": "roles/ipareplica/library/ipareplica_install_ca_certs.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "df4296a968cc5e9a178e55e3ac592529250344315ef101c55939c65328daa0ad",
+   "chksum_sha256": "086b8d23e9cb0c256d409003ada24782ae771c124df04d2df7b289e5204f615c",
    "format": 1
   },
   {
@@ -4617,7 +4624,7 @@
    "name": "roles/ipareplica/library/ipareplica_prepare.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "20d6cb1cd584cef36445689ad624f2f46987c375739d4636aeb703258fe9d519",
+   "chksum_sha256": "14f8eed8dffadfdb4b59f6cbcc44a033c6487faf3c9a74c57772ecdb2854bed6",
    "format": 1
   },
   {
@@ -4652,7 +4659,7 @@
    "name": "roles/ipareplica/library/ipareplica_setup_ca.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "aa1ba99883750a30709fb25700ac601ce29bd3d7723bf441fb1a6b042fe33d4a",
+   "chksum_sha256": "1c448351b566c67af43b178190767574a3c5f02dd469648e1b420c421f87c780",
    "format": 1
   },
   {
@@ -4673,14 +4680,14 @@
    "name": "roles/ipareplica/library/ipareplica_setup_dns.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "e7334c0f02500398b3da1d34304ba4e9500b4f70d2b81ce9000547205099ce0f",
+   "chksum_sha256": "97d2971fe5636f01a89ccafd3df633a4367e20f7ba49448af3f40c1b3eac23d4",
    "format": 1
   },
   {
    "name": "roles/ipareplica/library/ipareplica_setup_ds.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "cd27552e7abd441a323044aa8a5d42be23b547afa2fce6e85cdcdd525d7f0677",
+   "chksum_sha256": "e0c55c0d42048cdda4acf11c56f6cd965f0e0daea23ba37c9c29a5e34391dfcc",
    "format": 1
   },
   {
@@ -4694,7 +4701,7 @@
    "name": "roles/ipareplica/library/ipareplica_setup_kra.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "db1e9ff75eaa40771dfeb01310e86d60c31a6d95cdfcb591ac8018ec090769ff",
+   "chksum_sha256": "7d316fd6284e37c093698edd6e75e6508461294b125eb901917d2cc1d39f7da6",
    "format": 1
   },
   {
@@ -4715,7 +4722,7 @@
    "name": "roles/ipareplica/library/ipareplica_test.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "7c6b9f9f6efb0126de8aa4e56da7f8930c6ca3b7a7fd30c5eb773192513dae3f",
+   "chksum_sha256": "aa78b9afbc556635720e1d847e33018eb4f9635c587f683daa7349e04902ddb0",
    "format": 1
   },
   {
@@ -4729,7 +4736,7 @@
    "name": "roles/ipareplica/meta/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "b9b53bd3e3c9961a9b755264f266f768b0a0057e206d6ab88a02ba6a9ea4c193",
+   "chksum_sha256": "651f7f8c678ae55c558da242ee0bfe69792247812e62e1c8aacd65ec2550d9de",
    "format": 1
   },
   {
@@ -4743,7 +4750,7 @@
    "name": "roles/ipareplica/module_utils/ansible_ipa_replica.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "d8fec7e8dd197119bd77513d725e762b5313853daa5fc8fc437c8db96120cc50",
+   "chksum_sha256": "ea126722924c80df75d0ae66ecb3e19c6eb27a8b2469d9fd88ea4b60039daf6f",
    "format": 1
   },
   {
@@ -4757,7 +4764,7 @@
    "name": "roles/ipareplica/tasks/install.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "2b858da2364ae10a64d647acc29c948b6dea8a606b312a25d214b7ab1b7f1145",
+   "chksum_sha256": "9696eb4365828366cba2d54f2a3db7aeea361274951943f08b26dd4f083db76c",
    "format": 1
   },
   {
@@ -4855,7 +4862,7 @@
    "name": "roles/ipaserver/README.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "ac56bad5cd0a1ac56aea814882c961c29e0c7547beabd465ca0b70d434e6d347",
+   "chksum_sha256": "f6533351ed6156d09dd884b935376fa23bfb5c22c20dfa2e35f4c34508621b2f",
    "format": 1
   },
   {
@@ -4890,7 +4897,7 @@
    "name": "roles/ipaserver/library/ipaserver_get_connected_server.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "13704638cdab2e12e04b5b0ed9f14136f1ac895e7e05570c5e8b078cf000b87a",
+   "chksum_sha256": "200113284a65ff9992a592841beefb90b7e0154a8fb535c1bca62659dd77bc49",
    "format": 1
   },
   {
@@ -4911,14 +4918,14 @@
    "name": "roles/ipaserver/library/ipaserver_prepare.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "432ee2ab130daa17585cc6519cd7bd8f1cf5c9e87fa396db83143f449691d223",
+   "chksum_sha256": "26a390c5da29308525c582e7e02f3f2fba86182fa1327e26e8463bd2726c782b",
    "format": 1
   },
   {
    "name": "roles/ipaserver/library/ipaserver_set_ds_password.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "eb05af790c50de0d529e3cbf08afef978cc0f09d0d74194cbef54b1e980e27c3",
+   "chksum_sha256": "6af19f1c71a5dd835ade61ce326198e5d75d465fab88ccf8f93c26dbf0c4e46e",
    "format": 1
   },
   {
@@ -4932,49 +4939,42 @@
    "name": "roles/ipaserver/library/ipaserver_setup_ca.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "8257634e8f55906abe60ad8ed45447d273f68d4d62012f117dafacbb1894fc73",
-   "format": 1
-  },
-  {
-   "name": "roles/ipaserver/library/ipaserver_setup_custodia.py",
-   "ftype": "file",
-   "chksum_type": "sha256",
-   "chksum_sha256": "91e3d63a3e6688ee70291456f98ea06fdc13547b8ae7ee9d9a227364cd9bda93",
+   "chksum_sha256": "8ae4fdb2a13e9e9e3895ad2426fa825283e3fb60d51dc42b4407fd70189b6dd4",
    "format": 1
   },
   {
    "name": "roles/ipaserver/library/ipaserver_setup_dns.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "ef3db2a1c59a3fe474ab785c3e9c27362348adb2da0194ed4bce9d2aa42896a0",
+   "chksum_sha256": "39129840d80f5677cac64628bac2f89e87fc47172e107876269707bf4ff153b6",
    "format": 1
   },
   {
    "name": "roles/ipaserver/library/ipaserver_setup_ds.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "939604210619f5117ea1a28c3a82099e86e2637fee72d44f1e0ea90977c629a3",
+   "chksum_sha256": "c902368692fc2ce0c63af2d2c32f938bd2d0c66cb5c68312919aa8b0748ab207",
    "format": 1
   },
   {
    "name": "roles/ipaserver/library/ipaserver_setup_http.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "961f5fcf8eb921c504a3b5aa8ff5820894d6045c7eea68b78abffa6394311d09",
+   "chksum_sha256": "7677f620537fdc279cb7e33a89563613127e2c33b054df648b290d8eb12d597d",
    "format": 1
   },
   {
    "name": "roles/ipaserver/library/ipaserver_setup_kra.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "66bb2974014796d656637f7a66354e4af26a4f56f76e893ed0fb416cdd824ea7",
+   "chksum_sha256": "67bda45351eb88bf09d74182eab744a6e9948bb509cea91965c66ef22219388a",
    "format": 1
   },
   {
    "name": "roles/ipaserver/library/ipaserver_setup_krb.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "c4c5f735edf071f62787c0f5a774ae8576f0dacbca958fada2102e277ca84335",
+   "chksum_sha256": "9347465322e582e1bdf0d667fa064093bc757dc44ed6d87b595ea809197e8e57",
    "format": 1
   },
   {
@@ -4995,7 +4995,7 @@
    "name": "roles/ipaserver/library/ipaserver_test.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "d0a2c666b468485b2e419317d80b4aa103f2c1a9a3e2f060836a9080cc51e860",
+   "chksum_sha256": "92f1c61e76fe1fa64801e3ab5750efddc4219e1181e6b109a162d711ca7220a7",
    "format": 1
   },
   {
@@ -5009,7 +5009,7 @@
    "name": "roles/ipaserver/meta/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "d6a07ce2017de5300bd49de685f9ddac8a4364f32a39a377a221809c9e4767e1",
+   "chksum_sha256": "acc2ea35adfe081a45c0c9bb3d293bd32b142de18abe9f1ec033441621456cc8",
    "format": 1
   },
   {
@@ -5023,7 +5023,7 @@
    "name": "roles/ipaserver/module_utils/ansible_ipa_server.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "ffb9b54ba1373b81c3eabfea37101cabe894be809d02adf08cb0d72005c8710e",
+   "chksum_sha256": "b7ec8326c899b78d16cfd44d648178c6b7c4af699157384cd9ba23fa96385555",
    "format": 1
   },
   {
@@ -5044,7 +5044,7 @@
    "name": "roles/ipaserver/tasks/install.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "8f1a4affce48d0c9da720d10fa7fb4585ad75c6f26afb781b6425088c275ed5e",
+   "chksum_sha256": "58ef04faf94b30e7ba2b6e2edd327d799ce4966e9214f0bb6d214e94be9ca1fa",
    "format": 1
   },
   {
@@ -5142,7 +5142,7 @@
    "name": "roles/ipasmartcard_client/README.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "7e72276600a26d3e49c8679479c14fa9c901b93a4d9bbce8b8a6b282bf4fec69",
+   "chksum_sha256": "9b71b272bf4958876db18166fedf0c60be9b4e6904ca7ae1e25e1b72f0f67e3e",
    "format": 1
   },
   {
@@ -5205,7 +5205,7 @@
    "name": "roles/ipasmartcard_client/library/ipasmartcard_client_validate_ca_certs.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "f413685035b5d656447f49993d687bec2d2ab63bb3186b21779fc0e476db6cf0",
+   "chksum_sha256": "1a652e41ba0596a49ef2844502ff2ca8641b91f3c4e93ab99c88020b76d483b0",
    "format": 1
   },
   {
@@ -5219,7 +5219,7 @@
    "name": "roles/ipasmartcard_client/meta/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "314f9f6982bdf979650af3abd9aead6afdf6522d376bf06d17599c40482a06b1",
+   "chksum_sha256": "33ceeeda982ed6b76846213d468cde66840d1dc0b76a26fbb6af35bdebf7f08f",
    "format": 1
   },
   {
@@ -5261,7 +5261,7 @@
    "name": "roles/ipasmartcard_server/README.md",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "f4525ee89237df5c44e6119adf5457008aed28bda916e8904159452f7f281790",
+   "chksum_sha256": "df1b9f6643e908850d5917c03d9a3f9edf2059604f0091f1d3b4618f1bc57450",
    "format": 1
   },
   {
@@ -5331,7 +5331,7 @@
    "name": "roles/ipasmartcard_server/library/ipasmartcard_server_validate_ca_certs.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "f7ff2209e36a0e1d0bad874cc2fe040db31ed849633f990a5e019308851ea01a",
+   "chksum_sha256": "5f6b7dd3319addd5f4c7442fb4552c845307825f66453d355e87ad80676ebf6b",
    "format": 1
   },
   {
@@ -5345,7 +5345,7 @@
    "name": "roles/ipasmartcard_server/meta/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "314f9f6982bdf979650af3abd9aead6afdf6522d376bf06d17599c40482a06b1",
+   "chksum_sha256": "33ceeeda982ed6b76846213d468cde66840d1dc0b76a26fbb6af35bdebf7f08f",
    "format": 1
   },
   {
@@ -5685,31 +5685,31 @@
    "format": 1
   },
   {
-   "name": "tests/ca-less/certificates/pkinit",
-   "ftype": "dir",
-   "chksum_type": null,
-   "chksum_sha256": null,
+   "name": "tests/ca-less/certificates/extensions.conf",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "247598e9446949e9707c3a2476fbecb311492263a05e6b06cce806c17e5047ba",
    "format": 1
   },
   {
-   "name": "tests/ca-less/certificates/pkinit/extensions.conf",
+   "name": "tests/ca-less/certificates/pkinit-extensions.conf",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "b30665f59adfb6f1a66d3175dc9dbe0e0951d4dc0e27b51be08e7e4f84e8a400",
+   "chksum_sha256": "dc86df3262715fd46d537671d76fcf1083a042c7a3a992fd90c76a0e9741e5d3",
    "format": 1
   },
   {
    "name": "tests/ca-less/clean_up_certificates.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "29d0f957d3b2f6c5c75a26d6df70e904693f4ec54b5faf8d153183d8e7ff720f",
+   "chksum_sha256": "f690234eeeb37ecede1e5c3139dbddf175938fd189b391764ec07ce4d54e8538",
    "format": 1
   },
   {
    "name": "tests/ca-less/generate-certificates.sh",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "b099086785d77691439a462b8ce1a29aa65a8b5c03beb009a45a12f6fbdae053",
+   "chksum_sha256": "fe2096242e8688c163d171c55a7819e442587eaa271818932a51cf06f4adf051",
    "format": 1
   },
   {
@@ -6661,7 +6661,7 @@
    "name": "tests/permission/test_permission.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "c5f12000253a0e30da38902a3c05248bba4c3bb42b38a75d66d87361e6bfd126",
+   "chksum_sha256": "81f0a64bc27d24f01c08325ad3d1da22f56bc60fd3edb28341c2cf9c3d755fa8",
    "format": 1
   },
   {
@@ -6899,7 +6899,7 @@
    "name": "tests/sanity/sanity.sh",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "a1e6394cbf535967e96a6e93b246c88276722d9518ec07f0fd60aaa5e43f7fbd",
+   "chksum_sha256": "4d8e3e1f89d56f618b4e8c70f54cbeb8a2790ea50ce127d6259cedf813723e31",
    "format": 1
   },
   {
@@ -7410,7 +7410,7 @@
    "name": "tests/utils.py",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "72908ecf6a134deefbcc03fe417c68425fbbaa3ee27eafe333867576a2cce28e",
+   "chksum_sha256": "7a0262b1a064219e9714b0d466f16b73d78cf0521c83161d1928517baa5dbafe",
    "format": 1
   },
   {
@@ -7515,14 +7515,14 @@
    "name": "utils/ansible-freeipa.spec.in",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "f5d8571619de034b598db8d49ed9db424898be89a5a040a9d189236aac843a74",
+   "chksum_sha256": "580c8ded6d2a9293bc9ef463d234d26b6267c7b760fd2cf56fc561ca3e6f40eb",
    "format": 1
   },
   {
    "name": "utils/build-galaxy-release.sh",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "e48ef1e74073a0931a2cb6ff6dae26519738f1ecdd7d7b76a1118a1eb57fcff2",
+   "chksum_sha256": "22bd4704b6515b0ddd8a71ea58a284dd245193222b087a9679153c4feefbcc48",
    "format": 1
   },
   {
@@ -7648,14 +7648,14 @@
    "name": "utils/templates/README-module+member.md.in",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "8bd7123bb576053670e0fa5f7a56d68ad7594b353744d2216f2c61bdb9678b8a",
+   "chksum_sha256": "d6defbba831ee9804843bdb02c6ced13992ee4d41a4074aa20eb2d228d7a55dc",
    "format": 1
   },
   {
    "name": "utils/templates/README-module.md.in",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "a26a6762946f6f5fa85d6219ad6bfc217acf3eda088166cbeb7fb4d8251eca26",
+   "chksum_sha256": "beaa21439ed74219e30ad153fc0ebbb6ffb4d39bb365883c5bfd96bdb338f014",
    "format": 1
   },
   {
@@ -7725,7 +7725,14 @@
    "name": "CHANGELOG.rst",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "12f77c0c218c427c26df4a488f54fb50f961ebfcddb6d19f43e16a7c2ca56b4e",
+   "chksum_sha256": "dd2332b97590bdfb02555263b04eeca6f526b0ced675729b440c143b6fae8e9a",
+   "format": 1
+  },
+  {
+   "name": "README-inventory-plugin-freeipa.md",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "52a6ebf50025bdfc2a91b8c505c902aa4dce0573a39c6dd206310a50c66e2acc",
    "format": 1
   }
  ],

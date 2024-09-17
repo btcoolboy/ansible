@@ -10,4 +10,4 @@ NG server:
 
 -   Advanced Package Tool: `debops.apt_proxy`
 
-Read the [apt_cacher_ng role documentation](https://docs.debops.org/en/HEAD/ansible/roles/apt_cacher_ng/) for more details.
+Read the [apt_cacher_ng role documentation](https://docs.debops.org/en/master/ansible/roles/apt_cacher_ng/) for more details.

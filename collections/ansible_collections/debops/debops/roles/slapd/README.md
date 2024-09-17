@@ -11,4 +11,4 @@ easy management of the on-line configuration (OLC) used to manage
 `slapd` instances and integrates with other DebOps roles like
 `debops.pki` and `debops.dhparam` for additional functionality.
 
-Read the [slapd role documentation](https://docs.debops.org/en/HEAD/ansible/roles/slapd/) for more details.
+Read the [slapd role documentation](https://docs.debops.org/en/master/ansible/roles/slapd/) for more details.

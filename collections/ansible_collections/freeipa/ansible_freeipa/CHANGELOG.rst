@@ -1,69 +1,59 @@
-Changes for 1.12.1 since 1.12.0
+Changes for 1.13.2 since 1.13.1
 -------------------------------
 
-  - Disable config tests for pac type without ms pac (#1211)
-  - ipaclient_setup_automount with new install states (#1208)
-  - ipaclient: Enable SELinux for SSSD (#1207)
-  - ipaserver: Fix deployment after Bronze-bit fix (#1206)
-  - ipahbacrule: Fix handling of hbacsvcgroup in members (#1203)
-  - ipahostgroup: Fix idempotence issues due to capitalization (#1202)
-  - ipagroup: Fix idempotence issues due to capitalization (#1201)
-  - Fixes for ansible-lint 6.22.1 (#1195)
-  - Revert "[TEMP] Enable only idp, service and user module tests" (#1189)
-  - Bump minimum ansible-lint version to 6.22 (#1188)
-  - ipaclient: Fix OTP error reporting (#1187)
-  - test_host_random: No jinja2 templating in conditional statements (#1186)
-  - upstream ci: Increase timeout for PR tests (#1184)
-  - ipaidp: Fix validation and reset of parameters (#1183)
-  - test_pwpolicy: minlength parameter can be reset with empty string now (#1180)
-  - ipagroup: Add support for renaming groups (#1178)
-  - ipauser: Add support for renaming users (#1174)
-  - ipaclient: Properly name automount_location var and add documentation (#1169)
-  - ipareplica: Support inventory groups.ipaserver (#1151)
-  - ipauser: Do not try to modify user when not changing password (#1149)
-  - ipadnszone: Add support for per-zone privilege delegation (#1147)
-  - Handle data type or empty string in module_utils (#1143)
-  - ipasudorule: Allow setting groups for runasuser. (#899)
-  - ipadelegation: Fix idempotence issues due to capitalization. (#760)
+  - Documentation fixes for issues found by ansible-test part of ansible-core 2.17.1 (#1264)
+  - tests/sanity/sanity.sh: Install setuptools with pip (#1263)
+  - user: Fix idp_user_id aliases (#1262)
+  - plugins/inventory/freeipa: Try imports for requests and urllib3 (#1261)
+  - permission: Fix idempotency issues for DN parameters (#1259)
+  - README-service.md: Add multi service handling (#1255)
+  - Convert input certificates (#1250)
+  - ansible_freeipa_module: Fix errors in batch mode (#1248)
+  - Fixes for FreeIPA 4.12 (#1246)
+  - Bump minimum supported Ansible version (#1130)
 
-Detailed changelog for 1.12.1 since 1.12.0 by author
+Detailed changelog for 1.13.2 since 1.13.1 by author
 ----------------------------------------------------
-  2 authors, 31 commits
+  2 authors, 35 commits
 
-Rafael Guterres Jeffman (20)
+Rafael Guterres Jeffman (9)
 
-  - ipadelegation: Fix idempotence issues due to capitalization.
-  - ipagroup: Fix idempotence issues due to capitalization
-  - ipahostgroup: Fix idempotence issues due to capitalization
-  - ipaserver: Fix deployment after Bronze-bit fix
-  - ipahbacrule: Fix handling of hbacsvcgroup in members
-  - ipasudorule: Allow setting groups for runasuser.
-  - ipagroup: Add support for renaming groups
-  - tests/group: Use module_defaults on tests_group
-  - ipauser: Add support for renaming users
-  - ipadnszone: Add support for per-zone privilege delegation
-  - idoveridegroup: Use module.params_get_type
-  - idoverideuser: Use module.params_get_type
-  - ipapwpolicy: Use modules.params_get_type
-  - ansible_freeipa_module: Ensure data type when retrieving parameter
-  - Rename parameter 'allow_empty_string' to 'allow_empty_list_item'
-  - upstream ci: Increase timeout for PR tests
-  - Bump minimum ansible-lint version to 6.22
-  - ipaclient: Fix OTP error reporting
-  - ipauser: Do not try to modify user when not changing password
-  - ipareplica: Support inventory groups.ipaserver
+  - ansible-freeipa.spec: Bump minimum supported Ansible version to 2.15
+  - utils/templates: Bump minimum supported Ansible version to 2.15
+  - ipasmartcard_*: Bump minimum supported Ansible version to 2.15
+  - ipabackup: Bump minimum supported Ansible version to 2.15
+  - ipaserver: Bump minimum supported Ansible version to 2.15
+  - ipareplica: Bump minimum supported Ansible version to 2.15
+  - ipaclient: Bump minimum supported Ansible version to 2.15
+  - README-*: Bump minimum Ansible supported version to 2.15
+  - Set collection ansible-core minimum version to 2.15
 
-Thomas Woerner (11)
+Thomas Woerner (26)
 
-  - config: Disable config tests due to pac type requirement MS-PAC
-  - ipaclient_setup_automount: Only return changed if there was a change
-  - ipaclient_setup_automount with new install states
-  - ipaclient: Enable SELinux for SSSD
-  - Fixes for ansible-lint 6.22.1
-  - Revert "[TEMP] Enable only idp, service and user module tests"
-  - test_host_random: No jinja2 templating in conditional statements
-  - [TEMP] Enable only idp, service and user module tests
-  - ipaidp: Fix validation and reset of parameters
-  - test_pwpolicy: minlength parameter can be reset with empty string now
-  - ipaclient: Properly name automount_location var and add documentation
+  - Role modules: Docs: Fix default value for string list parameters
+  - tests/utils.py: Fix missing whitespace around arithmetic operator (E226)
+  - ipareplica_prepare: Documentation: Fixed name of ipa_client_installed
+  - ipaclient_setup_nss: Documentation: Add default for selinux_works
+  - service: Docs: Fix required for name, add delete_continue to services
+  - idp: Drop no_log from docs section, allow to log token_uri and keys_uri
+  - idoverrideuser: Docs: Fix sshpubkey element type, nomembers type
+  - cert: Fix short_description tag, add chain option, remove authors
+  - inventory/freeipa: Documentation: Fix version_added and drop plugin_type
+  - ipamodule_base_docs: Documentation: Fix default for delete_continue
+  - tests/sanity/sanity.sh: Install setuptools with pip
+  - user: Fix idp_user_id aliases
+  - service: Add multi service examples to EXAMPLES
+  - README-service.md: Add multi service handling
+  - plugins/inventory/freeipa: Try imports for requests and urllib3
+  - permission: Fix idempotency issues for DN parameters
+  - ansible_freeipa_module: Fix errors in batch mode
+  - ipauser: Use new convert_input_certificates
+  - ipaidoverrideusere: Use new convert_input_certificates
+  - ipahost: Use new convert_input_certificates
+  - ipaservice: Use new convert_input_certificates
+  - ansible_freeipa_module: New function convert_input_certificates
+  - ipareplica: After an HSM replica install ensure all certs are visible
+  - ipareplica: Refactor CA file handling
+  - ipareplica_install_ca_certs: Do not return unchanged config attributes
+  - ipaserver: Set hsm attributes to None for now
 

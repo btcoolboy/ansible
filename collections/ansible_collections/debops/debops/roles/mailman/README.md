@@ -10,4 +10,4 @@ By default the role provides configuration for `debops.postfix` role to
 configure the SMTP server integration, as well as `debops.nginx` role to
 configure access to the web control panel.
 
-Read the [mailman role documentation](https://docs.debops.org/en/HEAD/ansible/roles/mailman/) for more details.
+Read the [mailman role documentation](https://docs.debops.org/en/master/ansible/roles/mailman/) for more details.

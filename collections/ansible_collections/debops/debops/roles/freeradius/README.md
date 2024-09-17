@@ -8,4 +8,4 @@ network.
 The `debops.freeradius` Ansible role can be used to install and
 configure FreeRADIUS server on a Debian/Ubuntu hosts.
 
-Read the [freeradius role documentation](https://docs.debops.org/en/HEAD/ansible/roles/freeradius/) for more details.
+Read the [freeradius role documentation](https://docs.debops.org/en/master/ansible/roles/freeradius/) for more details.

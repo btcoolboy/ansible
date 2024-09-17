@@ -18,4 +18,4 @@ containers) from physical ones to make their management easier by
 changing their "ChassisID" attribute to reflect their virtualized
 status.
 
-Read the [lldpd role documentation](https://docs.debops.org/en/HEAD/ansible/roles/lldpd/) for more details.
+Read the [lldpd role documentation](https://docs.debops.org/en/master/ansible/roles/lldpd/) for more details.

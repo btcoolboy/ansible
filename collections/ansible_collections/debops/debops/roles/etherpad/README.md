@@ -10,4 +10,4 @@ Etherpad, on a Debian/Ubuntu host. The application can use a MariaDB or
 SQLite database as a storage backend, and will be configured behind a
 Nginx proxy as a frontend.
 
-Read the [etherpad role documentation](https://docs.debops.org/en/HEAD/ansible/roles/etherpad/) for more details.
+Read the [etherpad role documentation](https://docs.debops.org/en/master/ansible/roles/etherpad/) for more details.

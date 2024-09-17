@@ -24,7 +24,7 @@ Requirements
 ------------
 
 **Controller**
-* Ansible version: 2.13+
+* Ansible version: 2.15+
 
 **Node**
 * Supported FreeIPA version (see above)
@@ -311,7 +311,7 @@ Example playbook to rename users:
       ipaadmin_password: SomeADMINpassword
       name: pinky
       rename: reddy
-      state: enabled
+      state: renamed
 ```
 
 Example playbook to unlock users:

@@ -44,7 +44,7 @@ options:
     description: The service to manage
     type: list
     elements: str
-    required: true
+    required: false
     aliases: ["service"]
   services:
     description: The list of service dicts.
@@ -167,6 +167,13 @@ options:
         type: list
         elements: str
         aliases: ["ipaallowedtoperform_read_keys_hostgroup"]
+      delete_continue:
+        description:
+          Continuous mode. Don't stop on errors.
+          Valid only if `state` is `absent`.
+        required: false
+        type: bool
+        aliases: ["continue"]
   certificate:
     description: Base-64 encoded service certificate.
     required: false
@@ -370,6 +377,43 @@ EXAMPLES = """
         host:
         - host1.example.com
       - name: HTTP/www.service.com
+
+  # Ensure multiple services are present
+  - freeipa.ansible_freeipa.ipaservice:
+      ipaadmin_password: SomeADMINpassword
+      services:
+      - name: HTTP/www.example.com
+        principal:
+        - host/host1.example.com
+      - name: mysvc/www.example.com
+        pac_type: NONE
+        ok_as_delegate: yes
+        ok_to_auth_as_delegate: yes
+      - name: HTTP/www.example.com
+        allow_create_keytab_user:
+        - user01
+        - user02
+        allow_create_keytab_group:
+        - group01
+        - group02
+        allow_create_keytab_host:
+        - host1.example.com
+        - host2.example.com
+        allow_create_keytab_hostgroup:
+        - hostgroup01
+        - hostgroup02
+      - name: mysvc/host2.example.com
+        auth_ind: otp,radius
+
+  # Ensure service host members are present
+  - freeipa.ansible_freeipa.ipaservice:
+      ipaadmin_password: SomeADMINpassword
+      services:
+      - name: HTTP/www1.example.com
+        host: host1.example.com
+      - name: HTTP/www2.example.com
+        host: host2.example.com
+      action: member
 """
 
 RETURN = """
@@ -378,7 +422,7 @@ RETURN = """
 from ansible_collections.freeipa.ansible_freeipa.plugins.module_utils.ansible_freeipa_module import \
     IPAAnsibleModule, compare_args_ipa, encode_certificate, \
     gen_add_del_lists, gen_add_list, gen_intersection_list, ipalib_errors, \
-    api_get_realm, to_text
+    api_get_realm, to_text, convert_input_certificates
 from ansible.module_utils import six
 if six.PY3:
     unicode = str
@@ -601,12 +645,6 @@ def main():
     # service attributes
     principal = ansible_module.params_get("principal")
     certificate = ansible_module.params_get("certificate")
-    # Any leading or trailing whitespace is removed while adding the
-    # certificate with serive_add_cert. To be able to compare the results
-    # from service_show with the given certificates we have to remove the
-    # white space also.
-    if certificate is not None:
-        certificate = [cert.strip() for cert in certificate]
     pac_type = ansible_module.params_get(
         "pac_type", allow_empty_list_item=True)
     auth_ind = ansible_module.params_get(
@@ -636,6 +674,8 @@ def main():
         ansible_module.fail_json(msg="At least one name or services is "
                                      "required")
     check_parameters(ansible_module, state, action, names)
+    certificate = convert_input_certificates(ansible_module, certificate,
+                                             state)
 
     # Use services if names is None
     if services is not None:
@@ -669,12 +709,8 @@ def main():
                 service_set.add(name)
                 principal = service.get("principal")
                 certificate = service.get("certificate")
-                # Any leading or trailing whitespace is removed while adding
-                # the certificate with serive_add_cert. To be able to compare
-                # the results from service_show with the given certificates
-                # we have to remove the white space also.
-                if certificate is not None:
-                    certificate = [cert.strip() for cert in certificate]
+                certificate = convert_input_certificates(ansible_module,
+                                                         certificate, state)
                 pac_type = service.get("pac_type")
                 auth_ind = service.get("auth_ind")
                 check_authind(ansible_module, auth_ind)
@@ -693,7 +729,11 @@ def main():
 
                 delete_continue = service.get("delete_continue")
 
-            elif isinstance(service, (str, unicode)):
+            elif (
+                isinstance(
+                    service, (str, unicode)  # pylint: disable=W0012,E0606
+                )
+            ):
                 name = service
             else:
                 ansible_module.fail_json(msg="Service '%s' is not valid" %
@@ -840,7 +880,9 @@ def main():
             elif state == "absent":
                 if action == "service":
                     if res_find is not None:
-                        args = {'continue': delete_continue}
+                        args = {}
+                        if delete_continue is not None:
+                            args['continue'] = delete_continue
                         commands.append([name, 'service_del', args])
 
                 elif action == "member":
@@ -929,7 +971,7 @@ def main():
 
         # Execute commands
         changed = ansible_module.execute_ipa_commands(
-            commands, fail_on_member_errors=True)
+            commands, batch=True, keeponly=[], fail_on_member_errors=True)
 
     # Done
     ansible_module.exit_json(changed=changed, **exit_args)

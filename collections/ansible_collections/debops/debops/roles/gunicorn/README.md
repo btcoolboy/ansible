@@ -17,4 +17,4 @@ applications that use either a system Python installation, or a
 From Debian Stretch upwards, the role configures a custom set of
 `systemd` units to support Green Unicorn service instances.
 
-Read the [gunicorn role documentation](https://docs.debops.org/en/HEAD/ansible/roles/gunicorn/) for more details.
+Read the [gunicorn role documentation](https://docs.debops.org/en/master/ansible/roles/gunicorn/) for more details.

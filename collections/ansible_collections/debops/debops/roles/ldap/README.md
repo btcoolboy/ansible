@@ -18,4 +18,4 @@ user.
 If you are looking for a LDAP server management solution, check out the
 `debops.slapd` Ansible role that can manage OpenLDAP servers.
 
-Read the [ldap role documentation](https://docs.debops.org/en/HEAD/ansible/roles/ldap/) for more details.
+Read the [ldap role documentation](https://docs.debops.org/en/master/ansible/roles/ldap/) for more details.

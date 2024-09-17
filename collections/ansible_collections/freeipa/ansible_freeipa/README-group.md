@@ -29,7 +29,7 @@ Requirements
 ------------
 
 **Controller**
-* Ansible version: 2.13+
+* Ansible version: 2.15+
 
 **Node**
 * Supported FreeIPA version (see above)
@@ -158,7 +158,7 @@ Several groups can also be renamed with a single task, as in the example playboo
   gather_facts: false
 
   tasks:
-  - name Rename group1 to newgroup1 and group2 to newgroup2
+  - name: Rename group1 to newgroup1 and group2 to newgroup2
     freeipa.ansible_freeipa.ipagroup:
       ipaadmin_password: SomeADMINpassword
       groups:

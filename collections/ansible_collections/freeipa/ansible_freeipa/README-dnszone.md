@@ -23,7 +23,7 @@ Requirements
 ------------
 
 **Controller**
-* Ansible version: 2.13+
+* Ansible version: 2.15+
 
 
 **Node**
@@ -135,7 +135,7 @@ Example playbook to enable a zone:
 
 Example playbook to allow per-zone privilege delegation:
 
-``` yaml
+```yaml
 ---
 - name: Playbook to enable per-zone privilege delegation
   hosts: ipaserver

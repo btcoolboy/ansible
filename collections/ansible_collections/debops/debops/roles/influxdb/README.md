@@ -14,4 +14,4 @@ delegation to configure users and databases in local or remote InfluxDB
 servers. You can use `debops.influxdb_server` role to manage the
 InfluxDB server itself.
 
-Read the [influxdb role documentation](https://docs.debops.org/en/HEAD/ansible/roles/influxdb/) for more details.
+Read the [influxdb role documentation](https://docs.debops.org/en/master/ansible/roles/influxdb/) for more details.

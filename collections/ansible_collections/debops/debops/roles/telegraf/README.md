@@ -8,4 +8,4 @@ from your stacks, sensors and systems.
 
 The `debops.telegraf` role installs and configures Telegraf.
 
-Read the [telegraf role documentation](https://docs.debops.org/en/HEAD/ansible/roles/telegraf/) for more details.
+Read the [telegraf role documentation](https://docs.debops.org/en/master/ansible/roles/telegraf/) for more details.

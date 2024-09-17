@@ -27,4 +27,4 @@ that happens, it executes various commands that can:
 This helps bring back the system to a state where `dpkg` can cleanly
 remove or purge the package.
 
-Read the [dpkg_cleanup role documentation](https://docs.debops.org/en/HEAD/ansible/roles/dpkg_cleanup/) for more details.
+Read the [dpkg_cleanup role documentation](https://docs.debops.org/en/master/ansible/roles/dpkg_cleanup/) for more details.

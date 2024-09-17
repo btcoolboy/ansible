@@ -25,4 +25,4 @@ the remote system).
 -   Multiple ciphers and corresponding keys chained to encrypt one
     filesystem.
 
-Read the [cryptsetup role documentation](https://docs.debops.org/en/HEAD/ansible/roles/cryptsetup/) for more details.
+Read the [cryptsetup role documentation](https://docs.debops.org/en/master/ansible/roles/cryptsetup/) for more details.

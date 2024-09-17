@@ -42,6 +42,7 @@ options:
     type: list
     elements: str
     required: no
+    default: []
   domain:
     description: Primary DNS domain of the IPA deployment
     type: str
@@ -51,6 +52,7 @@ options:
     type: list
     elements: str
     required: no
+    default: []
   realm:
     description: Kerberos realm name of the IPA deployment
     type: str
@@ -66,6 +68,7 @@ options:
     type: list
     elements: str
     required: no
+    default: []
   hidden_replica:
     description: Install a hidden replica
     type: bool
@@ -112,18 +115,21 @@ options:
     type: list
     elements: str
     required: no
+    default: []
   http_cert_files:
     description:
       File containing the Apache Server SSL certificate and private key
     type: list
     elements: str
     required: no
+    default: []
   pkinit_cert_files:
     description:
       File containing the Kerberos KDC SSL certificate and private key
     type: list
     elements: str
     required: no
+    default: []
   no_ntp:
     description: Do not configure ntp
     type: bool
@@ -134,6 +140,7 @@ options:
     type: list
     elements: str
     required: no
+    default: []
   ntp_pool:
     description: ntp server pool to use
     type: str
@@ -153,6 +160,7 @@ options:
     type: list
     elements: str
     required: no
+    default: []
   no_forwarders:
     description: Do not add any DNS forwarders, use root servers instead
     type: bool
@@ -191,7 +199,7 @@ from ansible_collections.freeipa.ansible_freeipa.plugins.module_utils.ansible_ip
     paths, sysrestore, ansible_module_get_parsed_ip_addresses, service,
     redirect_stdout, create_ipa_conf, ipautil,
     x509, validate_domain_name, common_check,
-    IPA_PYTHON_VERSION, getargspec, adtrustinstance
+    IPA_PYTHON_VERSION, getargspec, adtrustinstance, install_ca_cert
 )
 
 
@@ -542,7 +550,8 @@ def main():
         # additional
         client_enrolled=client_enrolled,
         change_master_for_certmonger=change_master_for_certmonger,
-        sid_generation_always=sid_generation_always
+        sid_generation_always=sid_generation_always,
+        install_ca_certs=install_ca_cert is not None
     )
 
 

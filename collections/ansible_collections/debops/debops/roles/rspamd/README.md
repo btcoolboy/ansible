@@ -12,4 +12,4 @@ The `debops.rspamd` Ansible role can be used to configure the `rspamd`
 service on a host and automatically setup the `debops.postfix` role to
 use it for spam filtering.
 
-Read the [rspamd role documentation](https://docs.debops.org/en/HEAD/ansible/roles/rspamd/) for more details.
+Read the [rspamd role documentation](https://docs.debops.org/en/master/ansible/roles/rspamd/) for more details.

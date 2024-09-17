@@ -27,4 +27,4 @@ include:
     ssh host keys and SSL certificates. Generated .tar.gz files are kept
     on Ansible Controller in secret directory).
 
-Read the [secret role documentation](https://docs.debops.org/en/HEAD/ansible/roles/secret/) for more details.
+Read the [secret role documentation](https://docs.debops.org/en/master/ansible/roles/secret/) for more details.

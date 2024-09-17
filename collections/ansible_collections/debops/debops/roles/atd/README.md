@@ -9,4 +9,4 @@ including randomized load average threshold and randomized time between
 batch job execution, as well as access control to the `at` and `batch`
 commands by the users.
 
-Read the [atd role documentation](https://docs.debops.org/en/HEAD/ansible/roles/atd/) for more details.
+Read the [atd role documentation](https://docs.debops.org/en/master/ansible/roles/atd/) for more details.

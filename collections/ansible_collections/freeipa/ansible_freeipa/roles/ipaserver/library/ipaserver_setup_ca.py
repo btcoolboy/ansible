@@ -54,6 +54,7 @@ options:
     type: list
     elements: str
     required: no
+    default: []
   domain:
     description: Primary DNS domain of the IPA deployment
     type: str
@@ -182,6 +183,7 @@ options:
     type: list
     elements: str
     required: no
+    default: []
   no_reverse:
     description: Do not create new reverse DNS zone
     type: bool
@@ -305,6 +307,12 @@ def main():
     options.dirsrv_cert_files = ansible_module.params.get('dirsrv_cert_files')
     options._dirsrv_pkcs12_info = ansible_module.params.get(
         '_dirsrv_pkcs12_info')
+    # hsm
+    if hasattr(ca, "hsm_version"):
+        options.token_name = None
+        options.token_library_path = None
+        options.token_password = None
+        options.token_password_file = None
     # certificate system
     options.external_ca = ansible_module.params.get('external_ca')
     options.external_ca_type = ansible_module.params.get('external_ca_type')
@@ -354,7 +362,7 @@ def main():
                       options.no_hbac_allow, options._dirsrv_pkcs12_info,
                       options.no_pkinit)
 
-    # setup CA ##############################################################
+    # setup custodia ########################################################
 
     if hasattr(custodiainstance, "get_custodia_instance"):
         if hasattr(custodiainstance.CustodiaModes, "FIRST_MASTER"):
@@ -362,9 +370,14 @@ def main():
         else:
             mode = custodiainstance.CustodiaModes.MASTER_PEER
         custodia = custodiainstance.get_custodia_instance(options, mode)
-        custodia.set_output(ansible_log)
-        with redirect_stdout(ansible_log):
-            custodia.create_instance()
+    else:
+        custodia = custodiainstance.CustodiaInstance(options.host_name,
+                                                     options.realm_name)
+    custodia.set_output(ansible_log)
+    with redirect_stdout(ansible_log):
+        custodia.create_instance()
+
+    # setup CA ##############################################################
 
     if options.setup_ca:
         if not options.external_cert_files and options.external_ca:

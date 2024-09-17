@@ -11,4 +11,4 @@ The `debops.nslcd` Ansible role can be used to configure the `nslcd`
 service on a host and, via `debops.ldap` role, create a bind account in
 the LDAP directory used by `nslcd` to perform LDAP lookups.
 
-Read the [nslcd role documentation](https://docs.debops.org/en/HEAD/ansible/roles/nslcd/) for more details.
+Read the [nslcd role documentation](https://docs.debops.org/en/master/ansible/roles/nslcd/) for more details.

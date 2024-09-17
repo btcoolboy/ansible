@@ -1,0 +1,228 @@
+---
+# .. vim: foldmarker=[[[,]]]:foldmethod=marker
+
+# .. Copyright (C) 2015-2017 Robin Schneider <ypid@riseup.net>
+# .. Copyright (C) 2022 David Härdeman <david@hardeman.nu>
+# .. Copyright (C) 2015-2022 DebOps <https://debops.org/>
+# .. SPDX-License-Identifier: GPL-3.0-only
+
+# .. _apparmor__ref_defaults:
+
+# Default variables
+# =================
+#
+# .. contents:: Sections
+#    :local:
+#
+# .. include:: ../../../../includes/global.rst
+
+
+# Packages and installation [[[
+# -----------------------------
+
+# .. envvar:: apparmor__base_packages [[[
+#
+# List of base packages to install.
+apparmor__base_packages:
+  - 'apparmor'
+  - 'apparmor-utils'
+  - 'apparmor-profiles'
+  - 'apparmor-profiles-extra'
+
+                                                                   # ]]]
+# .. envvar:: apparmor__packages [[[
+#
+# List of additional packages to install.
+apparmor__packages: []
+
+                                                                   # ]]]
+# .. envvar:: apparmor__enabled [[[
+#
+# Enable or disable support the AppArmor. Since the role is included from the
+# DebOps ``common`` playbook, this allows a manual override of the default
+# behavior.
+apparmor__enabled: '{{ ansible_local.apparmor.enabled
+                       | d(False
+                           if (ansible_distribution_release in ["stretch"] or
+                               (ansible_virtualization_role | d("") == "guest"
+                                and
+                                ansible_virtualization_type | d("") in
+                                  ["container"]))
+                           else True) }}'
+
+                                                                   # ]]]
+# .. envvar:: apparmor__manage_grub [[[
+#
+# Enable or disable support for adding kernel parameters via GRUB which cause
+# the AppArmor security module to be enabled at boot. Note that the normal
+# Debian/Ubuntu kernel packages already include and enable this support by
+# default, so this is only necessary for old distributions and/or customized
+# kernel builds.
+apparmor__manage_grub: '{{ ansible_local.apparmor.grub_enabled
+                           | d(True
+                               if (apparmor__enabled | d(False) | bool and
+                                   ansible_distribution_release in ["stretch"])
+                               else False) }}'
+
+                                                                   # ]]]
+# .. envvar:: apparmor__kernel_parameters [[[
+#
+# Kernel parameters needed to enable AppArmor (if not already enabled by
+# default, as in recent Debian/Ubuntu kernel packages). Only relevant if
+# :envvar:`apparmor__manage_grub` is enabled.
+apparmor__kernel_parameters:
+  - 'apparmor=1'
+  - 'security=apparmor'
+
+                                                                   # ]]]
+                                                                   # ]]]
+# AppArmor profiles [[[
+# ---------------------
+
+# These variables control the state of individual AppArmor profiles. See
+# :ref:`apparmor__ref_profiles` for more details.
+
+# .. envvar:: apparmor__default_profiles [[[
+#
+# List of profiles to enable/disable, defined by the role.
+apparmor__default_profiles: []
+
+                                                                   # ]]]
+# .. envvar:: apparmor__profiles [[[
+#
+# List of profiles to enable/disable, defined for all hosts in the Ansible
+# inventory.
+apparmor__profiles: []
+
+                                                                   # ]]]
+# .. envvar:: apparmor__group_profiles [[[
+#
+# List of profiles to enable/disable, defined on hosts in a specific Ansible
+# inventory group.
+apparmor__group_profiles: []
+
+                                                                   # ]]]
+# .. envvar:: apparmor__host_profiles [[[
+#
+# List of profiles to enable/disable, defined on specific hosts in the Ansible
+# inventory.
+apparmor__host_profiles: []
+
+                                                                   # ]]]
+# .. envvar:: apparmor__dependent_profiles [[[
+#
+# Variable definitions managed by roles using this role as dependency.
+apparmor__dependent_profiles: []
+
+                                                                   # ]]]
+# .. envvar:: apparmor__combined_profiles [[[
+#
+# A combination of the profiles to enable/disable, defined by the other
+# variables, used in role tasks.
+apparmor__combined_profiles: '{{ apparmor__default_profiles
+                                 + apparmor__profiles
+                                 + apparmor__group_profiles
+                                 + apparmor__host_profiles
+                                 + apparmor__dependent_profiles }}'
+
+                                                                   # ]]]
+                                                                   # ]]]
+# AppArmor local profile modifications [[[
+# ----------------------------------------
+
+# These variables control local profile modifications. See
+# :ref:`apparmor__ref_locals` for more details.
+
+# .. envvar:: apparmor__default_locals [[[
+#
+# List of default local profile modifications defined by the role.
+apparmor__default_locals: []
+
+                                                                   # ]]]
+# .. envvar:: apparmor__locals [[[
+#
+# List of local profile modifications defined for all hosts in the Ansible
+# inventory.
+apparmor__locals: []
+
+                                                                   # ]]]
+# .. envvar:: apparmor__group_locals [[[
+#
+# List of local profile modifications defined on hosts in a specific Ansible
+# inventory group.
+apparmor__group_locals: []
+
+                                                                   # ]]]
+# .. envvar:: apparmor__host_locals [[[
+#
+# List of local profile modifications defined on specific hosts in the Ansible
+# inventory.
+apparmor__host_locals: []
+
+                                                                   # ]]]
+# .. envvar:: apparmor__dependent_locals [[[
+#
+# Variable definitions managed by roles using this role as dependency.
+apparmor__dependent_locals: []
+
+                                                                   # ]]]
+# .. envvar:: apparmor__combined_locals [[[
+#
+# A combination of the local profile modifications defined by the other
+# variables, used in role tasks.
+apparmor__combined_locals: '{{ apparmor__default_locals
+                               + apparmor__locals
+                               + apparmor__group_locals
+                               + apparmor__host_locals
+                               + apparmor__dependent_locals }}'
+
+                                                                   # ]]]
+                                                                   # ]]]
+# AppArmor tunables [[[
+# ---------------------
+
+# These variables control profile tunables. See :ref:`apparmor__ref_tunables`
+# for more details.
+
+# .. envvar:: apparmor__default_tunables [[[
+#
+# List of default tunables defined by the role.
+apparmor__default_tunables: []
+
+                                                                   # ]]]
+# .. envvar:: apparmor__tunables [[[
+#
+# List of tunables defined for all hosts in the Ansible inventory.
+apparmor__tunables: []
+
+                                                                   # ]]]
+# .. envvar:: apparmor__group_tunables [[[
+#
+# List of tunables defined on hosts in a specific Ansible inventory group.
+apparmor__group_tunables: []
+
+                                                                   # ]]]
+# .. envvar:: apparmor__host_tunables [[[
+#
+# List of tunables defined on specific hosts in the Ansible inventory.
+apparmor__host_tunables: []
+
+                                                                   # ]]]
+# .. envvar:: apparmor__dependent_tunables [[[
+#
+# Variable definitions managed by roles using this role as dependency.
+apparmor__dependent_tunables: []
+
+                                                                   # ]]]
+# .. envvar:: apparmor__combined_tunables [[[
+#
+# A combination of the tunables defined by the other variables, used in
+# role tasks.
+apparmor__combined_tunables: '{{ apparmor__default_tunables
+                                 + apparmor__tunables
+                                 + apparmor__group_tunables
+                                 + apparmor__host_tunables
+                                 + apparmor__dependent_tunables }}'
+
+                                                                   # ]]]
+                                                                   # ]]]

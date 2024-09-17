@@ -19,4 +19,4 @@ upstream](https://github.com/minio/mc/blob/master/CONFLICT.md) as well.
 You can use the `debops.minio` Ansible role to install and configure the
 MinIO service itself.
 
-Read the [mcli role documentation](https://docs.debops.org/en/HEAD/ansible/roles/mcli/) for more details.
+Read the [mcli role documentation](https://docs.debops.org/en/master/ansible/roles/mcli/) for more details.

@@ -13,4 +13,4 @@ A special "raw" mode of operation with a separate Ansible playbook can
 be used to bootstrap Python environment on a host, so that Ansible can
 then install packages and operate normally.
 
-Read the [python role documentation](https://docs.debops.org/en/HEAD/ansible/roles/python/) for more details.
+Read the [python role documentation](https://docs.debops.org/en/master/ansible/roles/python/) for more details.

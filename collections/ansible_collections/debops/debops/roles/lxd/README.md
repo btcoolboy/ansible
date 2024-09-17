@@ -14,4 +14,4 @@ LXD service on a Debian or Ubuntu hosts. The role will use the
 `debops.golang` role to install the `lxd` and `lxc` binaries from
 upstream on Debian hosts.
 
-Read the [lxd role documentation](https://docs.debops.org/en/HEAD/ansible/roles/lxd/) for more details.
+Read the [lxd role documentation](https://docs.debops.org/en/master/ansible/roles/lxd/) for more details.

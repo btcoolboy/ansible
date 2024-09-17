@@ -15,4 +15,4 @@ Additionally, a simple Access Control List managed by the role in the
 Ansible local facts can be used by other Ansible roles to configure
 access for selected UNIX groups to the services managed by these roles.
 
-Read the [system_groups role documentation](https://docs.debops.org/en/HEAD/ansible/roles/system_groups/) for more details.
+Read the [system_groups role documentation](https://docs.debops.org/en/master/ansible/roles/system_groups/) for more details.

@@ -9,4 +9,4 @@ autodiscovery to find and monitor additional devices.
 `debops.librenms` role will manage a central LibreNMS monitoring host
 and web interface.
 
-Read the [librenms role documentation](https://docs.debops.org/en/HEAD/ansible/roles/librenms/) for more details.
+Read the [librenms role documentation](https://docs.debops.org/en/master/ansible/roles/librenms/) for more details.

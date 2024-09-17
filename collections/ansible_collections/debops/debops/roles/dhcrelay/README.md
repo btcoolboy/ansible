@@ -10,4 +10,4 @@ by the init script provided by the isc-dhcp-relay package in Debian
 Stable. A workaround for this can be implemented if there is demand for
 it.
 
-Read the [dhcrelay role documentation](https://docs.debops.org/en/HEAD/ansible/roles/dhcrelay/) for more details.
+Read the [dhcrelay role documentation](https://docs.debops.org/en/master/ansible/roles/dhcrelay/) for more details.

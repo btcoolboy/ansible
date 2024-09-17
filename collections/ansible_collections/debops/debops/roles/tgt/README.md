@@ -7,4 +7,4 @@ other targets. Only targets that are unused will be modified during
 normal operation. `debops.ferm` role will be used to manage `iptables`
 firewall to allow access from all or specific hosts or networks.
 
-Read the [tgt role documentation](https://docs.debops.org/en/HEAD/ansible/roles/tgt/) for more details.
+Read the [tgt role documentation](https://docs.debops.org/en/master/ansible/roles/tgt/) for more details.

@@ -14,4 +14,4 @@ using Ansible. It can be used either as a standalone role configured
 using role/inventory variables, or as a dependency of another role, to
 provide network configuration as needed.
 
-Read the [ifupdown role documentation](https://docs.debops.org/en/HEAD/ansible/roles/ifupdown/) for more details.
+Read the [ifupdown role documentation](https://docs.debops.org/en/master/ansible/roles/ifupdown/) for more details.

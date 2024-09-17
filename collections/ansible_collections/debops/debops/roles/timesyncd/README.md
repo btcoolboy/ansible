@@ -12,4 +12,4 @@ clients/servers installed on the host and back off when they are
 detected, so that users can easily switch to a different service
 provider if they wish.
 
-Read the [timesyncd role documentation](https://docs.debops.org/en/HEAD/ansible/roles/timesyncd/) for more details.
+Read the [timesyncd role documentation](https://docs.debops.org/en/master/ansible/roles/timesyncd/) for more details.
