@@ -13,57 +13,57 @@
       ignore_errors: true
 
     - name: Manage Advanced Package Manager
-      include_role:
+      import_role:
         name: debops.debops.apt
       tags: apt
 
     - name: Manage ca-certificates
-      include_role:
+      import_role:
         name: oefenweb.ca_certificates
       tags: ca_certificates
 
     - name: Manage Network Time Protocol service
-      include_role:
+      import_role:
         name: debops.debops.ntp
       tags: ntp
 
     - name: Configure localization and internationalization
-      include_role:
+      import_role:
         name: debops.debops.locales
       tags: locales
 
     - name: Manage time zone configuration
-      include_role:
+      import_role:
         name: debops.debops.tzdata
       tags: tzdata
 
     - name: Configure sudo service
-      include_role:
+      import_role:
         name: debops.debops.sudo
       tags: sudo
 
     - name: Manage SSH public keys
-      include_role:
+      import_role:
         name: debops.debops.authorized_keys
       tags: authorized_keys
 
     - name: Manage OpenSSH Server
-      include_role:
+      import_role:
         name: debops.debops.sshd
       tags: sshd
 
     - name: Manage user and group accounts
-      include_role:
+      import_role:
         name: oefenweb.user
       tags: user
 
     - name: Set up vim
-      include_role:
+      import_role:
         name: oefenweb.vim
       tags: vim
 
     - name: Set up DNS
-      include_role:
+      import_role:
         name: oefenweb.dns
       tags: dns
       when: ansible_distribution == 'Debian'

@@ -26,11 +26,11 @@
         https_proxy: 'http://10.200.101.20:3128'
 
     - name: Manage Advanced Package Manager
-      include_role:
+      import_role:
         name: debops.debops.apt
       tags: apt
   
     - name: Install APT packages
-      include_role:
+      import_role:
         name: debops.debops.apt_install
       tags: apt_install
