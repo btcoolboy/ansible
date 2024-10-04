@@ -1,0 +1,9 @@
+apt_install__packages:
+  - 'ceph-common'
+  - 'conntrack'
+  - 'ebtables'
+  - 'ipset'
+  - 'ipvsadm'
+  - 'nfs-common'
+  - 'socat'
+  - 'uidmap'

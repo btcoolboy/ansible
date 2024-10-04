@@ -1,0 +1,3 @@
+logrotate__options: |
+  create 0644 root root
+  su root root

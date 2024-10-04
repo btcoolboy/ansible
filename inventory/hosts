@@ -15,6 +15,7 @@ ceph-[01:03]
 k8s-master[01:03]
 k8s-worker[01:03]
 k8s-adm
+10.200.101.182
 
 [Ubuntu:vars]
 ansible_ssh_user=ubuntu

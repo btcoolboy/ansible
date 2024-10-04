@@ -2,26 +2,20 @@
 - name: Manage kubernetes server
   hosts: kubernetes
   tasks:
-    - name: Install packages
-      apt:
-        pkg:
-        - ceph-common
-        - conntrack
-        - ebtables
-        - ipset
-        - ipvsadm
-        - nfs-common
-        - open-iscsi
-        - socat
-        - uidmap
-        - xfsprogs
-        update_cache: yes
-        state: present
-    - name: Make sure iscsid is running
-      ansible.builtin.systemd:
-        name: iscsid
-        state: started
-        enabled: yes
+    - name: Install APT packages
+      import_role:
+        name: debops.debops.apt_install
+      tags: apt_install
+
+    - name: Create the k8s completion file
+      copy:
+        content: |
+          source <(kubectl completion bash)
+        dest: /etc/profile.d/k8s_comletion.sh
+        owner: 'root'
+        group: 'root'
+        mode: '0644'
+
   roles:
     - role: containerd
       vars:

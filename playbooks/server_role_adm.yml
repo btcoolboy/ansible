@@ -34,3 +34,12 @@
       import_role:
         name: debops.debops.apt_install
       tags: apt_install
+
+    - name: Create the k8s completion file
+      copy:
+        content: |
+          source <(kubectl completion bash)
+        dest: /etc/profile.d/k8s_comletion.sh
+        owner: 'root'
+        group: 'root'
+        mode: '0644'

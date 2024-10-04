@@ -52,6 +52,11 @@
         name: debops.debops.sshd
       tags: sshd
 
+    - name: Configure log rotation
+      import_role:
+        name: debops.debops.logrotate
+      tags: logrotate
+
     - name: Manage user and group accounts
       import_role:
         name: oefenweb.user
