@@ -7,4 +7,4 @@ optionally configure multiple DokuWiki instances with shared base
 installation using [DokuWiki vhost farm](https://www.dokuwiki.org/farms)
 mode.
 
-Read the [dokuwiki role documentation](https://docs.debops.org/en/master/ansible/roles/dokuwiki/) for more details.
+Read the [dokuwiki role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/dokuwiki/) for more details.

@@ -14,4 +14,4 @@ publish static host entries that point to other hosts on the local
 network, or even define and publish CNAME records pointing to the host
 itself via a custom script.
 
-Read the [avahi role documentation](https://docs.debops.org/en/master/ansible/roles/avahi/) for more details.
+Read the [avahi role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/avahi/) for more details.

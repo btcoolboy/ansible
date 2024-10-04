@@ -8,4 +8,4 @@ servers.
 To manage the PostgreSQL server itself, you will need to use
 `debops.postgresql_server` role.
 
-Read the [postgresql role documentation](https://docs.debops.org/en/master/ansible/roles/postgresql/) for more details.
+Read the [postgresql role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/postgresql/) for more details.

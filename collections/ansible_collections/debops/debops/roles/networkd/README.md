@@ -10,4 +10,4 @@ The `debops.networkd` Ansible role can be used to generate and update
 configuration of the `systemd-networkd` service. Other parts of the
 `systemd` ecosystem are managed by separate Ansible roles.
 
-Read the [networkd role documentation](https://docs.debops.org/en/master/ansible/roles/networkd/) for more details.
+Read the [networkd role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/networkd/) for more details.

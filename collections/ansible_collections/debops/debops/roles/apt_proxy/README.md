@@ -9,4 +9,4 @@ The role also features proxy online detection support to silently
 skip/ignore temporally offline proxies which can make sense for
 workstations and home servers.
 
-Read the [apt_proxy role documentation](https://docs.debops.org/en/master/ansible/roles/apt_proxy/) for more details.
+Read the [apt_proxy role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/apt_proxy/) for more details.

@@ -19,4 +19,4 @@ service. Docker Registry can be installed as standalone service, in
 which case it will be secured using HTTP Basic Authentication provided
 by the `debops.nginx` role.
 
-Read the [docker_registry role documentation](https://docs.debops.org/en/master/ansible/roles/docker_registry/) for more details.
+Read the [docker_registry role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/docker_registry/) for more details.

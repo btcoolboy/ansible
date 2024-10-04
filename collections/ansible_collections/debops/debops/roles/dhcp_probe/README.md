@@ -12,4 +12,4 @@ templates to run DHCP Probe instances on multiple network interfaces at
 once. By default, an e-mail message will be sent to the system
 administrator with notification on newly detected rogue DHCP servers.
 
-Read the [dhcp_probe role documentation](https://docs.debops.org/en/master/ansible/roles/dhcp_probe/) for more details.
+Read the [dhcp_probe role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/dhcp_probe/) for more details.

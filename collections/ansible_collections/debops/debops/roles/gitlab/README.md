@@ -17,4 +17,4 @@ DebOps (firewall, PKI infrastructure, LDAP environment) and GitLab
 Omnibus, and allows the system administrator to deploy and manage GitLab
 Omnibus using Ansible.
 
-Read the [gitlab role documentation](https://docs.debops.org/en/master/ansible/roles/gitlab/) for more details.
+Read the [gitlab role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/gitlab/) for more details.

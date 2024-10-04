@@ -8,4 +8,4 @@ NeuroDebian provides a large collection of popular neuroscience research
 software for the Debian operating system as well as Ubuntu and other
 derivatives.
 
-Read the [neurodebian role documentation](https://docs.debops.org/en/master/ansible/roles/neurodebian/) for more details.
+Read the [neurodebian role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/neurodebian/) for more details.

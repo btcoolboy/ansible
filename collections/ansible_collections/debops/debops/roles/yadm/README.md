@@ -16,4 +16,4 @@ Optionally, `debops.yadm` role can clone selected dotfiles `git`
 repositories to the host creating mirrors, that can be used by users or
 other Ansible roles to deploy dotfiles locally.
 
-Read the [yadm role documentation](https://docs.debops.org/en/master/ansible/roles/yadm/) for more details.
+Read the [yadm role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/yadm/) for more details.

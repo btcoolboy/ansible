@@ -10,4 +10,4 @@ file, as well as gives you a set of variables which can be used to
 manage LVM logical volumes, automatically create filesystems on them and
 mount them as needed.
 
-Read the [lvm role documentation](https://docs.debops.org/en/master/ansible/roles/lvm/) for more details.
+Read the [lvm role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/lvm/) for more details.

@@ -7,4 +7,4 @@ management of NSS services after they have been configured. System
 administrators can use this role to enable or disable NSS services
 conditionally or change the preferred order of the NSS services.
 
-Read the [nsswitch role documentation](https://docs.debops.org/en/master/ansible/roles/nsswitch/) for more details.
+Read the [nsswitch role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/nsswitch/) for more details.

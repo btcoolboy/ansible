@@ -6,4 +6,4 @@ PostgreSQL clusters on Debian-based systems. You can use
 `debops.postgresql` role to configure roles and databases on local or
 remote PostgreSQL servers.
 
-Read the [postgresql_server role documentation](https://docs.debops.org/en/master/ansible/roles/postgresql_server/) for more details.
+Read the [postgresql_server role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/postgresql_server/) for more details.

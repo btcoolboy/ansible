@@ -10,4 +10,4 @@ Configuration of `libvirtd` instance (local or remote) can be performed
 using `debops.libvirt` role, which uses the `libvirt` API to manage the
 server.
 
-Read the [libvirtd role documentation](https://docs.debops.org/en/master/ansible/roles/libvirtd/) for more details.
+Read the [libvirtd role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/libvirtd/) for more details.

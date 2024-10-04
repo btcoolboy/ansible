@@ -12,4 +12,4 @@ Authorities, or use the ACME protocol to automatically obtain
 certificates from CA that support it (for example [Let's
 Encrypt](https://en.wikipedia.org/wiki/Let's_Encrypt)).
 
-Read the [pki role documentation](https://docs.debops.org/en/master/ansible/roles/pki/) for more details.
+Read the [pki role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/pki/) for more details.

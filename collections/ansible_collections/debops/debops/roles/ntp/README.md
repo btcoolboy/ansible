@@ -10,4 +10,4 @@ containers.
 The role is also used to configure the system timezone using the
 `tzdata` package.
 
-Read the [ntp role documentation](https://docs.debops.org/en/master/ansible/roles/ntp/) for more details.
+Read the [ntp role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/ntp/) for more details.

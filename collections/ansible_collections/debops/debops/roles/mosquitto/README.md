@@ -10,4 +10,4 @@ Mosquitto on Debian/Ubuntu hosts. The role can use other DebOps roles to
 manage firewall access to Mosquitto, publish Avahi services and
 configure an nginx frontend for the Mosquitto WebSockets API.
 
-Read the [mosquitto role documentation](https://docs.debops.org/en/master/ansible/roles/mosquitto/) for more details.
+Read the [mosquitto role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/mosquitto/) for more details.

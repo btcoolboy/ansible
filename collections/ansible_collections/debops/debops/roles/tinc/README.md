@@ -9,4 +9,4 @@ VPN using `tinc`, including automatic public key exchange between all
 hosts in the Ansible inventory, connection to external hosts and secure
 configuration.
 
-Read the [tinc role documentation](https://docs.debops.org/en/master/ansible/roles/tinc/) for more details.
+Read the [tinc role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/tinc/) for more details.

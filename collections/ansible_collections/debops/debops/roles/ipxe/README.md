@@ -10,4 +10,4 @@ prepares a simple boot menu which can be used to either launch the
 Debian Installer over the network, or switch to another publicly
 available network boot menu.
 
-Read the [ipxe role documentation](https://docs.debops.org/en/master/ansible/roles/ipxe/) for more details.
+Read the [ipxe role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/ipxe/) for more details.

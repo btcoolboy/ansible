@@ -8,4 +8,4 @@ Encryption is done using SSL certificates. This Ansible role can be used
 to create tunnels between two or more hosts, using Ansible inventory
 groups.
 
-Read the [stunnel role documentation](https://docs.debops.org/en/master/ansible/roles/stunnel/) for more details.
+Read the [stunnel role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/stunnel/) for more details.

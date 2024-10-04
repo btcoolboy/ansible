@@ -17,4 +17,4 @@ This role is primarily geared towards allowing other roles to perform
 customizations of existing profiles, and allowing administrators to
 selectively enable/disable profiles.
 
-Read the [apparmor role documentation](https://docs.debops.org/en/master/ansible/roles/apparmor/) for more details.
+Read the [apparmor role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/apparmor/) for more details.

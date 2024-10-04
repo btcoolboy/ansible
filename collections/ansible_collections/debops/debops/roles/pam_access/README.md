@@ -7,4 +7,4 @@ authentication support to services on Linux hosts. The
 access control rules that can be used to grant or revoke access to
 services based on users, groups and origins.
 
-Read the [pam_access role documentation](https://docs.debops.org/en/master/ansible/roles/pam_access/) for more details.
+Read the [pam_access role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/pam_access/) for more details.

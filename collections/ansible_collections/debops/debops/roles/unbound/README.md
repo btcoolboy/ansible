@@ -5,4 +5,4 @@
 used to ensure that DNS queries protected by DNSSEC are signed by the
 correct DNS root zone key, verified locally.
 
-Read the [unbound role documentation](https://docs.debops.org/en/master/ansible/roles/unbound/) for more details.
+Read the [unbound role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/unbound/) for more details.

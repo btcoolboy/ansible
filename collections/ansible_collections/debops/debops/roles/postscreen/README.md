@@ -10,4 +10,4 @@ This role can be used to enable and configure Postscreen in a Postfix
 installation managed by the `debops.postfix` Ansible role. It does not
 configure Postfix directly on its own.
 
-Read the [postscreen role documentation](https://docs.debops.org/en/master/ansible/roles/postscreen/) for more details.
+Read the [postscreen role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/postscreen/) for more details.

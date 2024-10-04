@@ -6,4 +6,4 @@ deployed behind nginx webserver as a self-hosted application. The
 `debops.miniflux` Ansible role can be used to deploy Miniflux on a host
 managed by DebOps.
 
-Read the [miniflux role documentation](https://docs.debops.org/en/master/ansible/roles/miniflux/) for more details.
+Read the [miniflux role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/miniflux/) for more details.

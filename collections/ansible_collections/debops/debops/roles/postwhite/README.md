@@ -17,4 +17,4 @@ as long as the Postscreen configuration is enabled by the
 `debops.postscreen` role. See the documentation of the mentioned roles
 for more details.
 
-Read the [postwhite role documentation](https://docs.debops.org/en/master/ansible/roles/postwhite/) for more details.
+Read the [postwhite role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/postwhite/) for more details.

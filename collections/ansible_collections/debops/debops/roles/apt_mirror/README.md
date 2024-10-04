@@ -11,4 +11,4 @@ publish them using `nginx` for other hosts to use. The role supports
 configuration of multiple mirror "instances", which can be configured
 with different mirror frequency as needed.
 
-Read the [apt_mirror role documentation](https://docs.debops.org/en/master/ansible/roles/apt_mirror/) for more details.
+Read the [apt_mirror role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/apt_mirror/) for more details.

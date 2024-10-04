@@ -12,4 +12,4 @@ checks for presence of different services like `lxc-net` configured by
 the `debops.lxc`, `consul` and specific network interfaces defined by
 the `debops.ifupdown`, and adjusts the configuration automatically.
 
-Read the [dnsmasq role documentation](https://docs.debops.org/en/master/ansible/roles/dnsmasq/) for more details.
+Read the [dnsmasq role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/dnsmasq/) for more details.

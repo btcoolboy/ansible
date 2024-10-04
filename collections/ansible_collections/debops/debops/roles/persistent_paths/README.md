@@ -23,4 +23,4 @@ does this is `debops.cryptsetup`.
 The role can also be used by the system administrator to manage
 [bind-dirs]() using the Ansible inventory.
 
-Read the [persistent_paths role documentation](https://docs.debops.org/en/master/ansible/roles/persistent_paths/) for more details.
+Read the [persistent_paths role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/persistent_paths/) for more details.

@@ -12,4 +12,4 @@ repositories via Ansible using the `extrepo` package. The role is
 written as complimentary to the `debops.keyring` role which provides a
 similar functionality.
 
-Read the [extrepo role documentation](https://docs.debops.org/en/master/ansible/roles/extrepo/) for more details.
+Read the [extrepo role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/extrepo/) for more details.

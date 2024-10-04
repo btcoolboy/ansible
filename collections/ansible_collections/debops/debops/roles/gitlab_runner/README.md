@@ -12,4 +12,4 @@ create multiple Runner instances, each one with distinct configuration.
 The role will automatically register the Runners in GitLab CI management
 host if a required registration token is supplied.
 
-Read the [gitlab_runner role documentation](https://docs.debops.org/en/master/ansible/roles/gitlab_runner/) for more details.
+Read the [gitlab_runner role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/gitlab_runner/) for more details.

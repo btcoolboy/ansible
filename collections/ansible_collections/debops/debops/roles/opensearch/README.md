@@ -11,4 +11,4 @@ The `debops.opensearch` role only implements a subsection of the
 features supported by `debops.elasticsearch`. The role is currently only
 suitable for setting up a local OpenSearch instance without TLS support.
 
-Read the [opensearch role documentation](https://docs.debops.org/en/master/ansible/roles/opensearch/) for more details.
+Read the [opensearch role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/opensearch/) for more details.

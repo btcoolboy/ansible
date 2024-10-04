@@ -10,4 +10,4 @@ The `debops.resolved` Ansible role manages the `systemd-resolved`
 configuration. Other parts of the `systemd` ecosystem are managed by
 separate Ansible roles.
 
-Read the [resolved role documentation](https://docs.debops.org/en/master/ansible/roles/resolved/) for more details.
+Read the [resolved role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/resolved/) for more details.

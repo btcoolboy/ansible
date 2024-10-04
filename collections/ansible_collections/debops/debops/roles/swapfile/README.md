@@ -8,4 +8,4 @@ Note that this role can not setup a swap file on a BTRFS filesystem.
 Refer to `debops.sysctl` for paging and swapping related kernel
 settings.
 
-Read the [swapfile role documentation](https://docs.debops.org/en/master/ansible/roles/swapfile/) for more details.
+Read the [swapfile role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/swapfile/) for more details.

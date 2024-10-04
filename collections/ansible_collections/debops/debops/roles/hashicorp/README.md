@@ -10,4 +10,4 @@ repository, authenticated using the HashiCorp OpenPGP key and installed
 on the system. After that, other Ansible roles can be used to configure
 them as needed.
 
-Read the [hashicorp role documentation](https://docs.debops.org/en/master/ansible/roles/hashicorp/) for more details.
+Read the [hashicorp role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/hashicorp/) for more details.

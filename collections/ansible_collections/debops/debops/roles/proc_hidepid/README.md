@@ -5,4 +5,4 @@ This role will ensure that the `/proc` filesystem is mounted with the
 option](https://wiki.archlinux.org/index.php/Security#hidepid) can be
 used to hide processes that don't belong to a particular user account.
 
-Read the [proc_hidepid role documentation](https://docs.debops.org/en/master/ansible/roles/proc_hidepid/) for more details.
+Read the [proc_hidepid role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/proc_hidepid/) for more details.

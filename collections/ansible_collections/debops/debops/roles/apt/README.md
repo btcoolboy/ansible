@@ -3,4 +3,4 @@
 `debops.apt` configures and manages APT, the Advanced Package Tool in
 Debian and other derivative distributions.
 
-Read the [apt role documentation](https://docs.debops.org/en/master/ansible/roles/apt/) for more details.
+Read the [apt role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/apt/) for more details.

@@ -28,4 +28,4 @@ the `/etc/resolv.conf` file directly. You should consult the
 documentation of various DNS-related services to see how you can modify
 the contents of this file through them.
 
-Read the [resolvconf role documentation](https://docs.debops.org/en/master/ansible/roles/resolvconf/) for more details.
+Read the [resolvconf role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/resolvconf/) for more details.

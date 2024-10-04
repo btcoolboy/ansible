@@ -13,4 +13,4 @@ executed late in the configuration order defined in the `site.yml`
 Ansible playbook, so that other services required by a given application
 can be prepared before its installation.
 
-Read the [debconf role documentation](https://docs.debops.org/en/master/ansible/roles/debconf/) for more details.
+Read the [debconf role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/debconf/) for more details.

@@ -10,4 +10,4 @@ The `metricbeat` Ansible role configures Metricbeat on Debian/Ubuntu
 hosts. The software itself will be installed using the `debops.extrepo`
 Ansible role.
 
-Read the [metricbeat role documentation](https://docs.debops.org/en/master/ansible/roles/metricbeat/) for more details.
+Read the [metricbeat role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/metricbeat/) for more details.

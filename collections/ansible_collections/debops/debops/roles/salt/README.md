@@ -6,4 +6,4 @@ Salt Minions are installed using host deployment methods like
 PXE/preseeding, LXC template scripts, etc. and contact the Salt Master
 service over DNS.
 
-Read the [salt role documentation](https://docs.debops.org/en/master/ansible/roles/salt/) for more details.
+Read the [salt role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/salt/) for more details.

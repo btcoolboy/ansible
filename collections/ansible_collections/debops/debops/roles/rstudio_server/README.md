@@ -6,4 +6,4 @@ Environment for the R programming language.
 This Ansible role can be used to deploy RStudio Server, which is RStudio
 implemented as a web application accessible in a browser.
 
-Read the [rstudio_server role documentation](https://docs.debops.org/en/master/ansible/roles/rstudio_server/) for more details.
+Read the [rstudio_server role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/rstudio_server/) for more details.

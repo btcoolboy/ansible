@@ -6,4 +6,4 @@ in `/etc/hosts` and `/etc/networks` files, respectively. It can be used
 as a substitute for a DNS service for small number of hosts; with bigger
 network or larger clusters usage of a real DNS server is preferred.
 
-Read the [netbase role documentation](https://docs.debops.org/en/master/ansible/roles/netbase/) for more details.
+Read the [netbase role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/netbase/) for more details.

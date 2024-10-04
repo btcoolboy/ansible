@@ -12,4 +12,4 @@ The `debops.rsnapshot` Ansible role acts as another "layer" above
 host to internal or removable storage, as well as create snapshotted
 backups of remote hosts over SSH.
 
-Read the [rsnapshot role documentation](https://docs.debops.org/en/master/ansible/roles/rsnapshot/) for more details.
+Read the [rsnapshot role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/rsnapshot/) for more details.

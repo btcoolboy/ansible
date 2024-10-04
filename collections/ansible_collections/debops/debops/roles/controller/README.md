@@ -11,4 +11,4 @@ hosts, which then can be used to control other hosts using DebOps. Roles
 and playbooks will be installed by default in a central, system-wide
 location, available to all users.
 
-Read the [controller role documentation](https://docs.debops.org/en/master/ansible/roles/controller/) for more details.
+Read the [controller role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/controller/) for more details.

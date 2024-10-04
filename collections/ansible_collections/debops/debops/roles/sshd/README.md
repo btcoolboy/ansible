@@ -5,4 +5,4 @@ and other remote control programs. It allows you to connect to remote
 hosts over a encrypted communication channel and to perform a variety of
 tasks. It's also the primary communication channel used by Ansible.
 
-Read the [sshd role documentation](https://docs.debops.org/en/master/ansible/roles/sshd/) for more details.
+Read the [sshd role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/sshd/) for more details.

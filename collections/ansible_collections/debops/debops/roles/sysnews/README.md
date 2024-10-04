@@ -10,4 +10,4 @@ The System News can be read by executing the `news` command in the
 shell. You can read all of the news entries by executing the `news -a`
 command.
 
-Read the [sysnews role documentation](https://docs.debops.org/en/master/ansible/roles/sysnews/) for more details.
+Read the [sysnews role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/sysnews/) for more details.

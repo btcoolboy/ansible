@@ -11,4 +11,4 @@ service, the original `nscd` implemented by GNU `libc` library, as well
 as its drop-in replacement, `unscd`, created by the BusyBox project. The
 `unscd` version is installed by default.
 
-Read the [nscd role documentation](https://docs.debops.org/en/master/ansible/roles/nscd/) for more details.
+Read the [nscd role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/nscd/) for more details.

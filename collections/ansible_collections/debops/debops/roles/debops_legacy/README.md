@@ -15,4 +15,4 @@ with:
 Any changes that the role will create on the hosts can be overridden via
 the Ansible inventory if needed.
 
-Read the [debops_legacy role documentation](https://docs.debops.org/en/master/ansible/roles/debops_legacy/) for more details.
+Read the [debops_legacy role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/debops_legacy/) for more details.

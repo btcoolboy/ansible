@@ -1,4 +1,4 @@
 ### smstools
 
 This role does not have official documentation.
-See [DebOps documentation](https://docs.debops.org/en/master/) instead.
+See [DebOps documentation](https://docs.debops.org/en/stable-3.2/) instead.

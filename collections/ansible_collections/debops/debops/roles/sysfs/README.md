@@ -11,4 +11,4 @@ attributes in supported environments. It can be used as a standalone
 role, or a dependent role to configure `sysfs` on behalf of another
 Ansible role.
 
-Read the [sysfs role documentation](https://docs.debops.org/en/master/ansible/roles/sysfs/) for more details.
+Read the [sysfs role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/sysfs/) for more details.

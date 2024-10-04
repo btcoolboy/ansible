@@ -10,4 +10,4 @@ configuration for system packages, or create custom log configuration.
 The role can be used by other roles as a dependency to make automatic
 `logrotate` configuration easier.
 
-Read the [logrotate role documentation](https://docs.debops.org/en/master/ansible/roles/logrotate/) for more details.
+Read the [logrotate role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/logrotate/) for more details.

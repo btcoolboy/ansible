@@ -9,4 +9,4 @@ the same time. The server is configured using inventory variables. This
 role can also be used as a dependency of another role to configure a
 webserver for that role using dependency variables.
 
-Read the [nginx role documentation](https://docs.debops.org/en/master/ansible/roles/nginx/) for more details.
+Read the [nginx role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/nginx/) for more details.

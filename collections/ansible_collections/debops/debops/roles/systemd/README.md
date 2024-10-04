@@ -15,4 +15,4 @@ be used to manage disparate components like `journald` via the
 `systemd`, as well as the global configuration of the `systemd --user`
 instances and the configuration of the `systemd-logind` login manager.
 
-Read the [systemd role documentation](https://docs.debops.org/en/master/ansible/roles/systemd/) for more details.
+Read the [systemd role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/systemd/) for more details.

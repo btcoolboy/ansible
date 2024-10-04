@@ -11,4 +11,4 @@ directory and provide custom scripts that allow, for example, initial
 bootstrapping of the user's SSH public keys inside of the container so
 that it can be managed remotely with Ansible.
 
-Read the [lxc role documentation](https://docs.debops.org/en/master/ansible/roles/lxc/) for more details.
+Read the [lxc role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/lxc/) for more details.

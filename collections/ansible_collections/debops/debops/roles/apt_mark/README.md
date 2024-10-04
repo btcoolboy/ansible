@@ -7,4 +7,4 @@ are marked for autoremoval, or if you want to hold certain APT packages
 in their current state. The role operates only on packages that are
 already installed.
 
-Read the [apt_mark role documentation](https://docs.debops.org/en/master/ansible/roles/apt_mark/) for more details.
+Read the [apt_mark role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/apt_mark/) for more details.

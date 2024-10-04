@@ -11,4 +11,4 @@ configure users and databases in local or remote MariaDB servers. You
 can use `debops.mariadb_server` role to manage the MariaDB server
 itself.
 
-Read the [mariadb role documentation](https://docs.debops.org/en/master/ansible/roles/mariadb/) for more details.
+Read the [mariadb role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/mariadb/) for more details.

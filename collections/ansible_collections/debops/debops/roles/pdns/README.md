@@ -10,4 +10,4 @@ excellent DNSSEC support, currently supporting the vast majority of
 DNSSEC-enabled domains in Europe. pdns is extensible using a wide
 variety of scripting languages.
 
-Read the [pdns role documentation](https://docs.debops.org/en/master/ansible/roles/pdns/) for more details.
+Read the [pdns role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/pdns/) for more details.

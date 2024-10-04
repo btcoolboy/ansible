@@ -9,4 +9,4 @@ only for installation of packages, additional configuration and
 management of the installed software is performed by other Ansible
 roles.
 
-Read the [elastic_co role documentation](https://docs.debops.org/en/master/ansible/roles/elastic_co/) for more details.
+Read the [elastic_co role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/elastic_co/) for more details.

@@ -8,4 +8,4 @@ It's designed to be used either "locally", directly on a given host, or
 To configure a host to provide the `libvirtd` service you can use the
 `debops.libvirtd` role.
 
-Read the [libvirt role documentation](https://docs.debops.org/en/master/ansible/roles/libvirt/) for more details.
+Read the [libvirt role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/libvirt/) for more details.

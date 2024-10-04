@@ -11,4 +11,4 @@ The `debops.dovecot` Ansible role can be used to configure the `dovecot`
 service on a host and to automatically setup various auxiliary roles,
 such as `debops.pki` for SSL/TLS encryption.
 
-Read the [dovecot role documentation](https://docs.debops.org/en/master/ansible/roles/dovecot/) for more details.
+Read the [dovecot role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/dovecot/) for more details.

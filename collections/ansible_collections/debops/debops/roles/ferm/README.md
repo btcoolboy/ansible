@@ -6,4 +6,4 @@ easy and Ansible-friendly way. This role can be used to setup firewall
 rules directly from the inventory, or it can be used as a dependency by
 other roles to setup firewall rules for other services.
 
-Read the [ferm role documentation](https://docs.debops.org/en/master/ansible/roles/ferm/) for more details.
+Read the [ferm role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/ferm/) for more details.

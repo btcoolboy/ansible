@@ -13,4 +13,4 @@ future. The role is also integrated with the LDAP framework implemented
 in the `debops.ldap` role and can be used to implement authentication
 via the LDAP directory in other services.
 
-Read the [saslauthd role documentation](https://docs.debops.org/en/master/ansible/roles/saslauthd/) for more details.
+Read the [saslauthd role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/saslauthd/) for more details.

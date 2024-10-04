@@ -11,4 +11,4 @@ The `debops.reprepro` role uses the `reprepro` package to maintain
 multiple sets of APT repositories, with optional authentication and
 access restrictions.
 
-Read the [reprepro role documentation](https://docs.debops.org/en/master/ansible/roles/reprepro/) for more details.
+Read the [reprepro role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/reprepro/) for more details.

@@ -9,4 +9,4 @@ This role can also be used by other Ansible roles as a dependency to
 create global environment variables in a safe way, that preserves
 idempotency.
 
-Read the [environment role documentation](https://docs.debops.org/en/master/ansible/roles/environment/) for more details.
+Read the [environment role documentation](https://docs.debops.org/en/stable-3.2/ansible/roles/environment/) for more details.
