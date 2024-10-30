@@ -11,7 +11,7 @@
    "name": "INSTALL.rst",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "8a905f1e76a8b24593f97be3afa3cd26822c473953a1007204f001e1a8dc3bf8",
+   "chksum_sha256": "0dc35637e23dfb1fd199aa9303763b0db53657499f6694bb9f14d1c5d812d631",
    "format": 1
   },
   {
@@ -1012,7 +1012,7 @@
    "name": "roles/users/tasks/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "f563957c86f6c7369874c9f822886f19421d2c2cc7a446d169876fe7087599e6",
+   "chksum_sha256": "6b1b0da435124b58cd6c32f1b58e572357f19abfaae5fc2e096a9a6e74546e24",
    "format": 1
   },
   {
@@ -3308,7 +3308,7 @@
    "name": "roles/bind/defaults/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "46f79412d9fa299777cf3726d4ba65e6a1bea18c4fcb9dc3bb5b2a98ff49652d",
+   "chksum_sha256": "8bd1ecf06bae9915eccadd36e114d15a2f859fe25d4437f451b09897a4d0415d",
    "format": 1
   },
   {
@@ -3392,7 +3392,7 @@
    "name": "roles/bind/files/usr/local/sbin/debops-bind-snapshot",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "96e9ab325b00136787fc6a09e4a61d0baf819da259bfd9e7fe3e6ffd35d7907e",
+   "chksum_sha256": "c7f813902dfa8a2b926d44444412b5e899376e708f250d28f6675079a836f70f",
    "format": 1
   },
   {
@@ -3784,7 +3784,7 @@
    "name": "roles/resolved/defaults/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "4c053afe8dd90445d41dd55e77fe5939dc41693ba775a821239f2624c49a3e77",
+   "chksum_sha256": "e1e3e87d94e3c87cd20d8e64b78648790c45a017fef733aa682c493d070a8a6d",
    "format": 1
   },
   {
@@ -5737,7 +5737,7 @@
    "name": "roles/netbox/defaults/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "029133cf6bc6c3d2245ffb6a87bc740ff7458f34ed39ff788df8be7c1fcc41c7",
+   "chksum_sha256": "adda0aec82a46d52e56e093d7e3394992e089f65a367dfab073db080fa48b9a3",
    "format": 1
   },
   {
@@ -5758,7 +5758,7 @@
    "name": "roles/netbox/tasks/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "4297f95db4f67710d643960f7f743d7495b5fb5696004f7e3fbf5a869fcbeacb",
+   "chksum_sha256": "9964b46e6f7aa788de5be25a166bdd74ff66c40bfae3537609dbeb3caf07d34c",
    "format": 1
   },
   {
@@ -5786,7 +5786,7 @@
    "name": "roles/netbox/meta/watch-netbox",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "8d02d59dae847e7e918ea04361daf31ba6df1b984e7ceea03c5758f9212e37bd",
+   "chksum_sha256": "38b1373c20a29b05b64fd7b27e50477b28b0989b672fb8b8976dfb951f7b4ad7",
    "format": 1
   },
   {
@@ -5825,10 +5825,24 @@
    "format": 1
   },
   {
+   "name": "roles/netbox/templates/etc/systemd/system/netbox-housekeeping.timer.j2",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "5b70e5c669a756ed4b95dce705997560e5127699679fe7ce5e365a5c5b514a6a",
+   "format": 1
+  },
+  {
    "name": "roles/netbox/templates/etc/systemd/system/netbox.service.j2",
    "ftype": "file",
    "chksum_type": "sha256",
    "chksum_sha256": "2b2d0c544e72dfe6c7f0d9b65f0e4a1918bfb6300760e2e95425e1f0fc1dbabd",
+   "format": 1
+  },
+  {
+   "name": "roles/netbox/templates/etc/systemd/system/netbox-housekeeping.service.j2",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "9b5a901190acb739045899c581c68c8cf2691136402acd4af188a51081ab09b6",
    "format": 1
   },
   {
@@ -5898,7 +5912,7 @@
    "name": "roles/netbox/templates/usr/local/lib/netbox/configuration.py.j2",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "70643cde23e0102f439135ba227013363797f978a4793ea3cb1a50503255fac1",
+   "chksum_sha256": "72fc337c80b48ae634cb3bcdbc6efe998d76ef71e9c5a9905bdb7f8cf199f427",
    "format": 1
   },
   {
@@ -5954,7 +5968,7 @@
    "name": "roles/icinga/defaults/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "483c046537bac517645661a1e67c7a596f8b620d33ba67b4e3b179ad665b749d",
+   "chksum_sha256": "7a1efa012cd13ea3fb985ad199e043eebf8368e2fda05093c67ccb32e7dd2702",
    "format": 1
   },
   {
@@ -6234,7 +6248,7 @@
    "name": "roles/postgresql_server/templates/etc/postgresql/postgresql.conf.j2",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "e79bdbe3ffaa055039b09ff8d84de76426c7ea1e32fc5a7b4e75378556c80cad",
+   "chksum_sha256": "e5fbf68b5fecbf6575b22341d64d2cdc82a4757c72bee418ac83d9ddd70be03d",
    "format": 1
   },
   {
@@ -6878,7 +6892,7 @@
    "name": "roles/lvm/vars/lvm_config_2.03.02.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "bf69a13155b55223c6f3a5728648550a2e66d882946d5fca4ee59c57c4b2a6aa",
+   "chksum_sha256": "a30b298ca20ed9317e8501e5d9be315ac91790ce4f99667ce94409f4087aea10",
    "format": 1
   },
   {
@@ -6899,14 +6913,14 @@
    "name": "roles/lvm/vars/lvm_config_debian.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "bf69a13155b55223c6f3a5728648550a2e66d882946d5fca4ee59c57c4b2a6aa",
+   "chksum_sha256": "a30b298ca20ed9317e8501e5d9be315ac91790ce4f99667ce94409f4087aea10",
    "format": 1
   },
   {
    "name": "roles/lvm/vars/lvm_config_default.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "bf69a13155b55223c6f3a5728648550a2e66d882946d5fca4ee59c57c4b2a6aa",
+   "chksum_sha256": "a30b298ca20ed9317e8501e5d9be315ac91790ce4f99667ce94409f4087aea10",
    "format": 1
   },
   {
@@ -6934,7 +6948,7 @@
    "name": "roles/lvm/vars/lvm_config_debian_buster.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "bf69a13155b55223c6f3a5728648550a2e66d882946d5fca4ee59c57c4b2a6aa",
+   "chksum_sha256": "a30b298ca20ed9317e8501e5d9be315ac91790ce4f99667ce94409f4087aea10",
    "format": 1
   },
   {
@@ -6948,7 +6962,7 @@
    "name": "roles/lvm/vars/lvm_config_debian_stretch.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "3d27e7cf9e735df3ae7709bfa272ae31a031b98f146b19db665a39e8d30a730b",
+   "chksum_sha256": "da863204e7b7399d57d54d89e54950171a30d8b4c2bfc6fd8e49cb998111c725",
    "format": 1
   },
   {
@@ -6962,7 +6976,7 @@
    "name": "roles/lvm/vars/lvm_config_2.02.168.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "3d27e7cf9e735df3ae7709bfa272ae31a031b98f146b19db665a39e8d30a730b",
+   "chksum_sha256": "da863204e7b7399d57d54d89e54950171a30d8b4c2bfc6fd8e49cb998111c725",
    "format": 1
   },
   {
@@ -7207,7 +7221,7 @@
    "name": "roles/gitlab_runner/defaults/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "4ea6e4855cb32c23c1a8a2b115a625892ae9547a067ba27f61c31cd8126342f3",
+   "chksum_sha256": "26860e2f57342fc935d4277cd1ba92851f16e4fe63152043755bed55e7cd140b",
    "format": 1
   },
   {
@@ -7228,7 +7242,7 @@
    "name": "roles/gitlab_runner/tasks/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "8c7ae2487d41f7ba136be2194b025e5dcca458262d833dc1667127a6deae96d8",
+   "chksum_sha256": "ee173c9eb7f5ca7acbec1a10f71f8678f45253130a3367216c6d7aa3353150a4",
    "format": 1
   },
   {
@@ -8180,7 +8194,7 @@
    "name": "roles/ifupdown/templates/etc/systemd/system/iface@.service.j2",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "ce8982025b893e9b5eed30f103e84e77fb632bf9f6210fde6b7c6349b7e6e98b",
+   "chksum_sha256": "5394d2850ada02d25b9d5efc3c1269896bc5ab78b5897db62dc322ff36e16c67",
    "format": 1
   },
   {
@@ -9664,7 +9678,7 @@
    "name": "roles/ferm/defaults/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "7d45c8cea1b614cfcaa560115c32f14b147e445c2c24c8a5b3ee1a40271b1fed",
+   "chksum_sha256": "5d0131ca192f561a399cdc60b8b13b075d0d3939ffd258d168fbc37fdad780f2",
    "format": 1
   },
   {
@@ -9685,7 +9699,7 @@
    "name": "roles/ferm/tasks/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "608c25d47f26b7bb6d3f7ce2dfd88dbcdf6af839d551d214c72c81347415342c",
+   "chksum_sha256": "d8bcb2b1fcd7c5d89ec171f050a9db88c640dc23b6e6ec56380f81362c4ff5ff",
    "format": 1
   },
   {
@@ -10455,7 +10469,7 @@
    "name": "roles/system_users/tasks/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "66d49f2c64ab6ceae643f3bdab6c8ce1ee134deff9e556865940ad50bbd3da37",
+   "chksum_sha256": "7282c7da2de1dd2a34d469db23fa6398036242fe2cfd84fa246ca3a72954dd62",
    "format": 1
   },
   {
@@ -13879,6 +13893,20 @@
    "ftype": "file",
    "chksum_type": "sha256",
    "chksum_sha256": "af5c1fc5430da87f83e8a898fb325f3ee00f3f6d9730d65a95bfe56dca199044",
+   "format": 1
+  },
+  {
+   "name": "roles/debconf/meta",
+   "ftype": "dir",
+   "chksum_type": null,
+   "chksum_sha256": null,
+   "format": 1
+  },
+  {
+   "name": "roles/debconf/meta/main.yml",
+   "ftype": "file",
+   "chksum_type": "sha256",
+   "chksum_sha256": "052d391c4d34fcad2a7a87b35f1d479cd0f64c92090015b65858ae9eeda81600",
    "format": 1
   },
   {
@@ -17343,7 +17371,7 @@
    "name": "roles/owncloud/tasks/setup_owncloud.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "659ccfb418cbed49e13fe37c897c106ea207e3cd1e69edd039beeaacfbb61443",
+   "chksum_sha256": "1364412396765a3a4f9e6fc17e5c4b6946314e4d2e71d5766e04d4917aa8e05a",
    "format": 1
   },
   {
@@ -21438,7 +21466,7 @@
    "name": "roles/nginx/tasks/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "b128992165fbddbc016fa40b47a54f580219adf916e70101f72ef16569b8d479",
+   "chksum_sha256": "a9b93d244ec0a4f69e0023d590fab7620ad6ab2aeeff8c9877244b013322f42f",
    "format": 1
   },
   {
@@ -21473,14 +21501,14 @@
    "name": "roles/nginx/tasks/nginx_servers.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "bec6b8eec4ac871cddf226d81b92f23876f27761b28b11e71a10d37c2ebfc5fd",
+   "chksum_sha256": "e8e2aa8d2b9ce4ef5b15db5ac099efe9b7f757031724a7f854d52f065b6ff19f",
    "format": 1
   },
   {
    "name": "roles/nginx/tasks/nginx_configs.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "624171b40e363629ba78b63fac04a8513aca03f598e4662ed207cac90d8754b7",
+   "chksum_sha256": "a8f0ad41ee57692ae0c27ad6059c05ff657de24a59fdfecc0ede0c5038a65552",
    "format": 1
   },
   {
@@ -21620,7 +21648,7 @@
    "name": "roles/nginx/templates/etc/systemd/system/nginx.service.d/wait-for-network.conf.j2",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "ff7ddb3ea2b5b560ac875689bcc74ea3f0816aebee13f18d0b27255c99ed1479",
+   "chksum_sha256": "2a42dce030b9f76e604694d1936b0a9ef20b8ad433246aab629b2b38d555791e",
    "format": 1
   },
   {
@@ -23783,7 +23811,7 @@
    "name": "roles/root_account/tasks/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "96efca518043c22c852f09b1d1e81a737e2e05b24a8ba75598db4c8b0dcf00cc",
+   "chksum_sha256": "973df3ca7e68da57a55d3b522bd2185cd8f0ba5ec0eec998397deb2009d584ca",
    "format": 1
   },
   {
@@ -24518,7 +24546,7 @@
    "name": "roles/docker_gen/tasks/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "cf2926753527d8924ce5fb2c29210248f34fb16a5269d2c2ab9c9c34f6b8959e",
+   "chksum_sha256": "54356a6b8a298f352574c57371e755c28353691ee7a384c572699f1785002210",
    "format": 1
   },
   {
@@ -25764,7 +25792,7 @@
    "name": "roles/snmpd/files/etc/systemd/system/snmpd.service",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "162e4042b7199efb89b136a54bea546dff591d49d28c83d949feb7e0c46d2861",
+   "chksum_sha256": "d8ae7c3583e61733d0a447b71741c5f713fac81023e7106a15d9699b456784b9",
    "format": 1
   },
   {
@@ -28109,7 +28137,7 @@
    "name": "roles/sysctl/defaults/main.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "84c9f2babd35e610b0ac1949b71f79f76238950127b571e16049db572de0c754",
+   "chksum_sha256": "8f7b2998c4d514256e0d4c6d9a3731122911a6f9f9224d1a0a585fa53c2835a4",
    "format": 1
   },
   {
@@ -28557,7 +28585,7 @@
    "name": "roles/core/templates/etc/ansible/facts.d/core.fact.j2",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "6d1b90b00b60b1aa3043aea5c5c67fc018c4ff8736f9fd89f2954ae086f86c2e",
+   "chksum_sha256": "d94561daeb8efd4198fa805c9461702b66c9c3ee9ef97874cd987299c7b1bc52",
    "format": 1
   },
   {
@@ -29642,14 +29670,14 @@
    "name": "roles/rspamd/files/usr/local/sbin/rspamd-dkim-keygen",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "70af09e99b28f09a2e942e667d9333904fe9d2bc206511b0dc7960f2577153cf",
+   "chksum_sha256": "e28f898f0212d4f8dd6f860c9a4b52c374e4184c60bd255983eb37aad6895b71",
    "format": 1
   },
   {
    "name": "roles/rspamd/files/usr/local/sbin/rspamd-dkim-update",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "6e626528df2b066e9dc71f5c0285a900f0d1e489297a2c53815306d903cd4c8c",
+   "chksum_sha256": "afbcbd1a66e564706cf33a3b3c5f260a2cacb4fdbb0b09dae116d6bf70a0ea4c",
    "format": 1
   },
   {
@@ -29719,7 +29747,7 @@
    "name": ".yamllint",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "22119d6ce19f1c13f78c4ba7fcdee7ab15a5412d0507e674cd365f757e5f1e82",
+   "chksum_sha256": "ef99a628427a879798626c6fce4838ed0db40fc35223eb88d1cd4ba4df69acd2",
    "format": 1
   },
   {
@@ -30027,7 +30055,7 @@
    "name": "playbooks/service/resolved.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "af76601c45bda6dc0b8538eee4b39f5b7410d6405e3168e8c72189a3b071cba2",
+   "chksum_sha256": "483d81f93cbe472a1652f7d3df10486721957ba82377470379f9c98e1959a662",
    "format": 1
   },
   {
@@ -31308,7 +31336,7 @@
    "name": "playbooks/layer/common.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "275928e33211216e46d05ad4a724c85bde54df5c3ec4114a0f96cf6a57d76942",
+   "chksum_sha256": "e074cb63375471e20c2a0ba29cd38db6bccbe248654dc412f0e158966f5b86e7",
    "format": 1
   },
   {
@@ -31392,7 +31420,7 @@
    "name": "playbooks/tools/dist-upgrade.yml",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "ca07b05c052701a23b84b1763a9189779c452b75e5fc741536ee116a81146b97",
+   "chksum_sha256": "9f3505a6f275621a58afbe91df8dfa65ddecaed2818217fad752c2eaf7dc540f",
    "format": 1
   },
   {
@@ -31602,7 +31630,7 @@
    "name": "CHANGELOG.rst",
    "ftype": "file",
    "chksum_type": "sha256",
-   "chksum_sha256": "581da0a5a76ff74e50c705c7eacbd740af65f7f26f955e35c016d4b9cae47ced",
+   "chksum_sha256": "a85e82966c8fdc07704772e07fcbfc52df375f976ffe88005756a4d0d7273387",
    "format": 1
   }
  ],
