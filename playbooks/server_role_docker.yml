@@ -1,5 +1,4 @@
 ---
-
 - name: Manage Docker server
   hosts: docker
   tasks:
