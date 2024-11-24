@@ -1,5 +1,4 @@
 apt__repositories:
-
   - name: 'docker'
     filename: 'docker.list'
     repo: 'deb https://nexus3.cloud.lab/repository/docker/{{ ansible_distribution|lower }} {{ ansible_distribution_release }} stable'
@@ -12,7 +11,6 @@ docker_server__packages:
   - 'docker-scan-plugin'
 
 docker_server__configuration:
-
   - name: 'registry-mirrors'
     config:
       'registry-mirrors':
