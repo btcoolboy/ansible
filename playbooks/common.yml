@@ -1,5 +1,4 @@
 ---
-
 - name: Initialize operation system
   hosts: all
   tasks:
