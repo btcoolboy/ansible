@@ -1,0 +1,8 @@
+download_url: https://galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/artifacts/freeipa-ansible_freeipa-1.14.5.tar.gz
+format_version: 1.0.0
+name: ansible_freeipa
+namespace: freeipa
+server: https://galaxy.ansible.com/api/
+signatures: []
+version: 1.14.5
+version_url: /api/v3/plugin/ansible/content/published/collections/index/freeipa/ansible_freeipa/versions/1.14.5/

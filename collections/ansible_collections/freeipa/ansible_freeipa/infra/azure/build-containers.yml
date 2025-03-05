@@ -1,0 +1,35 @@
+---
+schedules:
+- cron: "0 0 * * 0"
+  displayName: Weekly Sunday midnight build
+  branches:
+    include:
+    - master
+  always: true
+
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-24.04'
+
+variables: { distros: "fedora-latest,fedora-rawhide,c9s,c10s" }
+
+stages:
+
+- ${{ each distro in split(variables.distros, ',') }}:
+  - stage: build_${{ join('_', split(distro, '-')) }}
+    dependsOn: []
+    jobs:
+    - template: templates/build_container.yml
+      parameters:
+        distro: ${{ distro }}
+
+# Special case for CentOS 8 Stream
+- stage: CentOS_8_Stream
+  dependsOn: []
+  jobs:
+  - template: templates/build_container.yml
+    parameters:
+      distro: c8s
+      # ansible-core 2.17+ cannot be used to deploy on CentOS 8 Stream.
+      ansible_core_version: "<2.17"

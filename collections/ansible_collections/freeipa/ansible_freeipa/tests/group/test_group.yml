@@ -1,13 +1,16 @@
 ---
 - name: Test group
   hosts: "{{ ipa_test_host | default('ipaserver') }}"
-  become: true
-  gather_facts: true
+  become: false
+  gather_facts: false
   module_defaults:
     freeipa.ansible_freeipa.ipauser:
       ipaadmin_password: SomeADMINpassword
       ipaapi_context: "{{ ipa_context | default(omit) }}"
     freeipa.ansible_freeipa.ipagroup:
+      ipaadmin_password: SomeADMINpassword
+      ipaapi_context: "{{ ipa_context | default(omit) }}"
+    freeipa.ansible_freeipa.ipaservice:
       ipaadmin_password: SomeADMINpassword
       ipaapi_context: "{{ ipa_context | default(omit) }}"
 
@@ -50,6 +53,16 @@
         last: Last
     register: result
     failed_when: not result.changed or result.failed
+
+  - name: Ensure test service HTTP is present
+    freeipa.ansible_freeipa.ipaservice:
+      name: "{{ 'HTTP/' + fqdn_at_domain }}"
+    notify: Cleanup http service
+
+  - name: Ensure test service LDAP is present
+    freeipa.ansible_freeipa.ipaservice:
+      name: "{{ 'ldap/' + fqdn_at_domain }}"
+    notify: Cleanup ldap service
 
   # TESTS
 
@@ -298,11 +311,11 @@
     register: result
     failed_when: result.changed or result.failed
 
-  #- ipagroup:
-  #    name: group1
-  #    user:
-  #    - user7
-  #    action: member
+  # - ipagroup:
+  #     name: group1
+  #     user:
+  #     - user7
+  #     action: member
 
   - name: Ensure user user7 is absent in group group1
     freeipa.ansible_freeipa.ipagroup:
@@ -437,3 +450,16 @@
       state: absent
     register: result
     failed_when: not result.changed or result.failed
+
+  # ansible-lint is complaining on the use of 'when' and requiring
+  # the use of handlers.
+  handlers:
+  - name: Cleanup http service
+    freeipa.ansible_freeipa.ipaservice:
+      name: "{{ 'HTTP/' + fqdn_at_domain }}"
+      state: absent
+
+  - name: Cleanup ldap service
+    freeipa.ansible_freeipa.ipaservice:
+      name: "{{ 'ldap/' + fqdn_at_domain }}"
+      state: absent

@@ -72,3 +72,9 @@
         name: oefenweb.dns
       tags: dns
       when: ansible_distribution == 'Debian'
+
+    - name: Manage netplan configuration
+      import_role:
+        name: mrlesmithjr.netplan
+      tags: netplan
+      when: ansible_distribution == 'Ubuntu'

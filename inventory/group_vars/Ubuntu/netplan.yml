@@ -1,0 +1,30 @@
+netplan_configuration: 
+    network:
+      version: 2
+      ethernets:
+        ens3:
+          addresses:
+            - '{{ netplan_ens3_address }}/{{ netplan_ens3_prefix }}'
+          nameservers:
+            addresses: '{{ resolvers }}'
+            search:
+              - '{{ netplan_pri_domain }}'
+          routes:
+            - to: default
+              via: '{{ netplan_gateway }}'
+
+netplan_remove_existing: True
+
+netplan_backup_existing: True
+
+netplan_pri_domain: 'cloud.lab'
+
+netplan_check_install: false
+
+netplan_apply: false
+
+netplan_ens3_address: "{{ hostvars[inventory_hostname]['ansible_ens3']['ipv4']['address'] }}"
+
+netplan_ens3_prefix: "{{ hostvars[inventory_hostname]['ansible_ens3']['ipv4']['prefix'] }}"
+
+netplan_gateway: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['gateway'] }}"

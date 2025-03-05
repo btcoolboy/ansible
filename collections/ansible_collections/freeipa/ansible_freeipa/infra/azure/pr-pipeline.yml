@@ -1,0 +1,39 @@
+---
+trigger:
+- master
+
+pool:
+  vmImage: 'ubuntu-20.04'
+
+variables:
+  distros: "fedora-latest,c10s,c9s,c8s,fedora-rawhide"
+  ansible_version: "-core >=2.15,<2.16"
+
+stages:
+
+# Test with repository in all distros
+
+- ${{ each distro in split(variables.distros, ',') }}:
+  - stage: ${{ replace(distro, '-', '_') }}_ansible_2_16
+    dependsOn: []
+    jobs:
+    - template: templates/run_tests.yml
+      parameters:
+        build_number: $(Build.BuildNumber)
+        distro: ${{ distro }}
+        ansible_version: ${{ variables.ansible_version }}
+        skip_git_test: false
+        test_galaxy: false
+
+# Galaxy on Fedora
+
+- stage: galaxy_fedora_latest_ansible_2_16
+  dependsOn: []
+  jobs:
+  - template: templates/run_tests.yml
+    parameters:
+      build_number: $(Build.BuildNumber)
+      distro: fedora-latest
+      ansible_version: ${{ variables.ansible_version }}
+      skip_git_test: false
+      test_galaxy: true

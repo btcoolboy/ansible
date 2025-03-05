@@ -1,0 +1,43 @@
+---
+- name: Test users present and absent with slice
+  hosts: ipaserver
+  become: true
+  gather_facts: false
+
+  vars:
+    slice_size: 100
+  tasks:
+  - name: Include generate_test_data.yml
+    ansible.builtin.include_tasks: generate_test_data.yml
+
+  - name: Size of user_list
+    ansible.builtin.debug:
+      msg: "{{ user_list | length }}"
+
+  - name: Size of user_absent_list
+    ansible.builtin.debug:
+      msg: "{{ user_absent_list | length }}"
+
+  - name: Cleanup test users
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      users: "{{ user_absent_list[item : item + slice_size] }}"
+      state: absent
+    loop: "{{ range(0, user_absent_list | length, slice_size) | list }}"
+
+  - name: Users present
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      users: "{{ user_list[item : item + slice_size] }}"
+    loop: "{{ range(0, user_list | length, slice_size) | list }}"
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Users absent
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      users: "{{ user_absent_list[item : item + slice_size] }}"
+      state: absent
+    loop: "{{ range(0, user_absent_list | length, slice_size) | list }}"
+    register: result
+    failed_when: not result.changed or result.failed

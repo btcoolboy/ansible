@@ -1,0 +1,38 @@
+---
+- name: Test users present and absent
+  hosts: ipaserver
+  become: true
+  gather_facts: false
+
+  tasks:
+  - name: Include generate_test_data.yml
+    ansible.builtin.include_tasks: generate_test_data.yml
+
+  - name: Size of user_list
+    ansible.builtin.debug:
+      msg: "{{ user_list | length }}"
+
+  - name: Size of user_absent_list
+    ansible.builtin.debug:
+      msg: "{{ user_absent_list | length }}"
+
+  - name: Cleanup test users
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      users: "{{ user_absent_list }}"
+      state: absent
+
+  - name: Users present
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      users: "{{ user_list }}"
+    register: result
+    failed_when: not result.changed or result.failed
+
+  - name: Users absent
+    freeipa.ansible_freeipa.ipauser:
+      ipaadmin_password: SomeADMINpassword
+      users: "{{ user_absent_list }}"
+      state: absent
+    register: result
+    failed_when: not result.changed or result.failed

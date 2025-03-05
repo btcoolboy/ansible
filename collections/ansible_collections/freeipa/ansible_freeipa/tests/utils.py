@@ -43,6 +43,10 @@ def get_ssh_password():
     return os.getenv("IPA_SSH_PASSWORD")
 
 
+def get_python_interpreter():
+    return os.getenv("IPA_PYTHON_PATH")
+
+
 def get_server_host():
     return os.getenv("IPA_SERVER_HOST")
 
@@ -97,6 +101,12 @@ def get_inventory_content():
     if sshpass:
         ipa_server_host += " ansible_ssh_pass=%s" % sshpass
 
+    python_interpreter = get_python_interpreter()
+    if python_interpreter:
+        ipa_server_host += (
+            " ansible_python_interpreter=%s" % python_interpreter
+        )
+
     lines = [
         "[ipaserver]",
         ipa_server_host,
@@ -138,11 +148,33 @@ def write_logs(result, test_name):
         log_file.write(result.stderr.decode("utf-8"))
 
 
+def _truncate(lines, charcount, minlines=0):
+    output = ""
+    line_count = 1
+    for i in range(len(lines) - 1, -1, -1):
+        if len(output) + len(lines[i]) + 1 <= charcount or \
+           line_count < minlines:
+            output = lines[i] + "\n" + output
+            line_count += 1
+        else:
+            remaining = charcount - len(output) - 1 - 4
+            if remaining > 60:
+                output = "... " + lines[i][-(remaining):] + "\n" + output
+            break
+    return output
+
+
 def _run_playbook(playbook):
     """
     Create a inventory using a temporary file and run ansible using it.
 
     The logs of the run will be placed in `tests/logs/`.
+
+    In case of failure the tail of the error message will be displayed
+    as an assertion message.
+
+    The full log of the execution will be available in the directory
+    `tests/logs/`.
     """
     with tempfile.NamedTemporaryFile() as inventory_file:
         inventory_file.write(get_inventory_content())
@@ -152,14 +184,45 @@ def _run_playbook(playbook):
         if verbose is not None:
             cmd_options.append(verbose)
         cmd = ["ansible-playbook"] + cmd_options + [playbook]
-        # pylint: disable=subprocess-run-check
         process = subprocess.run(
-            cmd, cwd=SCRIPT_DIR, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            cmd, cwd=SCRIPT_DIR, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE, check=False
         )
     test_name = get_test_name_from_playbook_path(playbook)
     write_logs(process, test_name)
 
-    return process
+    msg = ""
+    if process.returncode != 0:
+        status_code_msg = "ansible-playbook return code: {0}".format(
+            process.returncode
+        )
+
+        _stdout = process.stdout.decode("utf8")
+        _stderr = process.stderr.decode("utf8")
+        # Truncate stdout and stderr in the way that it hopefully
+        # shows all important information. At least 15 lines of stdout
+        # (Ansible tasks) and remaining from stderr to fill up to
+        # maxlen size.
+        maxlen = 2000
+        factor = maxlen / (len(_stdout) + len(_stderr))
+        stdout = _truncate(_stdout.splitlines(),
+                           int(factor * len(_stdout)),
+                           minlines=15)
+        stderr = _truncate(_stderr.splitlines(), maxlen - len(stdout))
+
+        msg = "\n".join(
+            [
+                "",
+                "-" * 30 + " Captured stdout " + "-" * 30,
+                stdout,
+                "-" * 30 + " Captured stderr " + "-" * 30,
+                stderr
+            ]
+        )
+        msg += "-" * 30 + " Playbook Return Code " + "-" * 30 + "\n"
+        msg += status_code_msg
+
+    return process, msg
 
 
 def run_playbook(playbook, allow_failures=False):
@@ -168,37 +231,10 @@ def run_playbook(playbook, allow_failures=False):
 
     Call ansible (using _run_playbook function) and assert the result of
     the execution.
-
-    In case of failure the tail of the error message will be displayed
-    as an assertion message.
-
-    The full log of the execution will be available in the directory
-    `tests/logs/`.
     """
-    result = _run_playbook(playbook)
-
-    if allow_failures:
-        return result
-
-    status_code_msg = "ansible-playbook return code: {0}".format(
-        result.returncode
-    )
-    assert_msg = "\n".join(
-        [
-            "",
-            "-" * 30 + " Captured stdout " + "-" * 30,
-            result.stdout.decode("utf8"),
-            "-" * 30 + " Captured stderr " + "-" * 30,
-            result.stderr.decode("utf8"),
-            "-" * 30 + " Playbook Return Code " + "-" * 30,
-            status_code_msg,
-        ]
-    )
-
-    # Need to get the last bytes of msg otherwise Azure
-    #   will cut it out.
-    assert result.returncode == 0, assert_msg[-2500:]
-
+    result, assert_msg = _run_playbook(playbook)
+    if not allow_failures:
+        assert result.returncode == 0, assert_msg
     return result
 
 

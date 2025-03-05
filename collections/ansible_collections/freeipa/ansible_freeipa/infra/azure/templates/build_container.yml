@@ -1,0 +1,45 @@
+---
+parameters:
+  - name: distro
+    type: string
+  - name: python_version
+    type: string
+    default: 3.x
+  - name: ansible_core_version
+    default: ""
+
+jobs:
+- job: BuildTestImage_${{ join('_', split(parameters.distro, '-')) }}
+  displayName: Build ${{ parameters.distro }} test container
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '${{ parameters.python_version }}'
+
+  - script: python -m pip install --upgrade pip "ansible-core${{ parameters.ansible_core_version }}"
+    retryCountOnTaskFailure: 5
+    displayName: Install tools
+
+  - script: ansible-galaxy collection install containers.podman
+    displayName: Install Ansible Galaxy collections
+
+  - script: infra/image/build.sh -s ${{ parameters.distro }}
+    displayName: Build ${{ parameters.distro }} base image
+    env:
+      ANSIBLE_ROLES_PATH: "${PWD}/roles"
+      ANSIBLE_LIBRARY: "${PWD}/plugins/modules"
+      ANSIBLE_MODULE_UTILS: "${PWD}/plugins/module_utils"
+
+  - script: podman login -u="$QUAY_ROBOT_USERNAME" -p="$QUAY_ROBOT_TOKEN" quay.io
+    displayName: Registry login
+    env:
+      # Secrets needs to be mapped as env vars to work properly
+      QUAY_ROBOT_TOKEN: $(QUAY_ROBOT_TOKEN)
+
+  - script: |
+      podman push quay.io/ansible-freeipa/upstream-tests:${{parameters.distro}}-base quay.io/ansible-freeipa/upstream-tests:${{ parameters.distro }}-base
+    displayName: Push base image
+
+  - script: |
+      podman push quay.io/ansible-freeipa/upstream-tests:${{ parameters.distro }}-server quay.io/ansible-freeipa/upstream-tests:${{ parameters.distro }}-server
+    displayName: Push server image

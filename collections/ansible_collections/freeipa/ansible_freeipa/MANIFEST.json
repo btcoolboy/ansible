@@ -2,7 +2,7 @@
  "collection_info": {
   "namespace": "freeipa",
   "name": "ansible_freeipa",
-  "version": "1.13.2",
+  "version": "1.14.5",
   "authors": [
    "Thomas Woerner <twoerner@redhat.com>"
   ],
@@ -31,7 +31,7 @@
   "name": "FILES.json",
   "ftype": "file",
   "chksum_type": "sha256",
-  "chksum_sha256": "0bbee70ae9be84cf26b579a9a85d74e57d5dc2b153d0c3e3495d0779a6b674d7",
+  "chksum_sha256": "fd4159e6900ba7c90369c7461376a5331cadb27cad7d47275cb2451067fdca8d",
   "format": 1
  },
  "format": 1

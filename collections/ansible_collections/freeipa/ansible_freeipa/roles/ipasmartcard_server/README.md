@@ -27,14 +27,14 @@ Supported Distributions
 
 * RHEL/CentOS 7.6+
 * CentOS Stream 8+
-* Fedora 26+
+* Fedora 40+
 
 
 Requirements
 ------------
 
 **Controller**
-* Ansible version: 2.15+
+* Ansible version: 2.14+
 
 **Node**
 * Supported FreeIPA version (see above)

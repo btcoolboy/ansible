@@ -1,0 +1,79 @@
+---
+schedules:
+- cron: "0 19 * * *"
+  displayName: Nightly Builds
+  branches:
+    include:
+    - master
+  always: true
+
+trigger: none
+
+pool:
+  vmImage: 'ubuntu-20.04'
+
+variables:
+  # We need to have two sets, as c8s is not supported by all ansible versions
+  recent_distros: "fedora-latest,fedora-rawhide,c10s,c9s"
+  distros: "fedora-latest,fedora-rawhide,c10s,c9s,c8s"
+  ansible_latest: "-core"
+  ansible_minimum: "-core <2.16"
+  ansible_version: "-core >=2.16,<2.17"
+
+stages:
+
+# Minimum ansible
+
+- ${{ each distro in split(variables.distros, ',') }}:
+  - stage: ${{ replace(distro, '-', '_') }}_ansible_2_15
+    dependsOn: []
+    jobs:
+    - template: templates/group_tests.yml
+      parameters:
+        build_number: $(Build.BuildNumber)
+        distro: fedora-latest
+        ansible_version: ${{ variables.ansible_minimum }}
+        skip_git_test: true
+        test_galaxy: false
+
+# Latest ansible
+
+- ${{ each distro in split(variables.recent_distros, ',') }}:
+  - stage: ${{ replace(distro, '-', '_') }}_ansible_latest
+    dependsOn: []
+    jobs:
+    - template: templates/group_tests.yml
+      parameters:
+        build_number: $(Build.BuildNumber)
+        distro: ${{ distro }}
+        ansible_version: ${{ variables.ansible_latest }}
+        skip_git_test: true
+        test_galaxy: false
+
+# Selected ansible-core version
+
+- ${{ each distro in split(variables.distros, ',') }}:
+  - stage: ${{ replace(distro, '-', '_') }}_ansible_2_16
+    dependsOn: []
+    jobs:
+    - template: templates/group_tests.yml
+      parameters:
+        build_number: $(Build.BuildNumber)
+        distro: ${{ distro }}
+        ansible_version: ${{ variables.ansible_version }}
+        skip_git_test: true
+        test_galaxy: false
+
+# Galaxy collection with selected ansible-core version
+
+- ${{ each distro in split(variables.distros, ',') }}:
+  - stage: galaxy_${{ replace(distro, '-', '_') }}_asible_2_16
+    dependsOn: []
+    jobs:
+    - template: templates/group_tests.yml
+      parameters:
+        build_number: $(Build.BuildNumber)
+        distro: ${{ distro }}
+        ansible_version: ${{ variables.ansible_version }}
+        skip_git_test: true
+        test_galaxy: true
