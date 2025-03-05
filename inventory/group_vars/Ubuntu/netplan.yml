@@ -6,7 +6,7 @@ netplan_configuration:
           addresses:
             - '{{ netplan_ens3_address }}/{{ netplan_ens3_prefix }}'
           nameservers:
-            addresses: '{{ resolvers }}'
+            addresses: '{{ netplan_resolvers }}'
             search:
               - '{{ netplan_pri_domain }}'
           routes:
@@ -28,3 +28,7 @@ netplan_ens3_address: "{{ hostvars[inventory_hostname]['ansible_ens3']['ipv4']['
 netplan_ens3_prefix: "{{ hostvars[inventory_hostname]['ansible_ens3']['ipv4']['prefix'] }}"
 
 netplan_gateway: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['gateway'] }}"
+
+netplan_resolvers:
+  - 10.200.101.20
+  - 10.200.101.254
