@@ -1,0 +1,8 @@
+---
+- name: debian | installing squid
+  ansible.builtin.apt:
+    name: "{{ squid_package }}"
+    state: present
+  become: true
+  register: result
+  until: result is successful

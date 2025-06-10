@@ -1,0 +1,70 @@
+---
+- name: config_squid_transparent_proxy | ensuring ferm is installed
+  ansible.builtin.apt:
+    name: ferm
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: ansible_os_family == "Debian"
+
+- name: config_squid_transparent_proxy | ensuring ferm is installed (RedHat)
+  ansible.builtin.yum:
+    name: ferm
+    state: present
+  become: true
+  register: result
+  until: result is successful
+  when: ansible_os_family == "RedHat"
+
+- name: config_squid_transparent_proxy | creating ferm directory
+  ansible.builtin.file:
+    path: /etc/ferm
+    state: directory
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  become: true
+
+- name: config_squid_transparent_proxy | creating ferm configuration directory
+  ansible.builtin.file:
+    path: /etc/ferm/ferm.d
+    state: directory
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  become: true
+
+- name: config_squid_transparent_proxy | configuring ferm default rules
+  ansible.builtin.template:
+    src: etc/ferm/ferm.conf.j2
+    dest: /etc/ferm/ferm.conf
+    mode: u=rw,g=r,o=r
+  become: true
+  notify: reload ferm
+
+- name: config_squid_transparent_proxy | configuring transparent proxy rule(s)
+  ansible.builtin.template:
+    src: etc/ferm/ferm.d/900_transparent_squid_proxy.conf.j2
+    dest: /etc/ferm/ferm.d/900_transparent_squid_proxy.conf
+    mode: u=rw,g=r,o=r
+  become: true
+  notify: reload ferm
+
+- name: config_squid_transparent_proxy | creating symlink for RedHat based installs
+  ansible.builtin.file:
+    src: /etc/ferm/ferm.conf
+    dest: /etc/ferm.conf
+    owner: root
+    group: root
+    state: link
+  become: true
+  notify: reload ferm
+  when: ansible_os_family == "RedHat"
+
+- name: config_squid_transparent_proxy | ensuring ferm is started and enabled
+  ansible.builtin.service:
+    name: ferm
+    state: started
+    enabled: true
+  become: true

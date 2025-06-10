@@ -1,0 +1,7 @@
+---
+- name: Example Playbook
+  hosts: all
+  tasks:
+    - name: Include ansible-squid
+      ansible.builtin.include_role:
+        name: ansible-squid

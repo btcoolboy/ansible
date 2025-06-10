@@ -1,0 +1,11 @@
+---
+- name: config_squid | Configuring Squid
+  ansible.builtin.template:
+    src: "{{ item.source }}"
+    dest: "{{ squid_root_dir }}/{{ item.name }}"
+    owner: root
+    group: root
+    mode: u=rw,g=r,o=r
+  loop: "{{ squid_config_files }}"
+  become: true
+  notify: "restart {{ squid_service }}"

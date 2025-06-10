@@ -1,0 +1,43 @@
+---
+- name: set_facts | Setting RedHat Facts
+  ansible.builtin.set_fact:
+    squid_package: squid
+    squid_root_dir: /etc/squid
+    squid_service: squid
+  when: ansible_os_family == "RedHat"
+
+- name: set_facts | Setting Debian < 9 Facts
+  ansible.builtin.set_fact:
+    squid_package: squid3
+    squid_root_dir: /etc/squid3
+    squid_service: squid3
+  when:
+    - ansible_distribution == "Debian"
+    - ansible_distribution_version is version('9', '<')
+
+- name: set_facts | Setting Debian >= 9 Facts
+  ansible.builtin.set_fact:
+    squid_package: squid
+    squid_root_dir: /etc/squid
+    squid_service: squid
+  when:
+    - ansible_distribution == "Debian"
+    - ansible_distribution_version is version('9', '>=')
+
+- name: set_facts | Setting Ubuntu < 16.04 Facts
+  ansible.builtin.set_fact:
+    squid_package: squid3
+    squid_root_dir: /etc/squid3
+    squid_service: squid3
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_version is version('16.04', '<')
+
+- name: set_facts | Setting Ubuntu >= 16.04 Facts
+  ansible.builtin.set_fact:
+    squid_package: squid
+    squid_root_dir: /etc/squid
+    squid_service: squid
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_version is version('16.04', '>=')

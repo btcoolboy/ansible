@@ -3,6 +3,6 @@ ntp__daemon_enabled: 'True'
 ntp__daemon: 'chrony'
 
 ntp__servers:
-  - 'vm-data-20.cloud.lab burst iburst minpoll 4 maxpoll 4'
+  - 'ntp.aliyun.com burst iburst minpoll 4 maxpoll 4'
 
 ntp__chrony_cmdport: 323

@@ -2,10 +2,10 @@
 10.200.101.165
 10.200.101.164
 10.200.101.181
+h77itx-homeserver ansible_host=10.200.101.10
 
 [Debian:vars]
 ansible_ssh_user=debian
-become=True
 
 [Ubuntu]
 ubuntu-template ansible_host=10.200.101.160
@@ -19,4 +19,3 @@ k8s-adm
 
 [Ubuntu:vars]
 ansible_ssh_user=ubuntu
-become=True
