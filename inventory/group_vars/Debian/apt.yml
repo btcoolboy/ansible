@@ -1,5 +1,7 @@
+include_vars: group_vars/all/vars.yml
+
 apt__distribution_repository_map:
-  'Debian': 'https://mirrors.aliyun.com/debian/'
+  'Debian': 'https://{{ repository_url }}/debian/'
 
 apt__nonfree: 'True'
 
@@ -8,7 +10,7 @@ apt__nonfree_firmware: 'True'
 apt__sources:
   - name: 'debian-release-security'
     types: '{{ apt__archive_types }}'
-    uri: 'https://mirrors.aliyun.com/debian-security/'
+    uri: 'https://{{ repository_url }}/debian-security/'
     suites:
       - '{{ apt__distribution_release + "-security" }}'
     components: [ 'main' ]
@@ -24,7 +26,8 @@ apt__combined_sources: '{{ apt__debian_sources
 apt__repositories:
   - name: 'ceph-v18'
     filename: 'ceph-v18.list'
-    repo: 'deb https://mirrors.aliyun.com/ceph/debian-reef/ {{ ansible_distribution_release }} main'
+    repo: 'deb https://{{ repository_url }}/ceph/debian-reef/ {{ ansible_distribution_release }} main'
+    signed_by: 'https://{{ repository_url }}/ceph/keys/release.asc'
     state: '{{ "present"
                if (ansible_distribution == "Debian" and 
                    ansible_distribution_release in ["bookworm"] and
@@ -32,7 +35,8 @@ apt__repositories:
                else "ignore" }}'
   - name: 'ceph-v17'
     filename: 'ceph-v17.list'
-    repo: 'deb https://mirrors.aliyun.com/ceph/debian-quincy/ {{ ansible_distribution_release }} main'
+    repo: 'deb https://{{ repository_url }}/ceph/debian-quincy/ {{ ansible_distribution_release }} main'
+    signed_by: 'https://{{ repository_url }}/ceph/keys/release.asc'
     state: '{{ "present"
                if (ansible_distribution == "Debian" and
                    ansible_distribution_release in ["bullseye"] and

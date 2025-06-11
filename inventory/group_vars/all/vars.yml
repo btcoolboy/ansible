@@ -1,1 +1,5 @@
-proxy: 'http://10.200.101.20:3128'
+proxy: 'http://10.200.101.10:3128'
+
+repository_url: 'mirrors.aliyun.com'
+
+ntp_url: 'ntp.aliyun.com'

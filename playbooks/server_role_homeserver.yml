@@ -1,0 +1,18 @@
+---
+- name: Manage Home server
+  hosts: homeserver
+  tasks:
+    - name: Manage Squid proxy
+      import_role:
+        name: mrlesmithjr.squid
+      tags: squid
+
+    - name: Manage Docker server
+      import_role:
+        name: debops.debops.docker_server
+      tags: docker_server
+
+    - name: Manage systemd service
+      import_role:
+        name: debops.debops.systemd
+      tags: systemd

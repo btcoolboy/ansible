@@ -4,7 +4,7 @@
   tasks:
     - name: Add Ceph apt key
       ansible.builtin.get_url:
-        url: "https://mirrors.aliyun.com/ceph/keys/release.asc"
+        url: "https://{{ repository_url }}/ceph/keys/release.asc"
         dest: /etc/apt/trusted.gpg.d/ceph.asc
         mode: '0644'
         force: true

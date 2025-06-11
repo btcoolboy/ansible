@@ -11,3 +11,6 @@ k8s-worker[01:03]
 
 [adm]
 k8s-adm
+
+[homeserver]
+h77itx-homeserver
