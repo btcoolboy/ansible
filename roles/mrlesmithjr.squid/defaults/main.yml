@@ -116,6 +116,8 @@ squid_icp_access: all
 
 squid_icp_port: 3130
 
+squid_never_direct: all
+
 # Define primary domain name
 squid_pri_domain_name: example.org
 

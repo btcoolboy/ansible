@@ -72,6 +72,7 @@ refresh_pattern {{ item['regex'] }} {{ item['min'] }} {{ item['percent'] }} {{ i
 {% if squid_cache_peering %}
 icp_access allow {{ squid_icp_access }}
 icp_port {{ squid_icp_port }}
+never_direct allow {{ squid_never_direct }}
 {% endif %}
 {% if (squid_transparent_proxy is defined and not squid_transparent_proxy) or squid_transparent_proxy is not defined %}
 http_port {{ squid_http_port }}
