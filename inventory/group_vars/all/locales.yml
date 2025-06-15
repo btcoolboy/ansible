@@ -1,0 +1,5 @@
+locales__packages: 
+  - locales-all
+
+locales__list: 
+  - zh_CN.UTF-8
