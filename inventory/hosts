@@ -2,7 +2,7 @@
 10.200.101.165
 10.200.101.164
 10.200.101.181
-h77itx-homeserver ansible_host=10.200.101.10
+pve-homeserver ansible_host=10.200.101.10
 
 [Debian:vars]
 ansible_ssh_user=debian

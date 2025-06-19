@@ -1,5 +1,5 @@
 # Installing Ansible
-python3 -m pip install --user ansible
-
+sudo apt install pipx
+pipx install ansible --pip-args="--index-url https://pypi.tuna.tsinghua.edu.cn/simple"
 # Upgrading Ansible
-python3 -m pip install --upgrade --user ansible
+pipx upgrade ansible --pip-args="--index-url https://pypi.tuna.tsinghua.edu.cn/simple"

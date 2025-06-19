@@ -13,4 +13,4 @@ k8s-worker[01:03]
 k8s-adm
 
 [homeserver]
-h77itx-homeserver
+pve-homeserver
