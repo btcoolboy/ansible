@@ -1,5 +1,7 @@
 proxy: 'http://10.200.101.10:3128'
 
-repository_url: 'mirrors.aliyun.com'
+external_repository_url: 'mirrors.aliyun.com'
+internal_repository_url: 'nexus3.cloud.lab/repository'
 
-ntp_url: 'ntp.aliyun.com'
+external_ntp_url: 'ntp.aliyun.com'
+internal_ntp_url: '10.200.101.10'

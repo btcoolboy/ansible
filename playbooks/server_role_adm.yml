@@ -2,6 +2,10 @@
 - name: Initialize Kubernetes adm system
   hosts: adm
   tasks:
+    - name: Include vars
+      include_vars:
+        file: '{{ inventory_dir }}/group_vars/all/vars.yml'
+
     - name: Add helm apt key
       ansible.builtin.get_url:
         url: 'https://nexus3.cloud.lab/repository/helm/signing.asc'

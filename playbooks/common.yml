@@ -2,9 +2,13 @@
 - name: Initialize operation system
   hosts: all
   tasks:
+    - name: Include vars
+      include_vars:
+        file: '{{ inventory_dir }}/group_vars/all/vars.yml'
+
     - name: Add Ceph apt key
       ansible.builtin.get_url:
-        url: "https://{{ repository_url }}/ceph/keys/release.asc"
+        url: "https://{{ external_repository_url }}/ceph/keys/release.asc"
         dest: /etc/apt/trusted.gpg.d/ceph.asc
         mode: '0644'
         force: true

@@ -1,14 +1,16 @@
 apt__repositories:
   - name: 'helm'
     filename: 'helm.list'
-    repo: 'deb https://nexus3.cloud.lab/repository/helm/stable/debian/ all main'
+    repo: 'deb https://{{ internal_repository_url }}/helm/stable/debian/ all main'
     state: 'present'
 
   - name: 'kubernetes'
     filename: 'kubernetes.list'
-    repo: 'deb https://nexus3.cloud.lab/repository/kubernetes/core:/stable:/v1.30/deb/ /'
+    repo: 'deb https://{{ internal_repository_url }}/kubernetes/core:/stable:/v{{ kunbernetes_version }}/deb/ /'
     state: 'present'
 
 apt_install__packages:
   - 'helm'
   - 'kubectl'
+
+kunbernetes_version: 1.30

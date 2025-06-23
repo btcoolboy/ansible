@@ -1,7 +1,7 @@
 apt__repositories:
   - name: 'docker'
     filename: 'docker.list'
-    repo: 'deb https://nexus3.cloud.lab/repository/docker/{{ ansible_distribution|lower }} {{ ansible_distribution_release }} stable'
+    repo: 'deb https://{{ internal_repository_url }}/docker/{{ ansible_distribution|lower }} {{ ansible_distribution_release }} stable'
     state: 'present'
 
 docker_server__upstream: True
@@ -14,5 +14,7 @@ docker_server__configuration:
   - name: 'registry-mirrors'
     config:
       'registry-mirrors':
-        - 'https://registry.cloud.lab'
+        - 'https://{{ internal_registry_url }}'
     state: 'present'
+
+internal_registry_url: 'registry.cloud.lab'

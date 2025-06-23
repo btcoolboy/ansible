@@ -1,10 +1,8 @@
-include_vars: group_vars/all/vars.yml
-
 ntp__daemon_enabled: 'True'
 
 ntp__daemon: 'chrony'
 
 ntp__servers:
-  - '{{ ntp_url }} burst iburst minpoll 4 maxpoll 4'
+  - '{{ internal_ntp_url }} burst iburst minpoll 4 maxpoll 4'
 
 ntp__chrony_cmdport: 323
