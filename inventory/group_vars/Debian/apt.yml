@@ -56,3 +56,4 @@ apt_install__packages:
   - 'tig'
   - 'htop'
   - 'pipx'
+  - 'vim'
