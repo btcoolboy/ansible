@@ -1,0 +1,13 @@
+---
+- name: Manage Freeipa server
+  hosts: freeipa
+  tasks:
+    - name: Manage Docker server
+      import_role:
+        name: debops.debops.docker_server
+      tags: docker_server
+
+    - name: Manage systemd service
+      import_role:
+        name: debops.debops.systemd
+      tags: systemd

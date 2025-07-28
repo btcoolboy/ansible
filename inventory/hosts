@@ -3,6 +3,7 @@
 10.200.101.164
 10.200.101.181
 pve-homeserver ansible_host=10.200.101.10
+pve-freeipa ansible_host=10.200.101.30
 
 [Debian:vars]
 ansible_ssh_user=debian

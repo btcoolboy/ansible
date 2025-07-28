@@ -1,0 +1,13 @@
+systemd__dependent_units:
+  - '{{ docker_server__systemd__dependent_units }}'
+
+docker_server__systemd__dependent_units:
+  - name: 'docker.service.d/proxy.conf'
+    comment: 'Proxy configuration for Docker'
+    raw: |
+      [Service]
+      Environment="http_proxy={{ proxy }}"
+      Environment="https_proxy={{ proxy }}"
+      Environment="no_proxy=localhost,127.0.0.1,cloud.lab"
+    state: 'present'
+    restart: 'docker.service'
