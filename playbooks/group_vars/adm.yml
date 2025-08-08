@@ -9,7 +9,7 @@ apt__repositories:
 
   - name: 'kubernetes'
     filename: 'kubernetes.sources'
-    repo: 'https://{{ internal_repository_url }}/kubernetes/core:/stable:/v{{ kunbernetes_version }}/deb'
+    uris: 'https://{{ internal_repository_url }}/kubernetes/core:/stable:/v{{ kunbernetes_version }}/deb'
     signed_by: 'https://{{ internal_repository_url }}/repository/kubernetes/core:/stable:/v{{ kunbernetes_version }}/deb/Release.key'
     state: 'present'
 
