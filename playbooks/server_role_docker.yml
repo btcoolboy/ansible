@@ -6,15 +6,6 @@
       include_vars:
         file: '{{ inventory_dir }}/group_vars/all/vars.yml'
 
-    - name: Add Docker apt key
-      ansible.builtin.get_url:
-        url: "https://nexus3.cloud.lab/repository/docker/debian/gpg"
-        dest: /etc/apt/trusted.gpg.d/docker.asc
-        mode: '0644'
-        force: true
-      register: add_repository_key
-      ignore_errors: true
-
     - name: Manage Advanced Package Manager
       import_role:
         name: debops.debops.apt

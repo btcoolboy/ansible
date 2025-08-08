@@ -1,7 +1,10 @@
 apt__repositories:
   - name: 'docker'
-    filename: 'docker.list'
-    repo: 'deb https://{{ internal_repository_url }}/docker/{{ ansible_distribution|lower }} {{ ansible_distribution_release }} stable'
+    filename: 'docker.sources'
+    uris: 'https://{{ internal_repository_url }}/docker/{{ ansible_distribution|lower }}'
+    signed_by: 'https://{{ internal_repository_url }}/repository/docker/debian/gpg'
+    suites: '{{ ansible_distribution_release }}'
+    components: 'stable'
     state: 'present'
 
 docker_server__upstream: True

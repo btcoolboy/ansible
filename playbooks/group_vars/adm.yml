@@ -1,12 +1,16 @@
 apt__repositories:
   - name: 'helm'
-    filename: 'helm.list'
-    repo: 'deb https://{{ internal_repository_url }}/helm/stable/debian/ all main'
+    filename: 'helm.sources'
+    uris: 'https://{{ internal_repository_url }}/helm/stable/debian'
+    signed_by: 'https://{{ internal_repository_url }}/repository/helm/signing.asc'
+    suites: 'all'
+    components: 'main'
     state: 'present'
 
   - name: 'kubernetes'
-    filename: 'kubernetes.list'
-    repo: 'deb https://{{ internal_repository_url }}/kubernetes/core:/stable:/v{{ kunbernetes_version }}/deb/ /'
+    filename: 'kubernetes.sources'
+    repo: 'https://{{ internal_repository_url }}/kubernetes/core:/stable:/v{{ kunbernetes_version }}/deb'
+    signed_by: 'https://{{ internal_repository_url }}/repository/kubernetes/core:/stable:/v{{ kunbernetes_version }}/deb/Release.key'
     state: 'present'
 
 apt_install__packages:

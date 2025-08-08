@@ -6,24 +6,6 @@
       include_vars:
         file: '{{ inventory_dir }}/group_vars/all/vars.yml'
 
-    - name: Add helm apt key
-      ansible.builtin.get_url:
-        url: 'https://nexus3.cloud.lab/repository/helm/signing.asc'
-        dest: '/etc/apt/trusted.gpg.d/helm-apt-keyring.asc'
-        mode: '0644'
-        force: true
-      register: add_repository_key
-      ignore_errors: true
-
-    - name: Add k8s apt key
-      ansible.builtin.get_url:
-        url: 'https://nexus3.cloud.lab/repository/kubernetes/core:/stable:/v1.30/deb/Release.key'
-        dest: '/etc/apt/trusted.gpg.d/kubernetes-apt-keyring.asc'
-        mode: '0644'
-        force: true
-      register: add_repository_key
-      ignore_errors: true
-
     - name: Manage Advanced Package Manager
       import_role:
         name: debops.debops.apt
