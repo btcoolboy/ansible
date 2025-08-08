@@ -1,0 +1,92 @@
+apt__distribution_repository_map:
+  'Debian': 'https://{{ external_repository_url }}/debian'
+  'Ubuntu': 'https://{{ internal_repository_url }}/ubuntu'
+
+apt__nonfree: 'True'
+
+apt__nonfree_firmware: 'True'
+
+apt__sources:
+  - name: 'debian-release-security'
+    types: '{{ apt__archive_types }}'
+    uri: 'https://{{ external_repository_url }}/debian-security/'
+    suites:
+      - '{{ apt__distribution_release + "-security" }}'
+    components: [ 'main' ]
+    state: '{{ "present"
+               if (apt__distribution == "Debian" and
+                   apt__distribution_release not in apt__debian_archived_releases and
+                   apt__distribution_version != "n/a")
+               else "ignore" }}'
+
+  - name: 'ubuntu-release-partner'
+    comment: |
+      Uncomment the following two lines to add software from Canonical's
+      'partner' repository.
+      This software is not part of Ubuntu, but is offered by Canonical and the
+      respective vendors as a service to Ubuntu users.
+    types: '{{ apt__archive_types }}'
+    uri: 'http://archive.canonical.com/ubuntu'
+    suites:
+      - '{{ apt__distribution_release }}'
+    components: [ 'partner' ]
+    state: 'absent'
+
+apt__combined_sources: '{{ apt__debian_sources
+                           + apt__ubuntu_sources
+                           + apt__sources }}'
+
+apt__repositories:
+  - name: 'ceph-v19-debian'
+    filename: 'ceph-v19-debian.sources'
+    uris: 'https://{{ external_repository_url }}/ceph/debian-squid'
+    signed_by: 'https://{{ external_repository_url }}/ceph/keys/release.asc'
+    suites: '{{ ansible_distribution_release }}'
+    components:
+      - 'main'
+    state: '{{ "present"
+               if (ansible_distribution == "Debian" and 
+                   ansible_distribution_release in ["bookworm"] and
+                   apt__distribution_version != "n/a")
+               else "ignore" }}'
+
+  - name: 'ceph-v18-ubuntu'
+    filename: 'ceph-v18-ubuntu.sources'
+    repo: 'https://{{ internal_repository_url }}/ceph/debian-reef'
+    signed_by: 'https://{{ external_repository_url }}/ceph/keys/release.asc'
+    suites: '{{ ansible_distribution_release }}'
+    components:
+      - 'main'
+    state: '{{ "present"
+               if (ansible_distribution == "Ubuntu" and 
+                   ansible_distribution_release in ["focal"] and
+                   apt__distribution_version != "n/a")
+               else "ignore" }}'
+
+  - name: 'ceph-v19-ubuntu'
+    filename: 'ceph-v19-ubuntu.sources'
+    repo: 'https://{{ internal_repository_url }}/ceph/debian-squid'
+    signed_by: 'https://{{ external_repository_url }}/ceph/keys/release.asc'
+    suites: '{{ ansible_distribution_release }}'
+    components:
+      - 'main'
+    state: '{{ "present"
+               if (ansible_distribution == "Ubuntu" and 
+                   ansible_distribution_release in ["jammy"] and
+                   apt__distribution_version != "n/a")
+               else "ignore" }}'
+
+apt__configuration:
+  - name: 'verify-peer'
+    filename: '99verify-peer.conf'
+    raw: |
+      Acquire { https::Verify-Peer false }
+    state: 'present'
+
+apt_install__packages:
+  - 'byobu'
+  - 'git'
+  - 'tig'
+  - 'htop'
+  - 'pipx'
+  - 'vim'
